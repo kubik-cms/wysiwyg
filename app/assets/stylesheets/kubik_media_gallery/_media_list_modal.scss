@@ -1,0 +1,21 @@
+.kubik-modal-element-window {
+  .media-library-listing-container {
+    display: grid;
+    height: calc(100% - 60px);
+    grid-template-rows: auto 1fr auto;
+    background-color: var(--kubik-interface-color-grey-100);
+  }
+  .kubik-media-library-listing {
+    overflow-y: auto;
+  }
+  .kubik-pagination {
+    background-color: white;
+    .pagination {
+      margin-bottom: 0;
+    }
+  }
+  #index_footer {
+    border-top: 1px solid var(--kubik-interface-color-grey-200);
+    background-color: white;
+  }
+}

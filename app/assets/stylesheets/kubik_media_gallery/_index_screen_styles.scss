@@ -1,0 +1,62 @@
+#media_list {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+  .kubik-media-gallery--media_item_container {
+    height: calc(100vw - 48px - 1rem);
+    margin: .5rem;
+    @media (min-width: 550px) {
+      flex: 1 1 33%;
+      height: calc(55vw - 48px - 2rem);
+    }
+    @media (min-width: 48em) {
+      flex: 1 1 25%;
+      height: calc(40vw - 48px - 2rem);
+    }
+    @media (min-width: 75em) {
+      flex: 1 1 30%;
+      height: calc((100vw - 288px - 2rem)/3);
+      max-width: calc((100vw - 288px - 2rem)/3);
+    }
+    @media (min-width: 100em) {
+      flex: 1 1 20%;
+      height: calc((100vw - 288px - 2rem)/4);
+      max-width: 250px;
+      height: 250px;
+    }
+    &__small {
+      height: 180px;
+      width: 180px;
+      @media (min-width: 550px) {
+        flex: 1 1 180px;
+        height: 180px;
+      }
+      @media (min-width: 48em) {
+        flex: 1 1 180px;
+        height: 180px;
+      }
+      @media (min-width: 75em) {
+        flex: 1 1 180px;
+        height: 180px;
+      }
+      @media (min-width: 100em) {
+        flex: 1 1 180px;
+        height: 180px;
+      }
+    }
+  }
+}
+
+.admin_kubik_media_uploads .index_as_media_gallery {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+.kubik-modal-element-content {
+  background-color: var(--kubik-interface-color-grey-100);
+}
+.kubik-pagination {
+  @extend %pagination;
+}

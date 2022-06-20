@@ -1,0 +1,103 @@
+.kubik-media-gallery--media_item_container {
+  background: white;
+  display: flex;
+  overflow: hidden;
+  border: 1px solid var(--kubik-interface-color-grey-200);
+  flex: 1 1 auto;
+  flex-direction: column;
+  padding: 1rem;
+  border-radius: .3rem;
+  &--icon {
+    justify-self: flex-end;
+    display: block;
+    width: 1rem;
+    height: 1rem;
+    color: var(--kubik-interface-color-grey-500);
+    &.material-symbols-outlined {
+      font-size: 1rem;
+    }
+  }
+  &--title {
+    padding: var(--kubik-interface-space-300) var(--kubik-interface-space-100);
+    color: var(--kubik-interface-color-grey-500);
+    font-size: var(--kubik-interface-font-size-small);
+    font-weight: 600;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  &--image {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+    justify-content: center;
+    align-items: center;
+
+    &[class*='xls'] { color: #217346; }
+    &[class*='powerpoint'] { color: #d24726; }
+    &[class*='doc'] { color: #2b579a; }
+    &[class*='pdf'] { color: #F40F02; }
+
+    .material-icon {
+      font-size: 5rem;
+      opacity: .8;
+    }
+
+    a { color: inherit; }
+
+    img {
+      object-fit: contain;
+      display:block;
+      max-width: 100%;
+      width: 100%;
+    }
+  }
+  &--status {
+    display: flex;
+    padding-bottom: .5rem;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    .status {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+    }
+    &.uploaded {
+      .status_marker:nth-of-type(1) {
+        background-color: var(--kubik-interface-color-notice);
+      }
+    }
+    &.optimised {
+      .status_marker:nth-of-type(1), .status_marker:nth-of-type(2) {
+        background-color: var(--kubik-interface-color-notice);
+      }
+    }
+    &.thumbnails, &.resizing {
+      .status_marker:nth-of-type(1), .status_marker:nth-of-type(2),
+      .status_marker:nth-of-type(3) {
+        background-color: var(--kubik-interface-color-notice);
+      }
+    }
+    &.ready {
+      .status_marker:nth-of-type(1), .status_marker:nth-of-type(2),
+      .status_marker:nth-of-type(3), .status_marker:nth-of-type(4) {
+        background-color: var(--kubik-interface-color-notice);
+      }
+    }
+    .status_marker {
+      height: 2px;
+      width: 20px;
+      background-color: var(--kubik-interface-color-grey-300);
+      margin-right: 1px;
+    }
+  }
+  &__small {
+    width: 180px;
+    height: 180px;
+    .kubik-media-gallery--media_item_container--title {
+      padding-bottom: 0;
+    }
+  }
+}

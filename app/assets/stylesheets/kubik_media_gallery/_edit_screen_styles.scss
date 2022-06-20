@@ -1,0 +1,35 @@
+#edit_kubik_media_upload {
+  .media_image {
+    width: 100%;
+    padding: 0 0 0 1.5rem;
+    margin-bottom: 1rem;
+  }
+  .version_details .panel_contents {
+    .crop_group {
+      display: flex;
+      justify-content: flex-start;
+      flex-flow: column;
+      border: 1px solid #E6E6E6;
+      margin: 0.9rem 1rem;
+      background: #ffffff;
+      .h4 {
+        margin: 0;
+        padding: 1.25rem;
+        background: var(--kubik-interface-color-white);
+        border-bottom: 1px solid var(--kubik-interface-color-grey-200);
+        color: var(--kubik-interface-color-grey-700);
+        font-weight: 600;
+      }
+      .media_crop_details {
+        padding: 1.25rem;
+      }
+    }
+  }
+  .version_details {
+    h3 {
+      @extend .h3;
+    }
+  }
+
+}
+

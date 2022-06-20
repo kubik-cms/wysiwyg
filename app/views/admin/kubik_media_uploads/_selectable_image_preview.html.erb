@@ -1,0 +1,10 @@
+<div class="kubik-media-gallery--media_item_container--image media_type_<%= file_type[:format] %>">
+  <% if file_type[:type] == 'image' %>
+    <%= image_tag image.admin_image_thumbnail %>
+  <% else %>
+    <%= content_tag :span, class: 'material-symbols-outlined material-icon' do %>
+      <%= file_type[:format].include?('pdf') ? 'picture_as_pdf' : 'docs' %>
+    <% end %>
+  <% end %>
+</div>
+
