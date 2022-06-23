@@ -16,7 +16,7 @@ GIT
 PATH
   remote: .
   specs:
-    kubik_media_library (0.1.1)
+    kubik_media_library (0.1.2)
       aasm (~> 4.12.2)
       activeadmin (>= 1.2.1)
       acts_as_list

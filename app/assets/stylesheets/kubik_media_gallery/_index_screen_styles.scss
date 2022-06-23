@@ -58,5 +58,25 @@
   background-color: var(--kubik-interface-color-grey-100);
 }
 .kubik-pagination {
-  @extend %pagination;
+  @include kubik-typography-para--small;
+  margin-bottom: var(--kubik-interface-space-100); padding-left: var(--kubik-interface-space-350);
+  .page {
+    color: var(--kubik-interface-color-brand-400);
+    margin-right: var(--kubik-interface-space-050);
+    &.current {
+      display: inline-block; padding: .5em .75em;
+      background: var(--kubik-interface-color-brand-400);
+      color: var(--kubik-interface-color-white);
+    }
+    a {
+      display: inline-block;
+      padding: var(--kubik-interface-space-100) var(--kubik-interface-space-300);
+      text-decoration: none;
+      color: inherit;
+      background: var(--kubik-interface-color-white);
+    }
+  }
+  .next a, .last a, .prev a, .first a {
+    @include kubik-link;
+  }
 }

@@ -8,7 +8,7 @@ GIT
 
 GIT
   remote: https://github.com/primate-inc/kubik_styles_base.git
-  revision: c3487d73798f6ddb1b12da8ddab18b1f40da6c45
+  revision: 8e6d0e7f4766b34f51e54c145361c3d22141ade9
   branch: main
   specs:
     kubik_styles_base (0.1.0)
@@ -16,7 +16,7 @@ GIT
 PATH
   remote: /kubik_media_library
   specs:
-    kubik_media_library (0.1.0)
+    kubik_media_library (0.1.2)
       aasm (~> 4.12.2)
       activeadmin (>= 1.2.1)
       acts_as_list

@@ -27,7 +27,7 @@
   }
   .version_details {
     h3 {
-      @extend .h3;
+      @include kubik-typography-h3;
     }
   }
 

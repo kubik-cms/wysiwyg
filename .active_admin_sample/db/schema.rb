@@ -88,7 +88,7 @@ ActiveRecord::Schema.define(version: 2022_05_22_231902) do
     t.datetime "updated_at", null: false
     t.index ["additional_info"], name: "index_kubik_uploads_on_additional_info", using: :gin
     t.index ["kubik_media_upload_id"], name: "index_kubik_uploads_on_kubik_media_upload_id"
-    t.index ["uploadable_type", "uploadable_id"], name: "index_kubik_uploads_on_uploadable"
+    t.index ["uploadable_type", "uploadable_id"], name: "index_kubik_uploads_on_uploadable_type_and_uploadable_id"
   end
 
   create_table "news_articles", force: :cascade do |t|

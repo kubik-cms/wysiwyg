@@ -22,6 +22,8 @@ services:
       RAILS_ENV: test
     depends_on:
       - active_admin_sample_db
+    networks:
+      - development
   active_admin_sample_redis:
     image: redis:4.0-alpine
     command: redis-server

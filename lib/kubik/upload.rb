@@ -19,7 +19,7 @@ module Kubik
 
     default_scope { order(position: :asc) }
 
-    delegate :admin_image_thumbnail, to: :kubik_media_upload
+    delegate :admin_image_thumbnail, :image, :image_url, :file, :file_url, :additional_info, to: :kubik_media_upload
 
     private
 

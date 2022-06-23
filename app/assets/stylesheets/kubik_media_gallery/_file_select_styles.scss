@@ -31,7 +31,7 @@
       margin-right: .25rem;
     }
     &--text {
-      @extend %hint;
+      @include kubik-form-hint;
       margin: 2px 0 0;
     }
     &__brand {
@@ -60,18 +60,18 @@
     }
   }
   &--file_select_header {
-    @extend .h4;
+    @include kubik-typography-h4;
     text-align: center;
     margin-bottom: .5rem;
     transition: color .15s;
   }
   &--file_select_link {
-    @extend %title_link;
+    @include kubik-typography-title;
     margin-bottom: .5rem;
     text-align: center;
   }
   &--file_select_hint {
-    @extend %hint;
+    @include kubik-form-hint;
     text-align: center;
   }
 }

@@ -10,7 +10,7 @@ ActiveAdmin.register Book do
 
 
   index as: :grid, columns: 4 do |book|
-    link_to(book.cover.present? ? image_tag(book.cover.try(:image_url, :thumb_200x200)) : 'No cover', admin_book_path(book))
+    link_to(book.book_cover.present? ? image_tag(book.book_cover.try(:image_url, :thumb_200x200)) : 'No cover', admin_book_path(book))
   end
 
   form do |f|
@@ -54,7 +54,7 @@ ActiveAdmin.register Book do
       row :book_author
       row :genres
       row :book_cover do
-        image_tag book.cover.image_url(:thumb_200x200) if book.cover.present?
+        image_tag book.book_cover.image_url(:thumb_200x200) if book.book_cover.present?
       end
       row :created_at
       row :updated_at

@@ -3,8 +3,8 @@ class Book < ApplicationRecord
 
   GENRES = %i[thriller crime horror fantasy]
 
-  has_one_kubik_upload(:book_cover, :cover)
-  has_many_kubik_uploads(:book_gallery, :gallery)
+  has_one_kubik_upload(:book_cover)
+  has_many_kubik_uploads(:book_gallery)
 
   belongs_to :book_author
   has_many :book_editions
