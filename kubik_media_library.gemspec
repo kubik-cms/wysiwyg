@@ -1,10 +1,10 @@
 Gem::Specification.new do |spec|
   spec.name          = "kubik_media_library"
-  spec.version       = "0.1.3"
+  spec.version       = "0.1.4"
   spec.authors       = ["Bart Oleszczyk"]
   spec.email         = ["bart@primate.co.uk"]
 
-  spec.summary       = "Media Gallery for Kubik CMS"
+  spec.summary       = "Media Library for Kubik CMS"
   spec.description   = "Active admin media library extension"
   spec.homepage      = "https://github.com/primate-inc/kubik_media_library"
   spec.license       = "MIT"

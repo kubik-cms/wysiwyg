@@ -41,9 +41,9 @@ module Kubik
     def field_attribute_factory(field_name)
       attributes_prefix = ActiveModel::Naming.param_key(object)
       association_name = options[:association].present? ? options[:association] : nil
-      form_string_head, *form_string_tail, field = [association_name, attributes_prefix, method, field_name].delete_if(&:blank?)
+      form_string_head, *form_string_tail = [association_name, attributes_prefix, method].delete_if(&:blank?)
       form_string_tail_string = form_string_tail.map{|a| "[#{a}_attributes]"}.join('')
-      "#{[form_string_head, form_string_tail_string, field].join('')}"
+      "#{[form_string_head, form_string_tail_string].join('')}[#{field_name}]"
     end
 
     def field_delete_attribute
@@ -54,7 +54,7 @@ module Kubik
       field_attribute_factory('kubik_media_upload_id')
     end
 
-    def id_attribute
+    def field_id_attribute
       field_attribute_factory('id')
     end
 
@@ -77,7 +77,12 @@ module Kubik
             field_delete_attribute,
             1,
             'data-image_selector-target': 'mediaUploadDelete',
+          ) +
+          template.hidden_field_tag(
+            field_id_attribute,
+            "${id}"
           )
+
         )
       end
     end
@@ -89,8 +94,7 @@ module Kubik
             field_name_attribute,
             "${kubik_media_upload_id}",
             'data-image_selector-target': 'mediaUploadId',
-          )
-        )
+          )        )
       end
     end
 

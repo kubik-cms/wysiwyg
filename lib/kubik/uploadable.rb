@@ -10,14 +10,16 @@ module Kubik
     end
 
     module ClassMethods
-      def has_one_kubik_upload(method_symbol, required=false, options={})
+      def has_one_kubik_upload(model, method_symbol, options={})
         has_one method_symbol,
-                -> { where(uploadable_type: method_symbol.to_s) },
+          -> { where(uploadable_type: "#{model.name.parameterize}_#{method_symbol.to_s}") },
                 foreign_key: 'uploadable_id',
                 class_name: 'Kubik::Upload',
                 dependent: :destroy
         accepts_nested_attributes_for method_symbol, allow_destroy: true
-        validates_with KubikImagePresentValidator, method_symbol: method_symbol, required: required
+        if options[:validate_presence].present? && options[:validate_presence] == true
+          validates_with KubikImagePresentValidator, method_symbol: method_symbol, required: true
+        end
       end
 
       def has_many_kubik_uploads(method_symbol, required=false, options={})

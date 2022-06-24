@@ -3,7 +3,7 @@ class Book < ApplicationRecord
 
   GENRES = %i[thriller crime horror fantasy]
 
-  has_one_kubik_upload(:book_cover)
+  has_one_kubik_upload self, :cover, { validate_presence: true }
   has_many_kubik_uploads(:book_gallery)
 
   belongs_to :book_author

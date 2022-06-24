@@ -21,30 +21,17 @@ You can quickly add the ability to preview individual model pages.
 
 ```ruby
 class Blog < ApplicationRecord
-  include include Kubik::Previewable
-  kubik_previewable
+  include include Kubik::Uploadable
+  has_one_kubik_upload(self, :header_image)
+  has_many_kubik_uploads(self, :gallery)
   ...
 end
 ```
 
-By default preview will use `application` layout and default show template for the model. Both could be overriden and you can also pass in some additional local variables.
+By default uplodable doesn't validate presence of attachments.
 
 ```ruby
-  kubik_previewable(
-    template: lambda { |blog| "kubik_page_templates/#{blog.template}"},
-    layout: false,
-    locals: lambda { |blog| {
-      content: draftjs_to_html(blog, :content)
-    } }
-  )
-```
-
-You can also temporarily remove the preview by setting:
-
-```ruby
-  kubik_previewable(
-    preview_enabled: false
-  )
+  has_one_kubik_upload(self, :header_image, { validate_presence: true })
 ```
 
 ## Development

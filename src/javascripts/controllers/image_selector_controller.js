@@ -69,6 +69,6 @@ export default class extends Controller {
   }
 
   removeImage() {
-    this.relatedMediaValue = { id: null, thumb: null, kubik_media_upload_id: null }
+    this.relatedMediaValue = { id: this.idValue, thumb: null, kubik_media_upload_id: null }
   }
 }
