@@ -13,28 +13,28 @@ module Kubik
       def has_one_kubik_upload(model, method_symbol, options={})
         model_param_key = ActiveModel::Naming.param_key(model)
         method_name = "#{model_param_key}_#{method_symbol.to_s}"
-        has_one method_name.to_sym,
+        has_one method_symbol,
           -> { where(uploadable_type: method_name) },
                 foreign_key: 'uploadable_id',
                 class_name: 'Kubik::Upload',
                 dependent: :destroy
-        accepts_nested_attributes_for method_name.to_sym, allow_destroy: true
+        accepts_nested_attributes_for method_symbol, allow_destroy: true
         if options[:validate_presence].present? && options[:validate_presence] == true
-          validates_with KubikImagePresentValidator, method_symbol: method_name.to_sym, required: true
+          validates_with KubikImagePresentValidator, method_symbol: method_symbol, required: true
         end
       end
 
       def has_many_kubik_uploads(model, method_symbol, options={})
         model_param_key = ActiveModel::Naming.param_key(model)
         method_name = "#{model_param_key}_#{method_symbol.to_s}"
-        has_many method_name.to_sym,
+        has_many method_symbol,
                  -> { where(uploadable_type: method_name) },
                  foreign_key: 'uploadable_id',
                  class_name: 'Kubik::Upload',
                  dependent: :destroy
-        accepts_nested_attributes_for method_name.to_sym, allow_destroy: true
+        accepts_nested_attributes_for method_symbol, allow_destroy: true
         validate do |object|
-          object.present_if_required(method_name.to_sym) if required == true
+          object.present_if_required(method_symbol) if required == true
         end
       end
     end
