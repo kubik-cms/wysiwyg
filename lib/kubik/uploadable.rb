@@ -34,7 +34,7 @@ module Kubik
                  dependent: :destroy
         accepts_nested_attributes_for method_symbol, allow_destroy: true
         validate do |object|
-          object.present_if_required(method_symbol) if required == true
+          object.present_if_required(method_symbol) if options[:validate_presence].present? && options[:validate_presence] == true
         end
       end
     end

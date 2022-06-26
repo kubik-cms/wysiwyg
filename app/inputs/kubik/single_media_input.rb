@@ -39,7 +39,7 @@ module Kubik
     end
 
     def field_attribute_factory(field_name)
-      attributes_prefix = ActiveModel::Naming.param_key(object)
+      attributes_prefix = options[:name].present? ? options[:name] : ActiveModel::Naming.param_key(object)
       association_name = options[:association].present? ? options[:association] : nil
       form_string_head, *form_string_tail = [association_name, attributes_prefix, method].delete_if(&:blank?)
       form_string_tail_string = form_string_tail.map{|a| "[#{a}_attributes]"}.join('')

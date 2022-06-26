@@ -36,15 +36,32 @@ module Kubik
       "#{method}_attributes"
     end
 
+    def field_attribute_factory(field_name)
+      attributes_prefix = options[:name].present? ? options[:name] : ActiveModel::Naming.param_key(object)
+      association_name = options[:association].present? ? options[:association] : nil
+      form_string_head, *form_string_tail = [association_name, attributes_prefix, method].delete_if(&:blank?)
+      form_string_tail_string = form_string_tail.map{|a| "[#{a}_attributes]"}.join('')
+      "#{[form_string_head, form_string_tail_string].join('')}[${index}][#{field_name}]"
+    end
+
+    def field_delete_attribute
+      field_attribute_factory('_destroy')
+    end
+
+    def field_name_attribute
+      field_attribute_factory('kubik_media_upload_id')
+    end
+
+    def field_id_attribute
+      field_attribute_factory('id')
+    end
+
     def new_fields_template_html
-      association = object.send(method)
-      attributes_prefix = object.class.name.parameterize
       template.content_tag(:template, 'data-multiple_image_selector-target': 'newFieldsTemplate') do
         (
           template.hidden_field_tag(
-            "#{attributes_prefix}[#{method_prefix}][${index}][kubik_media_upload_id]",
+            field_name_attribute,
             "${kubik_media_upload_id}",
-            id: "#{attributes_prefix}_#{method_prefix}_${index}_kubik_media_upload_id_${kubik_media_upload_id}",
             'data-image_selector-target': 'mediaUploadId',
           )
         )
@@ -52,12 +69,10 @@ module Kubik
     end
 
     def existing_fields_delete_template_html
-      association = object.send(method)
-      attributes_prefix = object.class.name.parameterize
       template.content_tag(:template, 'data-multiple_image_selector-target': 'existingFieldsDeleteTemplate') do
         (
           template.hidden_field_tag(
-            "#{attributes_prefix}[#{method_prefix}][${index}][_destroy]",
+            field_delete_attribute,
             1,
             'data-image_selector-target': 'mediaUploadDelete',
           )
@@ -71,12 +86,12 @@ module Kubik
       template.content_tag(:template, 'data-multiple_image_selector-target': 'existingFieldsTemplate') do
         (
           template.hidden_field_tag(
-            "#{attributes_prefix}[#{method_prefix}][${index}][kubik_media_upload_id]",
+            field_name_attribute,
             "${kubik_media_upload_id}",
             id: "#{attributes_prefix}_#{method_prefix}_${index}_kubik_media_upload_id_${kubik_media_upload_id}",
           ) +
           template.hidden_field_tag(
-            "#{attributes_prefix}[#{method_prefix}][${index}][id]",
+            field_id_attribute,
             "${id}",
             id: "#{attributes_prefix}_#{method_prefix}_${index}_kubik_media_upload_id_${id}",
           )
