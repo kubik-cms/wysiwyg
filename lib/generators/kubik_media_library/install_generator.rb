@@ -1,6 +1,6 @@
 require 'rails/generators/active_record'
 
-module KubikMediaGallery
+module KubikMediaLibrary
   module Generators
     class InstallGenerator < ActiveRecord::Generators::Base
       source_root File.expand_path("../templates", __FILE__)
@@ -15,7 +15,7 @@ module KubikMediaGallery
 
       def copy_initializers
         copy_file 'config/initializers/shrine.rb', 'config/initializers/shrine.rb'
-        copy_file 'config/initializers/admin_head_additions.rb', 'config/initializers/admin_head_additions.rb'
+        copy_file 'config/initializers/media_library_admin_head_additions.rb', 'config/initializers/media_library_admin_head_additions.rb'
       end
     end
   end

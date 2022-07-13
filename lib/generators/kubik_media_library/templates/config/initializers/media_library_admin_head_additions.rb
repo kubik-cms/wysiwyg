@@ -1,7 +1,7 @@
-module KubikMediaGalleryPageLayoutOverride
+module KubikMediaLibrararyPageLayoutOverride
   def build_active_admin_head
     within super do
-      render "admin/additional_headers"
+      render "admin/kubik/media_library/additional_headers"
     end
   end
 
@@ -13,4 +13,4 @@ module KubikMediaGalleryPageLayoutOverride
   end
 end
 
-ActiveAdmin::Views::Pages::Base.prepend KubikMediaGalleryPageLayoutOverride
+ActiveAdmin::Views::Pages::Base.prepend KubikMediaLibrararyPageLayoutOverride

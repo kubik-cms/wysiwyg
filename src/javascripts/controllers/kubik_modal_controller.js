@@ -64,7 +64,6 @@ export default class extends Controller {
   }
 
   openModal(e) {
-    console.log(this.modalReturnPayloadValue, e.currentTarget.dataset.kubikModalReturnPayload, e.currentTarget.dataset)
     this.modalSrcValue = e.currentTarget.attributes.src.value
     this.modalHeaderValue = e.currentTarget.dataset.kubikModalHeaderText
     this.modalActionValue = e.currentTarget.dataset.kubikModalAction
