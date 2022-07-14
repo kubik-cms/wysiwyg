@@ -22,6 +22,10 @@ ActiveAdmin.register Kubik::MediaUpload do
   end
 
   controller do
+    def permitted_params
+      params.permit(:authenticity_token, :commit, kubik_media_upload: [:image, :file, :media_tag_list, additional_info: {}])
+    end
+
     def index
       @page_title = 'Media gallery'
       @collection = scoped_collection
