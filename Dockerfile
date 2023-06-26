@@ -9,6 +9,7 @@ RUN apt-get install -y \
             git \
             curl \
             vim \
+            npm \
             rsync \
             libpq-dev \
             python-dev \
@@ -23,19 +24,15 @@ RUN apt-get install -y \
             libvips \
             libvips-dev \
             libvips-tools
-RUN mkdir /kubik_metatagable
 RUN mkdir -p /vendor/bundle
 
 RUN gem install bundler
 
-ENV APP_PATH /kubik_media_gallery/test/dummy
 WORKDIR /tmp
 ADD Gemfile /tmp/Gemfile
 ADD Gemfile.lock /tmp/Gemfile.lock
-ADD kubik_media_library.gemspec /tmp/kubik_media_library.gemspec
+ADD kubik_wysiwyg.gemspec /tmp/kubik_wysiwyg.gemspec
 RUN bundle install
-RUN mkdir /kubik_media_library
-WORKDIR /kubik_media_library
 
 # YARN
 RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -

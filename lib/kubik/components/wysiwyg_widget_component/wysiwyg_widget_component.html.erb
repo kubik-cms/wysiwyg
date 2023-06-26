@@ -1,0 +1,3 @@
+<% if @tabs.present? %>
+  <%= render Kubik::Common::TabbedContent.new(@tabs, @setup, @data) %>
+<% end %>

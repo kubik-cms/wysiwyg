@@ -13,7 +13,7 @@ gem 'kubik_previewable', github: 'primate_inc/kubik_previewable'
 And then execute:
 
     $ bundle install
-    $ gem install kubik_media_library
+    $ gem install kubik_wysiwyg
 
 ## Usage
 

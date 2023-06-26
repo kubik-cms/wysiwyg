@@ -1,9 +1,9 @@
 {
-  "name": "kubik_media_gallery",
+  "name": "@kubik-cms/",
   "version": "0.1.0",
   "targets": {
     "js": {
-      "source": "src/javascripts/kubik_media_gallery.js",
+      "source": "./package/src/index.ts",
       "distDir": "./app/assets/javascripts/"
     }
   },
@@ -18,9 +18,19 @@
     "parcel": "^2.3.2"
   },
   "dependencies": {
+    "@editorjs/editorjs": "2.25.0",
+    "@editorjs/embed": "^2.5.2",
+    "@editorjs/header": "2.6.2",
+    "@editorjs/nested-list": "^1.0.2",
+    "@editorjs/paragraph": "^2.8.0",
+    "@editorjs/quote": "^2.4.0",
+    "@editorjs/underline": "^1.0.0",
     "@hotwired/stimulus": "^3.0.1",
     "@hotwired/turbo": "^7.1.0",
-    "dropzone": "^6.0.0-beta.2",
-    "lodash": "^4.17.21"
+    "@kubik-cms/interface_elements": "^0.1.6",
+    "@kubik-cms/kubik_interface_elements": "^0.1.0",
+    "@kubik-cms/media_library": "^0.1.9",
+    "editorjs-hyperlink": "^1.type.6",
+    "stimulus-reveal-controller": "^4.0.0"
   }
 }

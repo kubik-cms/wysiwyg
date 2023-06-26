@@ -1,0 +1,29 @@
+<div data-controller='kubik-autocomplete'
+   data-kubik-autocomplete-src-value='/admin/book_authors'
+   data-kubik-autocomplete-field-name-value='<%= @field_name %>'
+   data-kubik-autocomplete-active-class='kubik-autocomplete-wrapper__active',
+   data-kubik-autocomplete-fetch-error-class='kubik-autocomplete-wrapper__error',
+   data-kubik-autocomplete-loading-class='kubik-autocomplete-wrapper__loading',
+   data-kubik-autocomplete-active-result-class='kubik-wysiwyg-component--item-autocomplete-results-list-item__active',
+   data-kubik-autocomplete-active-list-class='kubik-wysiwyg-component--type-autocomplete-results-list__active',
+   data-kubik-autocomplete-no-results-class='kubik-autocomplete-wrapper__no-results'
+  class='kubik-wysiwyg-component--item-autocomplete-wrapper kubik-autocomplete-wrapper kubik-wysiwyg--standard-fields'>
+  <div class='kubik-wysiwyg-component--item-autocomplete input'>
+    <label class='label'>Select <%= @field[:label].downcase %></label>
+    <input data-kubik-autocomplete-src-value=''
+           data-kubik-autocomplete-target='input'
+           data-action='input->kubik-autocomplete#load keydown->kubik-autocomplete#keyCheck blur->kubik-autocomplete#blur focus->kubik-autocomplete#focus'
+           type='text'
+           id='add_me'
+           class='kubik-wysiwyg-component--item-autocomplete'
+           placeholder='Search for a component' />
+     <ul data-kubik-autocomplete-target='resultsList' class='kubik-wysiwyg-component--item-autocomplete-results-list'>
+       <li class='kubik-wysiwyg-component--item-autocomplete-feedback kubik-wysiwyg-component--item-autocomplete-results-list-item'
+            data-kubik-autocomplete-target='feedback',
+         >
+
+     </ul>
+     <p class='inline-hints'>Start typing to search item</p>
+     <button data-action='click->kubik-autocomplete#cancel' class='kubik-wysiwyg-component--cancel'>Cancel</button>
+  </div>
+</div>

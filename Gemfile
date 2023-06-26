@@ -9,8 +9,9 @@ gem "rake", "~> 13.0"
 gem "minitest", "~> 5.0"
 gem "rubocop", "~> 1.7"
 
-gem 'kubik_styles_base', github: 'primate-inc/kubik_styles_base', branch: 'main'
-gem 'active_admin_kubik', git: 'https://github.com/primate-inc/active_admin_kubik_theme.git', branch: 'master'
+gem 'kubik_styles_base', github: 'kubik-cms/kubik_styles_base', branch: 'main'
+gem 'active_admin_kubik', git: 'https://github.com/kubik-cms/active_admin_kubik_theme.git', branch: 'master'
+gem 'kubik_media_library', git: 'https://github.com/kubik-cms/media_library.git', branch: 'master'
 
 group :development do
   gem "devise"

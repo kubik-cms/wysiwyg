@@ -1,0 +1,283 @@
+.ce-block__content,
+.ce-toolbar__content {
+  max-width: unset;
+  width: calc(100% - 50px);
+}
+.ce-block__content {
+  margin: unset;
+}
+.ce-toolbar {
+  left: unset;
+  left: -1.5rem;
+  &__actions {
+    background: white;
+    border-radius: 2px;
+  }
+}
+.codex-editor__redactor {
+  padding-bottom: 45px !important;
+}
+.active_admin .formtastic .cdx-nested-list {
+  border: none;
+  .cdx-nested-list {
+    padding-top: 0;
+  }
+}
+
+.kubik-wysiwyg--standard-fields--select {
+  @include kubik-form-input-select;
+  background: white;
+}
+
+.kubik-wysiwyg-component {
+  border: 1px solid var(--kubik-interface-color-grey-200);
+  border-radius: .2rem;
+  &--header {
+    display: flex;
+    flex-direction: row;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--kubik-interface-color-grey-200);
+    &-icon {
+      margin-right: .75rem;
+    }
+    &--text {
+      margin: 0;
+    }
+  }
+  &--add-item {
+    @include kubik-button--secondary;
+    width: 100%;
+    text-align: center;
+  }
+  & &--item {
+    display: flex;
+    flex-direction: row;
+    margin-bottom: .75rem;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid var(--kubik-interface-color-grey-200);
+    border-radius: .2rem;
+    background: var(--kubik-interface-color-grey-100);
+
+    &-images {
+      padding: 1.5rem;
+      display: flex;
+      justify-content: center;
+      border-right: 1px solid var(--kubik-interface-color-grey-200);
+      img { max-width: 100%; }
+    }
+
+    &-image {
+      max-width: 204px;
+    }
+
+    &-fields {
+      flex: 1;
+      padding: 1.5rem;
+      .input {
+        padding: 0 0 .25rem;
+      }
+      &--with-sections {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+      }
+      input {
+        @include kubik-form-input-base;
+        width: 100%;
+        background-color: #fff;
+        border-color: transparent;
+      }
+      .inline-hints {
+        @include kubik-form-hint;
+      }
+    }
+  }
+}
+.kubik-wysiwyg-component .kubik-wysiwyg--standard-fields {
+  .input {
+    padding: 0 0 .25rem;
+    input {
+      @include kubik-form-input-base;
+      width: 100%;
+    }
+    .inline-hints {
+      @include kubik-form-hint;
+    }
+  }
+}
+.kubik-wysiwyg--standard-fields--wysiwyg {
+  @include kubik-form-input-textarea;
+  font-weight: normal;
+}
+.kubik-wysiwyg-tabs-container {
+  display: flex;
+  flex-wrap: wrap;
+  .kubik-wysiwyg-tab-input {
+    display: none;
+    &:checked + .kubik-wysiwyg-tab-label {
+      @extend %slickr_active_tab;
+    }
+    &:checked + .kubik-wysiwyg-tab-label + .kubik-wysiwyg-tab-content {
+      display: block;
+    }
+  }
+  .kubik-wysiwyg-tab-label {
+    @extend %slickr_tab;
+    padding: .75rem 0;
+    order: 0;
+    margin-right: 1rem;
+    &:first-of-type {
+      margin-left: 1.5rem;
+    }
+  }
+  .kubik-wysiwyg-tab-content {
+    order: 100;
+    flex: 0 0 100%;
+    display: none;
+    border-top: 1px solid var(--kubik-interface-color-grey-200);
+    padding: 1.5rem;
+  }
+}
+
+.kubik-wysiwyg-component--item-images {
+  display: flex;
+  flex-direction: column;
+}
+.kubik-wysiwyg-component--item-actions {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+
+.kubik-wysiwyg-component--items-action {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  .kubik-wysiwyg-component--items-action--more &--icon, &--icon {
+    display: block;
+    font-size: 1.5rem;
+    width: 1.5rem;
+    color: var(--kubik-interface-color-grey-400);
+    height: 100%;
+    font-size: 1.25rem;
+    line-height: 2;
+  }
+}
+
+.kubik-wysiwyg-component--items-action--icon {
+}
+
+.kubik-wysiwyg-component--items-action--more {
+  position: relative;
+  text-align: center;
+  margin-left: .5rem;
+  .kubik-wysiwyg-component--items-more-actions {
+    display: none;
+    position: absolute;
+    z-index: 2;
+    left: 0;
+    top: 100%;
+    background: white;
+    border: 1px solid var(--kubik-interface-color-grey-200);
+    border-radius: 3px;
+    box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.1);
+  }
+  .kubik-wysiwyg-component--items-more-action {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: .5rem;
+    color: var(--kubik-interface-color-brand-400);
+    border-bottom: 1px solid var(--kubik-interface-color-grey-200);
+    &--icon {
+      color: var(--kubik-interface-color-brand-400);
+    }
+    &:hover {
+      background: var(--kubik-interface-color-grey-100);
+    }
+    &--text {
+      margin-left: .5rem;
+      white-space: nowrap;
+    }
+    &:last-of-type {
+      border-bottom: none;
+    }
+  }
+  &:focus, &:focus-within {
+    .kubik-wysiwyg-component--items-more-actions {
+      display: block;
+    }
+  }
+}
+
+.kubik-wysiwyg-component--items-action-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-left: 1rem;
+  padding-top: .5rem;
+}
+
+.kubik--item {
+  &-static-content {
+    flex: 1;
+    margin-bottom: 1.5rem;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    &--thumb {
+      margin-right: 1rem;
+      width: 2rem;
+      height: 2rem;
+      img, svg {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+    }
+    &--main-info {
+      @include kubik-form-label;
+    }
+    &--additional-info {
+      @include kubik-typography-para--small;
+      margin-left: 1.5rem;
+      font-weight: 600;
+      flex: 1;
+      color: var(--kubik-interface-color-grey-500);
+    }
+    &--status-info {
+      margin-left: auto;
+      .kubik-pill {
+        margin-left: .5rem;
+      }
+    }
+  }
+}
+
+.kubik-wysiwyg-widget--media_item_container {
+  flex: 0 0 204px;
+  width: 204px;
+  height: 204px;
+  img {
+    max-width: 100%;
+  }
+  &--image {
+    margin: .5rem 0;
+  }
+  &--image__broken {
+    display: flex;
+    align-items: flex-start;
+    text-align: center;
+    height: 100%;
+    width: 100%;
+  }
+  .kubik-wysiwyg-component &--media_item_broken {
+    flex: 1;
+    font-size: 7.5rem;
+  }
+}

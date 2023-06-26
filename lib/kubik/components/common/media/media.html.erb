@@ -1,0 +1,33 @@
+<div class='input'>
+  <div class='label'><%= @field[:label] %></div>
+  <div class="kubik-media-gallery--media_item_container kubik-wysiwyg-widget--media_item_container">
+    <div src="/admin/kubik_media_uploads?modal=true"
+         data-kubik-modal-header-text="Select <%= @field[:label] %>"
+         data-kubik-modal-action="return"
+         data-kubik-modal-return-controller="kubik-widget#<%= @widget_id %>"
+         data-field-name='<%= @field_name %>'
+         class="kubik-media-gallery--media_item_action kubik-media-gallery--media_item_action__brand">
+      <span class="material-symbols-outlined kubik-media-gallery--media_item_container--icon">autorenew</span>
+      <span
+        src="/admin/kubik_media_uploads?modal=true"
+        data-kubik-modal-header-text="Select <%= @field[:label] %>"
+        data-kubik-modal-return-controller="kubik-widget#<%= @widget_id %>"
+        data-kubik-modal-action="return"
+        data-kubik-modal-return-payload='{ "field_name": "<%= @field_name %>" }'
+        data-action="click->kubik-modal#openModal"
+        class="kubik-media-gallery--media_item_action--text">Swap image</span>
+    </div>
+    <div class="kubik-wysiwyg-widget--media_item_container--image<%= @media.blank? ? ' kubik-wysiwyg-widget--media_item_container--image__broken' : nil %>">
+      <% if @media.present? %>
+        <%= image_tag @media.admin_image_thumbnail %>
+      <% else %>
+        <div class="material-symbols-outlined kubik-media-gallery--media_item_container--icon kubik-wysiwyg-widget--media_item_container--media_item_broken">broken_image</div>
+      <% end %>
+    </div>
+    <div data-field-name='<%= @field_name %>' data-action="click->kubik-widget#removeResource" class="kubik-media-gallery--media_item_action kubik-media-gallery--media_item_action__alert">
+      <span class="material-symbols-outlined kubik-media-gallery--media_item_container--icon">cancel</span>
+      <span class="kubik-media-gallery--media_item_action--text">Remove image</span>
+    </div>
+  </div>
+  <p class='inline-hints'><%= @field[:hint] %></p>
+</div>

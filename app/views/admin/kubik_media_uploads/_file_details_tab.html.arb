@@ -1,6 +1,0 @@
-attributes_table_for image.object do
-  row 'Original' do
-    "Original - #{image.object.file_url}"
-  end
-end
-

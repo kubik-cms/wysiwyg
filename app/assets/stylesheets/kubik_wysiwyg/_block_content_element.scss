@@ -1,0 +1,12 @@
+.ce-block__content,
+.ce-toolbar__content {
+  max-width: unset;
+  width: calc(100% - 50px);
+}
+.ce-block {
+  margin-bottom: 1rem;
+  &__content {
+    margin: unset;
+    padding-left: .25rem;
+  }
+}

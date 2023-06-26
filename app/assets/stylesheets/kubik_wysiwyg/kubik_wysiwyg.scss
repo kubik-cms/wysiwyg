@@ -1,0 +1,13 @@
+@import './field_styles';
+@import './block_content_element';
+@import './autocomplete';
+@import './repeater';
+@import './media-widget';
+
+.ce-popover__item-icon svg {
+  width: 100%;
+  height: 100%;
+  max-width: 12px;
+  max-height: 12px;
+}
+

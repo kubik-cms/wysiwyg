@@ -1,5 +1,5 @@
 GIT
-  remote: https://github.com/primate-inc/active_admin_kubik_theme.git
+  remote: https://github.com/kubik-cms/active_admin_kubik_theme.git
   revision: 64c1adf94144438c13283ade7153c542b0258220
   branch: master
   specs:
@@ -7,16 +7,11 @@ GIT
       chosen-rails (~> 1.9.0)
 
 GIT
-  remote: https://github.com/primate-inc/kubik_styles_base.git
-  revision: f9b6040617add388bd73424d0a98daf1bc3550f5
-  branch: main
+  remote: https://github.com/kubik-cms/kubik_media_library.git
+  revision: 24474ba67cd493fd18920bab3b7c602cef2ab5e6
+  branch: master
   specs:
-    kubik_styles_base (0.1.0)
-
-PATH
-  remote: .
-  specs:
-    kubik_media_library (0.1.5)
+    kubik_media_library (0.1.9)
       aasm (~> 4.12.2)
       activeadmin (>= 1.2.1)
       acts_as_list
@@ -27,6 +22,20 @@ PATH
       rails (~> 6.0)
       ruby-vips
       shrine
+
+GIT
+  remote: https://github.com/kubik-cms/kubik_styles_base.git
+  revision: 8e6d0e7f4766b34f51e54c145361c3d22141ade9
+  branch: main
+  specs:
+    kubik_styles_base (0.1.0)
+
+PATH
+  remote: .
+  specs:
+    kubik_wysiwyg (0.1.0)
+      activeadmin (>= 1.2.1)
+      rails (~> 6.0)
 
 GEM
   remote: https://rubygems.org/
@@ -331,6 +340,7 @@ DEPENDENCIES
   devise
   kubik_media_library!
   kubik_styles_base!
+  kubik_wysiwyg!
   minitest (~> 5.0)
   minitest-rails
   minitest-rails-capybara
@@ -345,4 +355,4 @@ DEPENDENCIES
   warning
 
 BUNDLED WITH
-   2.3.15
+   2.3.20

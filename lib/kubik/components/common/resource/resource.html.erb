@@ -1,0 +1,20 @@
+<div class='kubik--item'>
+  <div class='kubik--item-static-content'>
+    <div class='kubik--item-static-content--thumb'>
+      <%= image_tag @item[:thumb], alt: '' %>
+    </div>
+    <div class='kubik--item-static-content--main-info'>
+      <%= @item[:display_name] %>
+    </div>
+    <div class='kubik--item-static-content--additional-info'>
+      <%= @item[:additional_info] %>
+    </div>
+    <div class='kubik--item-static-content--status-info'>
+      <% @item[:status_info].each do |key, value| %>
+        <span class='kubik-pill kubik-pill--<%= key %>'>
+          <%= value %>
+        </span>
+      <% end %>
+    </div>
+  </div>
+</div>

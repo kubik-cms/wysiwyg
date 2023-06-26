@@ -21,9 +21,13 @@ gem 'jbuilder', '~> 2.7'
 
 gem 'activeadmin'
 
-gem 'kubik_styles_base', github: 'primate-inc/kubik_styles_base', branch: 'main'
-gem 'active_admin_kubik', git: 'https://github.com/primate-inc/active_admin_kubik_theme.git', branch: 'master'
-gem 'kubik_media_library', path: '/kubik_media_library'
+gem 'kubik_styles_base', path: '/kubik_styles_base' #github: 'kubik-cms/kubik_styles_base', branch: 'main'
+gem 'active_admin_kubik', git: 'https://github.com/kubik-cms/active_admin_kubik_theme.git'
+gem 'kubik_media_library', git: 'https://github.com/kubik-cms/media_library.git', branch: 'master'
+gem 'kubik_interface_elements', github: 'kubik-cms/kubik_interface_elements'
+gem 'kubik_wysiwyg', path: '/kubik_wysiwyg'
+#gem 'webpacker'
+gem 'importmap-rails'
 
 gem 'hotwire-rails'
 # Use Redis adapter to run Action Cable in production

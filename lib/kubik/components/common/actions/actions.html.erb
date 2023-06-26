@@ -1,0 +1,26 @@
+<div class='kubik-wysiwyg-component--items-action--more' tabindex='1'>
+  <div class='material-symbols-outlined kubik-media-gallery--media_item_container--icon kubik-wysiwyg-component--items-action kubik-wysiwyg-component--items-action--icon'>more_horiz</div>
+  <div class='kubik-wysiwyg-component--items-more-actions'>
+    <% if @index > 0 %>
+      <div class='kubik-wysiwyg-component--items-more-action' data-target-list='<%= @tab_name %>' data-item-index='<%= @index %>' data-action='click->kubik-widget#moveItemUp'>
+        <div class='kubik-wysiwyg-component--items-more-action--icon kubik-wysiwyg-component--items-action material-symbols-outlined'>
+          arrow_upward
+        </div>
+        <div class='kubik-wysiwyg-component--items-more-action--text'>
+          Move up
+        </div>
+      </div>
+    <% end %>
+    <% if last_item? %>
+      <div class='kubik-wysiwyg-component--items-more-action' data-target-list='<%= @tab_name %>' data-item-index='<%= @index %>' data-action='click->kubik-widget#moveItemDown'>
+        <div class='kubik-wysiwyg-component--items-more-action--icon kubik-wysiwyg-component--items-action material-symbols-outlined'>
+          arrow_downward
+        </div>
+        <div class='kubik-wysiwyg-component--items-more-action--text'>
+          Move down
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
+

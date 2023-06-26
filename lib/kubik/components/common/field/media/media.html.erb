@@ -1,0 +1,16 @@
+<div class='input'>
+  <div class='label'><%= @field[:label] %></div>
+  <div src="/admin/kubik_media_uploads?modal=true"
+       data-kubik-modal-header-text="Select <%= @field[:label] %>"
+       data-kubik-modal-action="return"
+       data-kubik-modal-return-controller="kubik-widget#<%= @widget_id %>"
+       data-kubik-modal-return-payload='{ "field_name": "<%= @field_name %>" }'
+       data-action="click->kubik-modal#openModal"
+       class="kubik-media-gallery--file_select_container kubik-media-gallery--file_select_container__small">
+    <div class="kubik-select-placeholder">
+      <div class="material-symbols-outlined material-icon">add</div>
+      <div class="kubik-media-gallery--file_select_header">Select <%= @field[:label].downcase %></div>
+    </div>
+  </div>
+  <p class='inline-hints'><%= @field[:hint] %></p>
+</div>

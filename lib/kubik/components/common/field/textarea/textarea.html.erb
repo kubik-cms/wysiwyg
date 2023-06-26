@@ -1,0 +1,13 @@
+<div class='input text'>
+  <label class='label' for='<%= @field[:name] %>-<% @widget_id %>'><%= @field_label %></label>
+  <textarea
+         id='title-<%= @widget_id %>'
+         tabindex='1'
+         name='<%= @field_name %>'
+         value='<%= @field_value %>'
+         class='input'
+         placeholder='<%= @field_label %>'
+         <%= @index.present? ? "data-item-index='#{@index}'" : nil %>
+         data-action='keyup->kubik-widget#updateField'><%= @field_value %></textarea>
+  <p class='inline-hints'><%= @field[:hint] %></p>
+</div>

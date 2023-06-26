@@ -6,12 +6,19 @@ volumes:
   gem_cache:
   shared_data:
 services:
+  package:
+    build:
+      context: .
+      dockerfile: Dockerfile-package
+    volumes:
+      - ./:/kubik_wysiwyg
   source:
     build:
       contenxt: .
       dockerfile: Dockerfile
     volumes:
-      - ./:/kubik_media_library
+      - ./:/kubik_wysiwyg
+      - ../kubik_interface_elements:/kubik_interface_elements
     env_file: ./.env
     tty: true
     stdin_open: true
@@ -21,7 +28,7 @@ services:
     environment:
       RAILS_ENV: test
     depends_on:
-      - active_admin_sample_db
+      - active_admin_wysiwyg_sample_db
     networks:
       - development
   active_admin_sample_redis:
@@ -31,9 +38,9 @@ services:
       - development
     volumes:
       - shared_data:/var/shared/redis
-  active_admin_sample_db:
+  active_admin_wysiwyg_sample_db:
     image: postgres:12.5-alpine
-    container_name: active_admin_sample_db
+    container_name: active_admin_wysiwyg_sample_db
     volumes:
       - db_data:/var/lib/postgresql/data
       - shared_data:/var/shared
@@ -44,14 +51,17 @@ services:
       POSTGRES_PASSWORD: password
     ports:
       - 5099:5432
-  active_admin_sample:
+  active_admin_wysiwyg_sample:
     build:
       context: ./.active_admin_sample
       dockerfile: Dockerfile
-    container_name: active_admin_sample
+    container_name: active_admin_wysiwyg_sample
     volumes:
       - ./.active_admin_sample:/var/app
-      - ./:/kubik_media_library
+      - ./package/dist:/var/app/vendor/javascript/@kubik-cms/wysiwyg
+      - ./:/kubik_wysiwyg
+      - ./../kubik_styles_base:/kubik_styles_base
+      - ./../kubik_media_gallery:/kubik_media_library
       - shared_data:/var/shared
       - gem_cache:/usr/local/bundle/gems
     networks:
@@ -66,4 +76,22 @@ services:
     environment:
       RAILS_ENV: development
     depends_on:
-      - active_admin_sample_db
+      - active_admin_wysiwyg_sample_db
+        #     - webpack
+        # webpack:
+        #   build:
+        #     context: ./.active_admin_sample
+        #     dockerfile: Dockerfile
+        #   command: 'bin/webpack-dev-server'
+        #   volumes:
+        #     - ./.active_admin_sample:/var/app
+        #     - shared_data:/var/shared
+        #     - ./:/kubik_wysiwyg
+        #     - gem_cache:/usr/local/bundle/gems
+        #   ports:
+        #     - "3035"
+        #   env_file: ./.active_admin_sample/.env.development
+        #   entrypoint: dev-entrypoint.sh
+        #   environment:
+        #     NODE_ENV: development
+        #     RAILS_ENV: development

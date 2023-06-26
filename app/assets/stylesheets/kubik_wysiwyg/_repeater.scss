@@ -1,0 +1,32 @@
+.kubik-wysiwyg-repeated-item {
+  flex: 0 0 100%;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  background-color: var(--kubik-interface-color-grey-100);
+  border: 1px solid var(--kubik-interface-color-grey-200);
+  display: flex;
+  flex-direction: column;
+  &-actions {
+    display: flex;
+    flex-direction: row;
+  }
+  .kubik-repeater-delete-action {
+    margin-right: .5rem;
+    height: 1.5rem;
+    font-size: 1.25rem;
+    margin-top: .45rem;
+  }
+  .fields {
+    flex: 1;
+    .input input,
+    .input.text textarea { background-color: white; }
+     &__with-sections {
+       display: flex;
+       flex-direction: row;
+       flex-wrap: wrap;
+       justify-content: space-between;
+       gap: 2rem;
+     }
+  }
+}
+

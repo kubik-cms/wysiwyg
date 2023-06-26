@@ -1,0 +1,9 @@
+FROM node:18-alpine
+MAINTAINER Bart Oleszczyk <bart@primate.co.uk>
+
+WORKDIR /kubik_wysiwyg
+RUN npm install -g npm
+ADD ./package/package.json /kubik_wysiwyg/package.json
+
+RUN npm install
+RUN chown -R 1000:1000 "/root/.npm"
