@@ -7,16 +7,15 @@ import { ImageSelectorController,
          MultipleImageSelectorController,
          ImageDropzoneController } from "@kubik-cms/media_library"
 import { ModalController, modalInit } from "@kubik-cms/interface_elements"
-import Wysiwyg from "wysiwyg"
+import Wysiwyg from "wysiwyg";
+import EditorController from "./controllers/wysiwyg"
 
 const KubikInterfaceStimulus = Application.start()
 
 if(typeof KubikInterfaceStimulus != 'undefined') {
-  KubikInterfaceStimulus.register("editor", Wysiwyg.WysiwygEditorController)
+  KubikInterfaceStimulus.register("editor", EditorController)
   KubikInterfaceStimulus.register("kubik-widget", Wysiwyg.KubikWidgetController)
-  KubikInterfaceStimulus.register("kubik-image-select", Wysiwyg.KubikImageSelectController)
   KubikInterfaceStimulus.register("kubik-autocomplete", Wysiwyg.KubikAutocompleteController)
-  KubikInterfaceStimulus.register("media-widget", Wysiwyg.MediaWidgetController)
   KubikInterfaceStimulus.register("image_selector", ImageSelectorController)
   KubikInterfaceStimulus.register("multiple_image_selector", MultipleImageSelectorController)
   KubikInterfaceStimulus.register("image_dropzone", ImageDropzoneController)

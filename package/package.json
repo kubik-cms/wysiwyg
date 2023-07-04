@@ -41,18 +41,8 @@
     "@hotwired/stimulus": "^3.0.1"
   },
   "dependencies": {
-    "@editorjs/editorjs": "^2.25.0",
-    "@editorjs/embed": "^2.5.3",
-    "@editorjs/header": "^2.6.2",
-    "@editorjs/nested-list": "^1.0.2",
-    "@editorjs/paragraph": "^2.8.0",
-    "@editorjs/quote": "^2.4.0",
-    "@editorjs/underline": "^1.0.0",
     "deep-keys": "^0.5.0",
     "deep-object-diff": "^1.1.9",
-    "editorjs-hyperlink": "^1.0.6",
-    "lodash.get": "^4.4.2",
-    "lodash.isequal": "^4.5.0",
     "lodash.set": "^4.3.2"
   },
   "description": "Wysiwyg for Kubik CMS"

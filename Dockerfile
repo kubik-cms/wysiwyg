@@ -1,10 +1,9 @@
-FROM ruby:2.7
+FROM ruby:3.1.2
 MAINTAINER Bart Oleszczyk <bart@primate.co.uk>
 
 # Update system
 RUN apt-get -y update -qq
-# Install required libraries
-RUN apt-get install -y \
+RUN apt-get install --allow-unauthenticated -y -f \
             build-essential \
             git \
             curl \
@@ -24,13 +23,16 @@ RUN apt-get install -y \
             libvips \
             libvips-dev \
             libvips-tools
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
+RUN apt-get install -y -f nodejs
+# Install required libraries
 RUN mkdir -p /vendor/bundle
 
 RUN gem install bundler
 
 WORKDIR /tmp
 ADD Gemfile /tmp/Gemfile
-ADD Gemfile.lock /tmp/Gemfile.lock
+#ADD Gemfile.lock /tmp/Gemfile.lock
 ADD kubik_wysiwyg.gemspec /tmp/kubik_wysiwyg.gemspec
 RUN bundle install
 

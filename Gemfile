@@ -12,6 +12,7 @@ gem "rubocop", "~> 1.7"
 gem 'kubik_styles_base', github: 'kubik-cms/kubik_styles_base', branch: 'main'
 gem 'active_admin_kubik', git: 'https://github.com/kubik-cms/active_admin_kubik_theme.git', branch: 'master'
 gem 'kubik_media_library', git: 'https://github.com/kubik-cms/media_library.git', branch: 'master'
+gem 'render_editorjs'
 
 group :development do
   gem "devise"

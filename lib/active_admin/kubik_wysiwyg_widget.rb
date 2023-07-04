@@ -4,7 +4,7 @@ ActiveAdmin.register_page 'Kubik Wysiwyg Widget' do
       format.json {
         render json: {
           html_data: render_to_string(
-            Kubik::WysiwygWidgetComponent.new(
+            Kubik::WysiwygEditor::WysiwygWidgetComponent.new(
               permitted_params[:setup].to_h,
               permitted_params[:data].to_h
             )

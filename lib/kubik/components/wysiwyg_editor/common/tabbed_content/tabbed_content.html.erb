@@ -1,0 +1,31 @@
+<div class='kubik-wysiwyg-tabs-container' id="<%= @widget_id %>-tabs">
+  <% @tabs.each_with_index do |tab,index| %>
+    <input class='kubik-wysiwyg-tab-input' id='<%= @widget_id %>-tabs-<%= tab[:name] %>' type='radio' value='<%= tab[:name] %>' name='<%= @widget_id %>-tabs' <%= 'checked' if index.zero? %> />
+    <label class='kubik-wysiwyg-tab-label' for="<%= @widget_id %>-tabs-<%= tab[:name] %>"><%= tab[:label] %></label>
+    <div class='kubik-wysiwyg-tab-content <%= @widget_id %>-tabs-<%= tab[:name] %>'>
+      <div class='kubik-wysiwyg--standard-fields' data-kubik-widget-content-target='<%= tab[:name] %>TabContainer'>
+
+        <% if tab[:repeated] %>
+          <%= render Kubik::WysiwygEditor::Common::Repeater.new(tab: tab, data: @data, widget_id: @widget_id) %>
+          <%= render Kubik::WysiwygEditor::Common::AddItem.new(tab, @widget_id) %>
+        <% else %>
+          <% if tab[:sections].present? %>
+            <% grouped_fields = tab[:fields].group_by { |f| f[:section] } %>
+            <% grouped_fields.each do |group, fields| %>
+              <div class='kubik_widget_section kubik_widget_section__<%= group %>'>
+                <% fields.each_with_index do |field, index| %>
+                  <%= render Kubik::WysiwygEditor::Common::Field.new(field, @data, @widget_id, tab) %>
+                <% end %>
+              </div>
+            <% end %>
+          <% else %>
+            <% tab[:fields].each do |field| %>
+              <%= render Kubik::WysiwygEditor::Common::Field.new(field, @data, @widget_id, tab) %>
+            <% end %>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</div>
+

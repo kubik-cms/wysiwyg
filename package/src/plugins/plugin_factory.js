@@ -1,4 +1,4 @@
-import { widgetWrapper } from './templates/widget_wrapper'
+import { widgetWrapper } from './templates/widget_wrapper';
 
 export default class PluginFactory {
 

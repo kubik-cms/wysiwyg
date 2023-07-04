@@ -20,16 +20,6 @@ function array_move(arr, old_index, new_index) {
   arr.splice(new_index, 0, arr.splice(old_index, 1)[0]);
   return arr; // for testing
 };
-function convert(namesArray) {
-  let result = {};
-  let nestedObj = result;
-  namesArray.forEach(name => {
-    nestedObj[name] = {};
-    nestedObj = nestedObj[name];
-  });
-
-  return result;
-}
 
 export default class extends Controller {
   widgetIdValue: String
@@ -84,7 +74,6 @@ export default class extends Controller {
     if (typeof this.dataValue[tab] == 'undefined') {
       this.dataValue = Object.assign({}, this.dataValue, { [tab]: {'repeated_items': []}})
     }
- //   const fields = this.setupValue['config']['tabs'].find( (t) => { return t.name == tab })
     this.dataValue = Object.assign({}, this.dataValue, { [tab]: {'repeated_items': [...this.dataValue[tab]['repeated_items'], {}]}})
     this.getNewWidget()
   }

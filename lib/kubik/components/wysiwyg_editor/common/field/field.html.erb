@@ -1,0 +1,20 @@
+<% case @field[:type] %>
+<% when 'resource' %>
+  <% if @field_value.present? %>
+    <% if @field[:variant] == 'media' %>
+      <%= render Kubik::WysiwygEditor::Common::Media.new(@field_value, @field, @data, @widget_id, @tab, @index) %>
+    <% else %>
+      <%= render Kubik::WysiwygEditor::Common::Resource.new(@field_value, @field, @data, @widget_id, @tab, @index) %>
+    <% end %>
+  <% else %>
+    <% if @field[:variant] == 'media' %>
+      <%= render Kubik::WysiwygEditor::Common::Field::Media.new(@field, @data, @widget_id, @tab, @index) %>
+    <% else %>
+      <%= render Kubik::WysiwygEditor::Common::Field::Resource.new(@field, @data, @widget_id, @tab, @index) %>
+    <% end %>
+  <% end %>
+<% when 'text' %>
+  <%= render Kubik::WysiwygEditor::Common::Field::TextInput.new(@field, @data, @widget_id, @tab, @index) %>
+<% when 'textarea' %>
+  <%= render Kubik::WysiwygEditor::Common::Field::Textarea.new(@field, @data, @widget_id, @tab, @index) %>
+<% end %>
