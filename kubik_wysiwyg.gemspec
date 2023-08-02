@@ -28,7 +28,7 @@ Gem::Specification.new do |spec|
   # spec.add_dependency "example-gem", "~> 1.0"
   spec.add_dependency "activeadmin", ">= 1.2.1"
   spec.add_development_dependency "pg"
-  spec.add_dependency "rails", "~> 6.0"
+  spec.add_dependency "rails", "> 6.0"
   spec.add_dependency "view_component", "~> 3.0"
   spec.add_development_dependency "warning"
 
