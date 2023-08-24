@@ -8,6 +8,7 @@ module Kubik
         @widget_id = widget_id
         @tab = tab
         @index  = index
+        @data_source = @data[:src]
         @field_value = @tab[:repeated] || @index.present? ?
           @data.dig(@tab[:name].to_sym, :repeated_items, (@index || 0), @field[:name].to_sym, :id) :
           @data.fetch(@tab[:name].to_sym, {}).fetch(@field[:name].to_sym, {}).fetch(:id, nil)

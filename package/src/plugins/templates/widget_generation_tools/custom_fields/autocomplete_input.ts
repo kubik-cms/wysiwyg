@@ -34,7 +34,7 @@ export default function autocompleteInput(settings) {
   const hiddenInput = makeElement('input',
     [],
     {
-      'data-kubik-name': 'author',
+      'data-kubik-name': settings.fieldName,
       'data-item-index': '',
       'type': 'hidden'
     }
@@ -51,7 +51,7 @@ export default function autocompleteInput(settings) {
     wrapperCssClasses: ['kubik-autocomplete-wrapper'],
     wrapperAttributes: {
       'data-controller': 'kubik-autocomplete',
-      'data-kubik-autocomplete-src-value': '/admin/book_authors',
+      'data-kubik-autocomplete-src-value': settings.itemsSrc,
       'data-kubik-autocomplete-active-class': 'kubik-autocomplete-wrapper__active',
       'data-kubik-autocomplete-fetch-error-class': 'kubik-autocomplete-wrapper__error',
       'data-kubik-autocomplete-loading-class': 'kubik-autocomplete-wrapper__loading',
