@@ -14,6 +14,13 @@ GIT
       rails
 
 GIT
+  remote: https://github.com/kubik-cms/kubik_styles_base.git
+  revision: a66a7fc9a8a3a9be6cd069ac036d3f9bad0148c7
+  branch: main
+  specs:
+    kubik_styles_base (0.1.1)
+
+GIT
   remote: https://github.com/kubik-cms/media_library.git
   revision: 5ca15cb921b3e9a9e89c514a8f41eee2a38a2617
   branch: master
@@ -31,16 +38,11 @@ GIT
       shrine
 
 PATH
-  remote: /kubik_styles_base
-  specs:
-    kubik_styles_base (0.1.1)
-
-PATH
   remote: /kubik_wysiwyg
   specs:
-    kubik_wysiwyg (0.1.0)
+    kubik_wysiwyg (0.1.3)
       activeadmin (>= 1.2.1)
-      rails (~> 6.0)
+      rails (> 6.0)
       view_component (~> 3.0)
 
 GEM
@@ -366,7 +368,7 @@ GEM
     turbolinks-source (5.2.0)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
-    view_component (3.0.0)
+    view_component (3.5.0)
       activesupport (>= 5.2.0, < 8.0)
       concurrent-ruby (~> 1.0)
       method_source (~> 1.0)

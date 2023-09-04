@@ -32,6 +32,7 @@ export default class extends Wysiwyg.PluginFactory {
               label: 'Author',
               model: 'BookAuthor',
               type: 'resource',
+              src: '/admin/book_authors'
             },
             {
               name: 'custom_name',
