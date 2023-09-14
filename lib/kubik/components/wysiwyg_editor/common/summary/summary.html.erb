@@ -1,0 +1,4 @@
+<% if @field[:type] == 'resource' %>
+  <%= render Kubik::WysiwygEditor::Common::Resource.new(@field, @data, @tab, @index) %>
+<% else %>
+<% end %>

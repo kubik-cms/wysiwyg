@@ -6,7 +6,7 @@
       <div class='kubik-wysiwyg--standard-fields' data-kubik-widget-content-target='<%= tab[:name] %>TabContainer'>
 
         <% if tab[:repeated] %>
-          <%= render Kubik::WysiwygEditor::Common::Repeater.new(tab: tab, data: @data, widget_id: @widget_id) %>
+          <%= render Kubik::WysiwygEditor::Common::Repeater.new(tab: tab, data: @data, widget_id: @widget_id, config: @config) %>
           <%= render Kubik::WysiwygEditor::Common::AddItem.new(tab, @widget_id) %>
         <% else %>
           <% if tab[:sections].present? %>

@@ -974,6 +974,11 @@ class kubik_widget_controller_default extends Controller {
     const duplicateData = set_1(this.dataValue, name, event.currentTarget.value);
     this.dataValue = duplicateData;
   }
+  updateWysiwygField(event) {
+    const name = event.currentTarget.dataset.fieldName;
+    const duplicateData = set_1(this.dataValue, name, event.currentTarget.innerHTML);
+    this.dataValue = duplicateData;
+  }
   selectResult(e) {
     const target = e.currentTarget;
     const returnObject = JSON.parse(target.dataset.returnObject);
@@ -1017,6 +1022,14 @@ kubik_widget_controller_default.values = {
   data: Object,
   maxItems: { type: Number, default: 0 }
 };
+class kubik_repeater_controller_default extends Controller {
+  connect() {
+  }
+  toggleItem(event) {
+    Array.from(this.element.classList).includes(this.expandedClass) ? this.element.classList.remove(this.expandedClass) : this.element.classList.add(this.expandedClass);
+  }
+}
+kubik_repeater_controller_default.classes = ["expanded"];
 function makeElement(tagName, classNames = [], attributes = {}, textContent = "") {
   const el = document.createElement(tagName);
   el.classList.add(...classNames);
@@ -1271,6 +1284,7 @@ class PluginFactory {
 }
 var index = {
   KubikWidgetController: kubik_widget_controller_default,
+  KubikRepeaterController: kubik_repeater_controller_default,
   PluginFactory,
   KubikAutocompleteController: kubik_autocomplete_controller_default
 };

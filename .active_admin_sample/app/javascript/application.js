@@ -15,6 +15,7 @@ const KubikInterfaceStimulus = Application.start()
 if(typeof KubikInterfaceStimulus != 'undefined') {
   KubikInterfaceStimulus.register("editor", EditorController)
   KubikInterfaceStimulus.register("kubik-widget", Wysiwyg.KubikWidgetController)
+  KubikInterfaceStimulus.register("kubik-repeater", Wysiwyg.KubikRepeaterController)
   KubikInterfaceStimulus.register("kubik-autocomplete", Wysiwyg.KubikAutocompleteController)
   KubikInterfaceStimulus.register("image_selector", ImageSelectorController)
   KubikInterfaceStimulus.register("multiple_image_selector", MultipleImageSelectorController)

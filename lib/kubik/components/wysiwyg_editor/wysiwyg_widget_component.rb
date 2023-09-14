@@ -1,10 +1,10 @@
 module Kubik
   module WysiwygEditor
     class WysiwygWidgetComponent < ViewComponent::Base
-      def initialize(setup, data)
-        @setup = setup.deep_symbolize_keys
-        @widget_id = setup[:widget_id]
-        @tabs = @setup[:config][:tabs]
+      def initialize(config, data)
+        @config = config.deep_symbolize_keys
+        @widget_id = config[:widget_id]
+        @tabs = @config[:config][:tabs]
         @data = widget_default_data.merge(data).symbolize_keys
       end
 

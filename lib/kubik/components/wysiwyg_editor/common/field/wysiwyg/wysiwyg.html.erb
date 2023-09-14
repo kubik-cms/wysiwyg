@@ -1,0 +1,12 @@
+<div class='input text'>
+  <label class='label' for='<%= @field[:name] %>-<% @widget_id %>'><%= @field_label %></label>
+  <div
+     contenteditable='true'
+     data-field-name='<%= @field_name %>'
+     class='input input-<%= @field[:type] %> <%= @field[:name] %>'
+     data-action='keyup->kubik-widget#updateWysiwygField'
+     id='<%= @field[:name] %>-<%= @widget_id %>'>
+         <%= @field_value %>
+     </div>
+  <p class='inline-hints'><%= @field[:hint] %></p>
+</div>

@@ -164,7 +164,7 @@
     color: var(--kubik-interface-color-grey-400);
     height: 100%;
     font-size: 1.25rem;
-    line-height: 2;
+    line-height: 1.5;
   }
 }
 
@@ -225,7 +225,6 @@
 .kubik--item {
   &-static-content {
     flex: 1;
-    margin-bottom: 1.5rem;
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -245,6 +244,7 @@
     }
     &--additional-info {
       @include kubik-typography-para--small;
+      line-height: 1.5;
       margin-left: 1.5rem;
       font-weight: 600;
       flex: 1;
@@ -280,4 +280,11 @@
     flex: 1;
     font-size: 7.5rem;
   }
+}
+.kubik-wysiwyg-component .kubik-wysiwyg--standard-fields .input.input-wysiwyg {
+  @include kubik-form-input-textarea;
+  resize: vertical;
+  height: auto;
+  min-height: 2rem;
+  font-weight: normal;
 }

@@ -68,6 +68,7 @@ export default class extends Wysiwyg.PluginFactory {
           repeated: true,
           repeater_settings: {
             add_label: 'Add Media',
+            summary: 'media',
           }
         },
         {

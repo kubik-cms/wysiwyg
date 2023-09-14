@@ -26,6 +26,7 @@ export default class extends Controller {
   setupValue: Object
   dataValue: Object
   maxItemsValue: Number
+  hasExpandedClass: Boolean
 
   static values = {
     widgetId: String,
@@ -90,6 +91,12 @@ export default class extends Controller {
   updateField(event):void {
      const name = event.currentTarget.name
      const duplicateData = set(this.dataValue, name, event.currentTarget.value)
+     this.dataValue = duplicateData
+  }
+
+  updateWysiwygField(event):void {
+     const name = event.currentTarget.dataset.fieldName
+     const duplicateData = set(this.dataValue, name, event.currentTarget.innerHTML)
      this.dataValue = duplicateData
   }
 

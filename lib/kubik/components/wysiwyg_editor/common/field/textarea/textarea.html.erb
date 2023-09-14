@@ -1,7 +1,7 @@
 <div class='input text'>
   <label class='label' for='<%= @field[:name] %>-<% @widget_id %>'><%= @field_label %></label>
   <textarea
-         id='title-<%= @widget_id %>'
+         id='<%= @field_name%>-<%= @widget_id %>'
          tabindex='1'
          name='<%= @field_name %>'
          value='<%= @field_value %>'

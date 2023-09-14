@@ -43,6 +43,7 @@ export default class extends Wysiwyg.PluginFactory {
           repeated: true,
           repeater_settings: {
             add_label: 'Add Author',
+            summary: 'author',
           }
         },
         {
@@ -57,7 +58,7 @@ export default class extends Wysiwyg.PluginFactory {
             {
               name: 'intro',
               label: 'Intro',
-              type: 'textarea',
+              type: 'wysiwyg',
             }
           ]
         },
