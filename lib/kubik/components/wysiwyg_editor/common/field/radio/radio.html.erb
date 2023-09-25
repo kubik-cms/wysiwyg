@@ -1,0 +1,13 @@
+<div class='input choices'>
+  <label class='label' for='<%= @field[:name] %>-<% @widget_id %>'><%= @field_label %></label>
+  <% @options.each do |option| %>
+    <div class='radio choice'>
+      <input type='radio' id='<%= @field[:name] %>-<%= @widget_id %>' name='<%= @field_name %>' data-action='change->kubik-widget#updateField' value='<%= option[:value] %>' <% if option[:value] == @field_value %>checked='checked'<% end %> />
+      <label for='<%= @field[:name] %>-<% @widget_id %>'><%= option[:label] %></label>
+    </div>
+  <% end %>
+  <% if @options.blank? %>
+    <p>No options available</p>
+  <% end %>
+  <p class='inline-hints'><%= @field[:hint] %></p>
+</div>

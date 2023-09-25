@@ -6,7 +6,7 @@
      class='input input-<%= @field[:type] %> <%= @field[:name] %>'
      data-action='keyup->kubik-widget#updateWysiwygField'
      id='<%= @field[:name] %>-<%= @widget_id %>'>
-         <%= @field_value %>
+         <%= @field_value.html_safe %>
      </div>
   <p class='inline-hints'><%= @field[:hint] %></p>
 </div>

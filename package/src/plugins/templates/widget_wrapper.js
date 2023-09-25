@@ -7,6 +7,7 @@ export const widgetWrapper = function widgetWrapper (details = {}, data) {
     'data-kubik-widget-setup-value': JSON.stringify(details.setup),
     'data-kubik-widget-data-value': JSON.stringify(data),
     'data-kubik-widget-widget-id-value': details.setup.widget_id,
+    'data-kubik-widget-widget-icon': details.setup.config.icon,
     id: details.setup.widget_id
   }
 

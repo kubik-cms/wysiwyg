@@ -19,7 +19,7 @@ gem 'turbolinks', '~> 5'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 gem 'jbuilder', '~> 2.7'
 
-gem 'activeadmin'
+gem 'activeadmin', '< 3.0'
 
 gem 'kubik_styles_base', github: 'kubik-cms/kubik_styles_base', branch: 'main'
 gem 'active_admin_kubik', git: 'https://github.com/kubik-cms/active_admin_kubik_theme.git'

@@ -285,6 +285,9 @@
   @include kubik-form-input-textarea;
   resize: vertical;
   height: auto;
-  min-height: 2rem;
+  min-height: 12rem;
   font-weight: normal;
+  border-color: var(--kubik-interface-color-grey-200);
+  background: white;
+
 }

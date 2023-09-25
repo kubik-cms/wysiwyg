@@ -21,6 +21,7 @@ export default class extends Wysiwyg.PluginFactory {
   static get widgetConfig() {
     return {
       widget_model: 'BookAuthor',
+      icon: Icon,
       widget_name: 'author-selector',
       tabs: [
         {
@@ -66,6 +67,39 @@ export default class extends Wysiwyg.PluginFactory {
           name: 'settings',
           label: 'Settings',
           fields: [
+            {
+              name: 'featured',
+              label: 'Featured',
+              type: 'boolean',
+            },
+            {
+              name: 'columns',
+              label: 'Columns',
+              type: 'radio',
+              options: [
+                { label: 'One', value: 'one' },
+                { label: 'Two', value: 'two' },
+              ]
+            },
+            {
+              name: 'check',
+              label: 'Check',
+              type: 'checkbox',
+              options: [
+                { label: 'One', value: 'one' },
+                { label: 'Two', value: 'two' },
+                { label: 'Three', value: 'three' },
+              ]
+            },
+            {
+              name: 'layout',
+              type: 'select',
+              options : [
+                { label: 'Single', value: 'single' },
+                { label: 'Multiple', value: 'multiple' },
+              ],
+              label: 'Layout',
+            },
             {
               name: 'additional_classes',
               type: 'text',

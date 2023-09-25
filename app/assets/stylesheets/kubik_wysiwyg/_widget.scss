@@ -1,0 +1,16 @@
+.kubik-wysiwyg-widget {
+  &-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 1rem 1.5rem .75rem;
+    border-bottom: 1px solid var(--kubik-interface-color-grey-200);
+  }
+  &-icon {
+    margin-right: .5rem;
+  }
+  &-title {
+    margin: 0;
+  }
+}
+

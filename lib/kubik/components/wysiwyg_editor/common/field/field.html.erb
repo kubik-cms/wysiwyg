@@ -17,6 +17,14 @@
   <%= render Kubik::WysiwygEditor::Common::Field::TextInput.new(@field, @data, @widget_id, @tab, @index) %>
 <% when 'textarea' %>
   <%= render Kubik::WysiwygEditor::Common::Field::Textarea.new(@field, @data, @widget_id, @tab, @index) %>
+<% when 'boolean' %>
+  <%= render Kubik::WysiwygEditor::Common::Field::Boolean.new(@field, @data, @widget_id, @tab, @index) %>
+<% when 'checkbox' %>
+  <%= render Kubik::WysiwygEditor::Common::Field::Checkbox.new(@field, @data, @widget_id, @tab, @index) %>
+<% when 'radio' %>
+  <%= render Kubik::WysiwygEditor::Common::Field::Radio.new(@field, @data, @widget_id, @tab, @index) %>
+<% when 'select' %>
+  <%= render Kubik::WysiwygEditor::Common::Field::Select.new(@field, @data, @widget_id, @tab, @index) %>
 <% when 'wysiwyg' %>
   <%= render Kubik::WysiwygEditor::Common::Field::Wysiwyg.new(@field, @data, @widget_id, @tab, @index) %>
 <% end %>

@@ -971,7 +971,14 @@ class kubik_widget_controller_default extends Controller {
   }
   updateField(event) {
     const name = event.currentTarget.name;
-    const duplicateData = set_1(this.dataValue, name, event.currentTarget.value);
+    let v = event.currentTarget.value;
+    if (event.currentTarget.dataset.boolean === "true" && event.currentTarget.type === "checkbox" && !event.currentTarget.checked) {
+      v = 0;
+    }
+    if (event.currentTarget.dataset.checkbox === "true" && event.currentTarget.type === "checkbox") {
+      v = Array.from(event.currentTarget.parentElement.parentElement.querySelectorAll("[name=`${event.currentTarget.name}`]")).map((el) => el.checked ? el.value : null).filter((el) => el !== null);
+    }
+    const duplicateData = set_1(this.dataValue, name, v);
     this.dataValue = duplicateData;
   }
   updateWysiwygField(event) {
@@ -1223,6 +1230,7 @@ const widgetWrapper = function widgetWrapper2(details = {}, data) {
     "data-kubik-widget-setup-value": JSON.stringify(details.setup),
     "data-kubik-widget-data-value": JSON.stringify(data),
     "data-kubik-widget-widget-id-value": details.setup.widget_id,
+    "data-kubik-widget-widget-icon": details.setup.config.icon,
     id: details.setup.widget_id
   };
   if (details.items_limit) {

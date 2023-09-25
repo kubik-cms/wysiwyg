@@ -6,6 +6,7 @@ module Kubik
         @widget_id = config[:widget_id]
         @tabs = @config[:config][:tabs]
         @data = widget_default_data.merge(data).symbolize_keys
+        @icon = @config.dig(:config, :icon)
       end
 
       private
@@ -24,6 +25,9 @@ module Kubik
                     break;
                   when 'textarea'
                     tab_data[field[:name].to_sym] = ''
+                    break
+                  when 'select'
+                    tab_data[field[:name].to_sym] = field[:options].try(:first)
                     break
                   when 'media'
                     tab_data[field[:name].to_sym] = nil
