@@ -8,7 +8,7 @@
     <% end %>
   <% else %>
     <% if @field[:variant] == 'media' %>
-      <%= render Kubik::WysiwygEditor::Common::Field::Media.new(@field, @data, @tab, @index) %>
+      <%= render Kubik::WysiwygEditor::Common::Field::Media.new(@field, @data, @widget_id, @tab, @index) %>
     <% else %>
       <%= render Kubik::WysiwygEditor::Common::Field::Resource.new(@field, @data, @widget_id, @tab, @index) %>
     <% end %>

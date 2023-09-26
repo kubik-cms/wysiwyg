@@ -22,6 +22,7 @@ export default class extends Wysiwyg.PluginFactory {
     return {
       widget_model: 'Kubik::Media',
       widget_name: 'media-selector',
+      icon: Icon,
       tabs: [
         {
           name: 'media',

@@ -14,8 +14,6 @@ module Kubik
           @data.fetch(@tab[:name].to_sym, {}).fetch(@field[:name].try(:to_sym), '')
 
         @options = @field[:options] || []
-        binding.pry
-
       end
     end
   end
