@@ -8,6 +8,11 @@
   }
   &-icon {
     margin-right: .5rem;
+    width: 1.5rem;
+    height: 1.5rem;
+    svg {
+      width: 100%;
+    }
   }
   &-title {
     margin: 0;

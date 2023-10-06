@@ -22,10 +22,10 @@ GIT
 
 GIT
   remote: https://github.com/kubik-cms/media_library.git
-  revision: aaf50ec75a551edb25bfd9f5b7b88b22bfc505a6
+  revision: ed2b1463fa3c49f129067e2ed0054ef0eb2c3b06
   branch: master
   specs:
-    kubik_media_library (0.1.15)
+    kubik_media_library (0.1.16)
       aasm
       activeadmin
       acts_as_list
@@ -40,7 +40,7 @@ GIT
 PATH
   remote: /kubik_wysiwyg
   specs:
-    kubik_wysiwyg (0.1.4)
+    kubik_wysiwyg (0.1.5)
       activeadmin (>= 1.2.1)
       rails (> 6.0)
       view_component (~> 3.0)
@@ -168,7 +168,7 @@ GEM
     execjs (2.9.1)
     exifr (1.4.0)
     fastimage (2.2.7)
-    ffi (1.16.1)
+    ffi (1.16.2)
     formtastic (4.0.0)
       actionpack (>= 5.2.0)
     formtastic_i18n (0.7.0)
@@ -388,7 +388,7 @@ GEM
     websocket-extensions (0.1.5)
     xpath (3.2.0)
       nokogiri (~> 1.8)
-    zeitwerk (2.6.11)
+    zeitwerk (2.6.12)
 
 PLATFORMS
   ruby

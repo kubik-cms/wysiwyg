@@ -3,6 +3,7 @@
     <div data-controller='kubik-repeater' class='kubik-wysiwyg-repeated-item' data-kubik-repeater-expanded-class='kubik-widget-expanded'>
       <div class='kubik-wysiwyg-repeated-item-actions'>
         <%= render Kubik::WysiwygEditor::Common::ExpandAction.new(index) %>
+        <%= render Kubik::WysiwygEditor::Common::Summary.new(fields: @fields, data: @data, tab: @tab, index: index) %>
         <%= render Kubik::WysiwygEditor::Common::DeleteAction.new(index, @tab[:name]) %>
         <%= render Kubik::WysiwygEditor::Common::Actions.new(index, @repeated_items.length, @tab[:name]) %>
       </div>

@@ -8,7 +8,7 @@ module Kubik
         @index = index
         @tab = tab
         @field_label = @field[:label] || @field[:name].humanize
-        @field_name = @index.present? ? "#{@tab[:name]}[repeated_items][#{@index}].#{@field[:name]}.id" : "#{@tab[:name]}.#{@field[:name]}.id}"
+        @field_name = @index.present? ? "#{@tab[:name]}[repeated_items][#{@index}].#{@field[:name]}.id" : "#{@tab[:name]}.#{@field[:name]}.id"
       end
     end
   end

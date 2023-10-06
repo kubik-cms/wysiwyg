@@ -6,6 +6,7 @@ import Paragraph from '@editorjs/paragraph';
 import Quote from '@editorjs/quote';
 import MediaWidget from './media_widget';
 import AuthorSelector from './authors_widget';
+import ContentWithMedia from './content_with_media_widget';
 import Hyperlink from 'editorjs-hyperlink';
 
 export default {
@@ -16,6 +17,10 @@ export default {
   author: {
     class: AuthorSelector,
     inlineToolbar: ['bold', 'underline', 'hyperlink', 'italic'],
+  },
+  content_with_media: {
+    class: ContentWithMedia,
+    inlineToolbar: false
   },
   paragraph: {
     class: Paragraph,

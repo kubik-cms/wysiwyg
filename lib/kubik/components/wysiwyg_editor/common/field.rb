@@ -14,7 +14,8 @@ module Kubik
             @data.dig(@tab[:name].to_sym, :repeated_items, (@index || 0), @field[:name].to_sym)
           end :
           if @field[:type] == 'resource'
-            @data.fetch(@tab[:name].to_sym, {}).fetch(@field[:name].to_sym, {}).fetch(:id, nil)
+
+            @data.dig(@tab[:name].to_sym, @field[:name].to_sym, :id)
           else
             @data.fetch(@tab[:name].to_sym, {}).fetch(@field[:name].to_sym, {})
           end
