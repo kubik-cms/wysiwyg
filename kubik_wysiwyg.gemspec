@@ -1,6 +1,6 @@
 Gem::Specification.new do |spec|
   spec.name          = "kubik_wysiwyg"
-  spec.version       = "0.1.6"
+  spec.version       = "0.1.7"
   spec.authors       = ["Bart Oleszczyk"]
   spec.email         = ["bart@primate.co.uk"]
 
