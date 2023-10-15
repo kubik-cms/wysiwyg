@@ -1,20 +1,31 @@
 .kubik-wysiwyg-repeated-item {
   flex: 0 0 100%;
   padding: 0;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
   background-color: var(--kubik-interface-color-grey-100);
   border: 1px solid var(--kubik-interface-color-grey-200);
   border-radius: 3px;
   display: flex;
   flex-direction: column;
 
-  &-actions {
+  &-header {
     display: flex;
     flex-direction: row;
     padding: 1rem 1rem;
     .kubik--item {
       flex: 1;
       margin: 0 .5rem;
+    }
+    &--summary {
+      display: flex;
+      flex: 1;
+      align-items: center;
+      font-weight: 600;
+      &:empty:before {
+        content: attr(data-header-placeholder);
+        display: block;
+        color: var(--kubik-interface-color-grey-600);
+      }
     }
   }
   .kubik-repeater-expand-action {

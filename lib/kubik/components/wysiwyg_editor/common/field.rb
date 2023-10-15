@@ -7,6 +7,7 @@ module Kubik
         @widget_id = widget_id
         @tab = tab
         @index  = index
+        @header_field = @tab.dig(:repeater_settings, :summary) == @field[:name]
         @field_value = @tab[:repeated] || @index.present? ?
           if @field[:type] == 'resource'
             @data.dig(@tab[:name].to_sym, :repeated_items, (@index || 0), @field[:name].to_sym, :id)

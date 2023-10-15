@@ -1,7 +1,7 @@
 <div class='kubik-wysiwyg-tabs-container' id="<%= @widget_id %>-tabs">
   <% @repeated_items.each_with_index do |item, index| %>
     <div data-controller='kubik-repeater' class='kubik-wysiwyg-repeated-item' data-kubik-repeater-expanded-class='kubik-widget-expanded'>
-      <div class='kubik-wysiwyg-repeated-item-actions'>
+      <div class='kubik-wysiwyg-repeated-item-header'>
         <%= render Kubik::WysiwygEditor::Common::ExpandAction.new(index) %>
         <%= render Kubik::WysiwygEditor::Common::Summary.new(fields: @fields, data: @data, tab: @tab, index: index) %>
         <%= render Kubik::WysiwygEditor::Common::DeleteAction.new(index, @tab[:name]) %>

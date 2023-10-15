@@ -8,6 +8,7 @@ import MediaWidget from './media_widget';
 import AuthorSelector from './authors_widget';
 import ContentWithMedia from './content_with_media_widget';
 import Hyperlink from 'editorjs-hyperlink';
+import ColumnText from './column_text_widget';
 
 export default {
   image: {
@@ -16,6 +17,10 @@ export default {
   },
   author: {
     class: AuthorSelector,
+    inlineToolbar: ['bold', 'underline', 'hyperlink', 'italic'],
+  },
+  column_text_widget: {
+    class: ColumnText,
     inlineToolbar: ['bold', 'underline', 'hyperlink', 'italic'],
   },
   content_with_media: {

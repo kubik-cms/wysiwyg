@@ -14,7 +14,7 @@
     <% end %>
   <% end %>
 <% when 'text' %>
-  <%= render Kubik::WysiwygEditor::Common::Field::TextInput.new(@field, @data, @widget_id, @tab, @index) %>
+  <%= render Kubik::WysiwygEditor::Common::Field::TextInput.new(@field, @data, @widget_id, @tab, @index, header_field: @header_field) %>
 <% when 'textarea' %>
   <%= render Kubik::WysiwygEditor::Common::Field::Textarea.new(@field, @data, @widget_id, @tab, @index) %>
 <% when 'boolean' %>

@@ -4,7 +4,7 @@
      contenteditable='true'
      data-field-name='<%= @field_name %>'
      class='input input-<%= @field[:type] %> <%= @field[:name] %>'
-     data-action='keyup->kubik-widget#updateWysiwygField'
+     data-action='input->kubik-widget#updateWysiwygField '
      id='<%= @field[:name] %>-<%= @widget_id %>'>
          <%= @field_value.to_s.html_safe %>
      </div>

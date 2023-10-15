@@ -3,10 +3,14 @@ import { Controller } from "@hotwired/stimulus"
 export default class extends Controller {
   hasExpandedClass: Boolean
   expandedClass: string
+  headerTarget: HTMLElement
+
+  static targets = ['header']
 
   static classes = [ 'expanded' ]
 
-  connect():void {
+  updateHeader(event):void {
+    this.headerTarget.innerHTML = event.currentTarget.value
   }
 
   toggleItem(event):void {
