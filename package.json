@@ -30,7 +30,7 @@
     "@kubik-cms/interface_elements": "^0.1.6",
     "@kubik-cms/kubik_interface_elements": "^0.1.0",
     "@kubik-cms/media_library": "^0.1.9",
-    "editorjs-hyperlink": "^1.type.6",
+    "editorjs-hyperlink": "^1.0.6",
     "stimulus-reveal-controller": "^4.0.0"
   }
 }
