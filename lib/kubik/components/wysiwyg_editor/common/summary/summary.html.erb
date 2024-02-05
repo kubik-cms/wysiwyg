@@ -1,0 +1,9 @@
+<%= content_tag :div, container_attributes do %>
+  <% if @field_value.present? %>
+    <% if @field[:type] == 'resource' %>
+      <%= render Kubik::WysiwygEditor::Common::Resource.new(@field, @data, @tab, @index) %>
+    <% else %>
+      <%= @field_value %>
+    <% end %>
+  <% end %>
+<% end %>

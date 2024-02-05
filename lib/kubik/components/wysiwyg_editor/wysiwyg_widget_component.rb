@@ -1,11 +1,12 @@
 module Kubik
   module WysiwygEditor
     class WysiwygWidgetComponent < ViewComponent::Base
-      def initialize(setup, data)
-        @setup = setup.deep_symbolize_keys
-        @widget_id = setup[:widget_id]
-        @tabs = @setup[:config][:tabs]
+      def initialize(config, data)
+        @config = config.deep_symbolize_keys
+        @widget_id = config[:widget_id]
+        @tabs = @config[:config][:tabs]
         @data = widget_default_data.merge(data).symbolize_keys
+        @icon = @config.dig(:config, :icon)
       end
 
       private
@@ -24,6 +25,9 @@ module Kubik
                     break;
                   when 'textarea'
                     tab_data[field[:name].to_sym] = ''
+                    break
+                  when 'select'
+                    tab_data[field[:name].to_sym] = field[:options].try(:first)
                     break
                   when 'media'
                     tab_data[field[:name].to_sym] = nil

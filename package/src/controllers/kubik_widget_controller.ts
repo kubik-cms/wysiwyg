@@ -26,6 +26,7 @@ export default class extends Controller {
   setupValue: Object
   dataValue: Object
   maxItemsValue: Number
+  hasExpandedClass: Boolean
 
   static values = {
     widgetId: String,
@@ -89,7 +90,21 @@ export default class extends Controller {
 
   updateField(event):void {
      const name = event.currentTarget.name
-     const duplicateData = set(this.dataValue, name, event.currentTarget.value)
+     let v = event.currentTarget.value
+     if(event.currentTarget.dataset.boolean === 'true' && event.currentTarget.type === 'checkbox' && !event.currentTarget.checked) {
+       v = 0
+     }
+     if(event.currentTarget.dataset.checkbox === 'true' && event.currentTarget.type === 'checkbox') {
+       v = Array.from(event.currentTarget.parentElement.parentElement.querySelectorAll("[name=`${event.currentTarget.name}`]")).map( (el:HTMLInputElement) => el.checked ? el.value : null).filter( (el) => el !== null)
+     }
+
+     const duplicateData = set(this.dataValue, name, v)
+     this.dataValue = duplicateData
+  }
+
+  updateWysiwygField(event):void {
+     const name = event.currentTarget.dataset.fieldName
+     const duplicateData = set(this.dataValue, name, event.currentTarget.innerHTML)
      this.dataValue = duplicateData
   }
 

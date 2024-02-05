@@ -22,6 +22,7 @@ export default class extends Wysiwyg.PluginFactory {
     return {
       widget_model: 'Kubik::Media',
       widget_name: 'media-selector',
+      icon: Icon,
       tabs: [
         {
           name: 'media',
@@ -68,6 +69,7 @@ export default class extends Wysiwyg.PluginFactory {
           repeated: true,
           repeater_settings: {
             add_label: 'Add Media',
+            summary: 'media',
           }
         },
         {

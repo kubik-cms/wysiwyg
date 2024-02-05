@@ -20938,7 +20938,7 @@ function autocompleteInput(settings) {
         ],
         wrapperAttributes: {
             "data-controller": "kubik-autocomplete",
-            "data-kubik-autocomplete-src-value": "/admin/book_authors",
+            "data-kubik-autocomplete-src-value": settings.itemsSrc,
             "data-kubik-autocomplete-active-class": "kubik-autocomplete-wrapper__active",
             "data-kubik-autocomplete-fetch-error-class": "kubik-autocomplete-wrapper__error",
             "data-kubik-autocomplete-loading-class": "kubik-autocomplete-wrapper__loading",
@@ -21212,7 +21212,7 @@ const itemsContents = function itemsContents(widgetName, widgetId) {
             {
                 name: "Video",
                 value: "video"
-            }, 
+            },
         ]
     });
     const thumbnailSelector = (0, _widgetGenerationTools.imageSelector)(widgetId, "image");

@@ -1,25 +1,29 @@
 <div class='kubik-wysiwyg-tabs-container' id="<%= @widget_id %>-tabs">
   <% @repeated_items.each_with_index do |item, index| %>
-    <div class='kubik-wysiwyg-repeated-item'>
-      <div class='kubik-wysiwyg-repeated-item-actions'>
+    <div data-controller='kubik-repeater' class='kubik-wysiwyg-repeated-item' data-kubik-repeater-expanded-class='kubik-widget-expanded'>
+      <div class='kubik-wysiwyg-repeated-item-header'>
+        <%= render Kubik::WysiwygEditor::Common::ExpandAction.new(index) %>
+        <%= render Kubik::WysiwygEditor::Common::Summary.new(fields: @fields, data: @data, tab: @tab, index: index) %>
         <%= render Kubik::WysiwygEditor::Common::DeleteAction.new(index, @tab[:name]) %>
         <%= render Kubik::WysiwygEditor::Common::Actions.new(index, @repeated_items.length, @tab[:name]) %>
       </div>
       <div class='fields<%= @tab[:sections].present? ? " fields__with-sections" : nil %>'>
-        <% if @tab[:sections].present? %>
-          <% grouped_fields = @tab[:fields].group_by { |f| f[:section] } %>
-          <% grouped_fields.each do |group, fields| %>
-            <div class='kubik_widget_section kubik_widget_section__<%= group %>'>
-              <% fields.each do |field| %>
-                <%= render Kubik::WysiwygEditor::Common::Field.new(field, @data, @widget_id, @tab, index) %>
-              <% end %>
-            </div>
+        <div class='fields-container'>
+          <% if @tab[:sections].present? %>
+            <% grouped_fields = @tab[:fields].group_by { |f| f[:section] } %>
+            <% grouped_fields.each do |group, fields| %>
+              <div class='kubik_widget_section kubik_widget_section__<%= group %>'>
+                <% fields.each do |field| %>
+                  <%= render Kubik::WysiwygEditor::Common::Field.new(field, @data, @widget_id, @tab, index) %>
+                <% end %>
+              </div>
+            <% end %>
+          <% else %>
+            <% @fields.drop(1).each do |field| %>
+              <%= render Kubik::WysiwygEditor::Common::Field.new(field, @data, @widget_id, @tab, index) %>
+            <% end %>
           <% end %>
-        <% else %>
-          <% @fields.each do |field| %>
-            <%= render Kubik::WysiwygEditor::Common::Field.new(field, @data, @widget_id, @tab, index) %>
-          <% end %>
-        <% end %>
+        </div>
       </div>
     </div>
   <% end %>

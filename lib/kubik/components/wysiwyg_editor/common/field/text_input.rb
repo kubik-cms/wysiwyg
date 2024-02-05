@@ -1,13 +1,14 @@
 module Kubik
   module WysiwygEditor
     class Common::Field::TextInput < ViewComponent::Base
-      def initialize(field, data, widget_id, tab, index=nil)
+      def initialize(field, data, widget_id, tab, index=nil, header_field=false)
         @field = field
         @data = data.deep_symbolize_keys
         @widget_id = widget_id
         @index = index
         @tab = tab
         @field_label = @field[:label] || @field[:name].humanize
+        @header_field = header_field
         @field_name = @index.present? ? "#{@tab[:name]}[repeated_items][#{@index}].#{@field[:name]}" : "#{@tab[:name]}.#{@field[:name]}"
         @field_value = @tab[:repeated] || @index.present? ?
           @data.dig(@tab[:name].to_sym, :repeated_items, (@index || 0), @field[:name].to_sym) :

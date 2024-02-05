@@ -1,3 +1,7 @@
+<div class='kubik-wysiwyg-widget-header'>
+  <span class='kubik-wysiwyg-widget-icon'><%= @icon.html_safe %></span>
+  <h3 class='kubik-wysiwyg-widget-title'><%= @config[:label] %></h3>
+</div>
 <% if @tabs.present? %>
-  <%= render Kubik::WysiwygEditor::Common::TabbedContent.new(@tabs, @setup, @data) %>
+  <%= render Kubik::WysiwygEditor::Common::TabbedContent.new(@tabs, @config, @data) %>
 <% end %>

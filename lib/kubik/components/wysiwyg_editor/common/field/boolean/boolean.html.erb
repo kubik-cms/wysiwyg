@@ -1,0 +1,7 @@
+<div class='input boolean'>
+  <div class='boolean-input-wrapper'>
+    <input type='checkbox' id='<%= @field[:name] %>-<% @widget_id %>' name='<%= @field_name %>' data-boolean='true' data-action='change->kubik-widget#updateField' value='1' <% if @field_value.to_i == 1 %>checked='checked'<% end %> />
+    <label class='label' for='<%= @field[:name] %>-<% @widget_id %>'><%= @field_label %></label>
+  </div>
+  <p class='inline-hints'><%= @field[:hint] %></p>
+</div>

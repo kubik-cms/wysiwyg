@@ -1,11 +1,9 @@
 module Kubik
   module WysiwygEditor
     class Common::Resource < ViewComponent::Base
-      def initialize(field_value, field, data, widget_id, tab, index=nil)
-        @field_value = field_value
+      def initialize(field, data, tab, index=nil)
         @field = field
         @data = data.deep_symbolize_keys
-        @widget_id = widget_id
         @tab = tab
         @index  = index
         @field_value = @tab[:repeated] || @index.present? ?

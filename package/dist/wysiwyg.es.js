@@ -971,7 +971,19 @@ class kubik_widget_controller_default extends Controller {
   }
   updateField(event) {
     const name = event.currentTarget.name;
-    const duplicateData = set_1(this.dataValue, name, event.currentTarget.value);
+    let v = event.currentTarget.value;
+    if (event.currentTarget.dataset.boolean === "true" && event.currentTarget.type === "checkbox" && !event.currentTarget.checked) {
+      v = 0;
+    }
+    if (event.currentTarget.dataset.checkbox === "true" && event.currentTarget.type === "checkbox") {
+      v = Array.from(event.currentTarget.parentElement.parentElement.querySelectorAll("[name=`${event.currentTarget.name}`]")).map((el) => el.checked ? el.value : null).filter((el) => el !== null);
+    }
+    const duplicateData = set_1(this.dataValue, name, v);
+    this.dataValue = duplicateData;
+  }
+  updateWysiwygField(event) {
+    const name = event.currentTarget.dataset.fieldName;
+    const duplicateData = set_1(this.dataValue, name, event.currentTarget.innerHTML);
     this.dataValue = duplicateData;
   }
   selectResult(e) {
@@ -1017,6 +1029,16 @@ kubik_widget_controller_default.values = {
   data: Object,
   maxItems: { type: Number, default: 0 }
 };
+class kubik_repeater_controller_default extends Controller {
+  updateHeader(event) {
+    this.headerTarget.innerHTML = event.currentTarget.value;
+  }
+  toggleItem(event) {
+    Array.from(this.element.classList).includes(this.expandedClass) ? this.element.classList.remove(this.expandedClass) : this.element.classList.add(this.expandedClass);
+  }
+}
+kubik_repeater_controller_default.targets = ["header"];
+kubik_repeater_controller_default.classes = ["expanded"];
 function makeElement(tagName, classNames = [], attributes = {}, textContent = "") {
   const el = document.createElement(tagName);
   el.classList.add(...classNames);
@@ -1204,12 +1226,20 @@ kubik_autocomplete_controller_default.values = {
   results: { type: Array, default: [] },
   resultActive: Number
 };
+class KubikWysiwygController extends Controller {
+  connect() {
+  }
+  change(event) {
+    debugger;
+  }
+}
 const widgetWrapper = function widgetWrapper2(details = {}, data) {
   let wrapperAttributes = {
     "data-controller": "kubik-widget",
     "data-kubik-widget-setup-value": JSON.stringify(details.setup),
     "data-kubik-widget-data-value": JSON.stringify(data),
     "data-kubik-widget-widget-id-value": details.setup.widget_id,
+    "data-kubik-widget-widget-icon": details.setup.config.icon,
     id: details.setup.widget_id
   };
   if (details.items_limit) {
@@ -1271,7 +1301,9 @@ class PluginFactory {
 }
 var index = {
   KubikWidgetController: kubik_widget_controller_default,
+  KubikRepeaterController: kubik_repeater_controller_default,
   PluginFactory,
+  KubikWysiwygController,
   KubikAutocompleteController: kubik_autocomplete_controller_default
 };
 export { index as default };

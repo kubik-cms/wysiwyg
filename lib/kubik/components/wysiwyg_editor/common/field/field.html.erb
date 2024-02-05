@@ -4,7 +4,7 @@
     <% if @field[:variant] == 'media' %>
       <%= render Kubik::WysiwygEditor::Common::Media.new(@field_value, @field, @data, @widget_id, @tab, @index) %>
     <% else %>
-      <%= render Kubik::WysiwygEditor::Common::Resource.new(@field_value, @field, @data, @widget_id, @tab, @index) %>
+      <%= render Kubik::WysiwygEditor::Common::Resource.new(@field, @data, @tab, @index) %>
     <% end %>
   <% else %>
     <% if @field[:variant] == 'media' %>
@@ -14,7 +14,17 @@
     <% end %>
   <% end %>
 <% when 'text' %>
-  <%= render Kubik::WysiwygEditor::Common::Field::TextInput.new(@field, @data, @widget_id, @tab, @index) %>
+  <%= render Kubik::WysiwygEditor::Common::Field::TextInput.new(@field, @data, @widget_id, @tab, @index, header_field: @header_field) %>
 <% when 'textarea' %>
   <%= render Kubik::WysiwygEditor::Common::Field::Textarea.new(@field, @data, @widget_id, @tab, @index) %>
+<% when 'boolean' %>
+  <%= render Kubik::WysiwygEditor::Common::Field::Boolean.new(@field, @data, @widget_id, @tab, @index) %>
+<% when 'checkbox' %>
+  <%= render Kubik::WysiwygEditor::Common::Field::Checkbox.new(@field, @data, @widget_id, @tab, @index) %>
+<% when 'radio' %>
+  <%= render Kubik::WysiwygEditor::Common::Field::Radio.new(@field, @data, @widget_id, @tab, @index) %>
+<% when 'select' %>
+  <%= render Kubik::WysiwygEditor::Common::Field::Select.new(@field, @data, @widget_id, @tab, @index) %>
+<% when 'wysiwyg' %>
+  <%= render Kubik::WysiwygEditor::Common::Field::Wysiwyg.new(@field, @data, @widget_id, @tab, @index) %>
 <% end %>
