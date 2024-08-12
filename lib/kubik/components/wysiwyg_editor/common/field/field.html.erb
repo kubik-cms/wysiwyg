@@ -27,4 +27,6 @@
   <%= render Kubik::WysiwygEditor::Common::Field::Select.new(@field, @data, @widget_id, @tab, @index) %>
 <% when 'wysiwyg' %>
   <%= render Kubik::WysiwygEditor::Common::Field::Wysiwyg.new(@field, @data, @widget_id, @tab, @index) %>
+<% when 'key_value_repeater' %>
+  <%= render Kubik::WysiwygEditor::Common::Field::KeyValueRepeaterInput.new(@field, @data, @widget_id, @tab, @index, header_field: @header_field) %>
 <% end %>

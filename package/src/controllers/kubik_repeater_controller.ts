@@ -9,7 +9,10 @@ export default class extends Controller {
 
   static classes = [ 'expanded' ]
 
-  updateHeader(event):void {
+  connect() {
+  }
+
+  updateHeader(event) {
     this.headerTarget.innerHTML = event.currentTarget.value
   }
 

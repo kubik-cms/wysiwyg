@@ -25346,7 +25346,6 @@ var mediaContainer = function mediaContainer() {
             label: 'type'
         }
     ]);
-    debugger;
     wrapper.appendChild(tabs);
     return wrapper;
 };

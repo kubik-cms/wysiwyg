@@ -22,12 +22,12 @@ services:
     environment:
       RAILS_ENV: test
     depends_on:
-      - active_admin_sample_db
+      - active_admin_wysiwyg_sample_db
     networks:
       - development
-  active_admin_sample_db:
+  active_admin_wysiwyg_sample_db:
     image: postgres:12.5-alpine
-    container_name: active_admin_sample_db
+    container_name: active_admin_wysiwyg_sample_db
     volumes:
       - db_data:/var/lib/postgresql/data
       - shared_data:/var/shared

@@ -1,3 +1,9 @@
+var __defProp = Object.defineProperty;
+var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+var __publicField = (obj, key, value) => {
+  __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
+  return value;
+};
 function camelize(value) {
   return value.replace(/(?:[_-])([a-z0-9])/g, (_, char) => char.toUpperCase());
 }
@@ -804,13 +810,13 @@ function toString$1(value) {
 }
 var toString_1 = toString$1;
 var isArray$1 = isArray_1, isKey = _isKey, stringToPath = _stringToPath, toString = toString_1;
-function castPath$1(value, object) {
+function castPath$2(value, object) {
   if (isArray$1(value)) {
     return value;
   }
   return isKey(value, object) ? [value] : stringToPath(toString(value));
 }
-var _castPath = castPath$1;
+var _castPath = castPath$2;
 var MAX_SAFE_INTEGER = 9007199254740991;
 var reIsUint = /^(?:0|[1-9]\d*)$/;
 function isIndex$1(value, length) {
@@ -821,23 +827,23 @@ function isIndex$1(value, length) {
 var _isIndex = isIndex$1;
 var isSymbol = isSymbol_1;
 var INFINITY = 1 / 0;
-function toKey$1(value) {
+function toKey$2(value) {
   if (typeof value == "string" || isSymbol(value)) {
     return value;
   }
   var result = value + "";
   return result == "0" && 1 / value == -INFINITY ? "-0" : result;
 }
-var _toKey = toKey$1;
-var assignValue = _assignValue, castPath = _castPath, isIndex = _isIndex, isObject$2 = isObject_1, toKey = _toKey;
+var _toKey = toKey$2;
+var assignValue = _assignValue, castPath$1 = _castPath, isIndex = _isIndex, isObject$2 = isObject_1, toKey$1 = _toKey;
 function baseSet$1(object, path, value, customizer) {
   if (!isObject$2(object)) {
     return object;
   }
-  path = castPath(path, object);
+  path = castPath$1(path, object);
   var index2 = -1, length = path.length, lastIndex = length - 1, nested = object;
   while (nested != null && ++index2 < length) {
-    var key = toKey(path[index2]), newValue = value;
+    var key = toKey$1(path[index2]), newValue = value;
     if (key === "__proto__" || key === "constructor" || key === "prototype") {
       return object;
     }
@@ -859,6 +865,22 @@ function set(object, path, value) {
   return object == null ? object : baseSet(object, path, value);
 }
 var set_1 = set;
+var castPath = _castPath, toKey = _toKey;
+function baseGet$1(object, path) {
+  path = castPath(path, object);
+  var index2 = 0, length = path.length;
+  while (object != null && index2 < length) {
+    object = object[toKey(path[index2++])];
+  }
+  return index2 && index2 == length ? object : void 0;
+}
+var _baseGet = baseGet$1;
+var baseGet = _baseGet;
+function get(object, path, defaultValue) {
+  var result = object == null ? void 0 : baseGet(object, path);
+  return result === void 0 ? defaultValue : result;
+}
+var get_1 = get;
 const isDate = (d) => d instanceof Date;
 const isEmpty = (o) => Object.keys(o).length === 0;
 const isObject$1 = (o) => o != null && typeof o === "object";
@@ -969,6 +991,12 @@ class kubik_widget_controller_default extends Controller {
       this.getNewWidget();
     }
   }
+  overrideData(event) {
+    const fieldName = event.detail.fieldName;
+    const value = event.detail.newValues;
+    const duplicateData = set_1(this.dataValue, fieldName, value);
+    this.dataValue = duplicateData;
+  }
   updateField(event) {
     const name = event.currentTarget.name;
     let v = event.currentTarget.value;
@@ -977,6 +1005,18 @@ class kubik_widget_controller_default extends Controller {
     }
     if (event.currentTarget.dataset.checkbox === "true" && event.currentTarget.type === "checkbox") {
       v = Array.from(event.currentTarget.parentElement.parentElement.querySelectorAll("[name=`${event.currentTarget.name}`]")).map((el) => el.checked ? el.value : null).filter((el) => el !== null);
+    }
+    if (event.currentTarget.dataset.repeatedKeyValue === "true") {
+      const [field, idx, ...rest] = event.currentTarget.name.split(".").reverse();
+      const fieldName = [rest.reverse().join("."), idx.toString(), field].join(".");
+      get_1(this.dataValue, fieldName, "");
+    }
+    if (event.currentTarget.dataset.repeated === "true") {
+      event.currentTarget.dataset.index;
+      const [field, index2, ...rest] = event.currentTarget.name.split(".").reverse();
+      const fieldName = rest.reverse().join(".");
+      const fieldValues = get_1(this.dataValue, fieldName);
+      v = set_1(fieldValues[index2], field, v);
     }
     const duplicateData = set_1(this.dataValue, name, v);
     this.dataValue = duplicateData;
@@ -1030,6 +1070,8 @@ kubik_widget_controller_default.values = {
   maxItems: { type: Number, default: 0 }
 };
 class kubik_repeater_controller_default extends Controller {
+  connect() {
+  }
   updateHeader(event) {
     this.headerTarget.innerHTML = event.currentTarget.value;
   }
@@ -1039,6 +1081,92 @@ class kubik_repeater_controller_default extends Controller {
 }
 kubik_repeater_controller_default.targets = ["header"];
 kubik_repeater_controller_default.classes = ["expanded"];
+class KubikKeyValueRepeaterController extends Controller {
+  connect() {
+    this.renderFields();
+  }
+  dataValueChanged() {
+    console.log("dataValueChanged", this.dataValue);
+    this.dispatch("updateData", {
+      detail: {
+        fieldName: this.fieldNameValue,
+        newValues: this.dataValue
+      }
+    });
+  }
+  renderFields() {
+    this.valuesContainerTarget.innerHTML = "";
+    this.dataValue.forEach((item, index2) => {
+      const prefix = this.prefixValue != "" ? `<span class='kubik--key_value_repeater--prefix para--small'>${this.prefixValue}</span>` : "";
+      const formFields = this.fieldsValue.map((field) => {
+        return `<input 
+          id='${this.fieldNameValue}-${this.widgetIdValue}' 
+          name='${field}' 
+          tabindex='1' 
+          type='text' 
+          value='${item[field]}' 
+          class='input' 
+          placeholder='${field}' 
+          data-index='${index2}' 
+          data-repeated-key-value='true'
+          data-action='input->kubik-key-value-repeater#updateField'
+          data-item-index='${index2}'
+        >`;
+      }).join("");
+      const deleteButton = `<button 
+        class='kubik--key_value_repeater--delete_button' 
+        data-action='click->kubik-key-value-repeater#deleteField'
+        data-index='${index2}'>Delete</button>
+      `;
+      this.valuesContainerTarget.insertAdjacentHTML(
+        "beforeend",
+        `
+        <div class='kubik--key_value_repeater'>
+          ${prefix}
+          ${formFields}
+          ${deleteButton}
+        </div>
+        `
+      );
+    });
+  }
+  deleteField(event) {
+    const index2 = event.target.dataset.index;
+    this.dataValue = this.dataValue.filter((_, i) => i != index2);
+    this.valuesContainerTarget.innerHTML = "";
+    this.renderFields();
+  }
+  updateField(event) {
+    const index2 = event.target.dataset.index;
+    const name = event.target.name;
+    const value = event.target.value;
+    const updatedField = {
+      ...this.dataValue[index2],
+      [name]: value
+    };
+    this.dataValue = [
+      ...this.dataValue.slice(0, index2),
+      updatedField,
+      ...this.dataValue.slice(index2 + 1)
+    ];
+  }
+  addField() {
+    const newField = this.fieldsValue.reduce((acc, field) => {
+      acc[field] = "";
+      return acc;
+    }, {});
+    this.dataValue = [...this.dataValue, newField];
+    this.renderFields();
+  }
+}
+__publicField(KubikKeyValueRepeaterController, "targets", ["valuesContainer"]);
+__publicField(KubikKeyValueRepeaterController, "values", {
+  data: Array,
+  widgetId: String,
+  fields: Array,
+  fieldName: String,
+  prefix: String
+});
 function makeElement(tagName, classNames = [], attributes = {}, textContent = "") {
   const el = document.createElement(tagName);
   el.classList.add(...classNames);
@@ -1226,13 +1354,6 @@ kubik_autocomplete_controller_default.values = {
   results: { type: Array, default: [] },
   resultActive: Number
 };
-class KubikWysiwygController extends Controller {
-  connect() {
-  }
-  change(event) {
-    debugger;
-  }
-}
 const widgetWrapper = function widgetWrapper2(details = {}, data) {
   let wrapperAttributes = {
     "data-controller": "kubik-widget",
@@ -1302,8 +1423,8 @@ class PluginFactory {
 var index = {
   KubikWidgetController: kubik_widget_controller_default,
   KubikRepeaterController: kubik_repeater_controller_default,
+  KubikKeyValueRepeaterController,
   PluginFactory,
-  KubikWysiwygController,
   KubikAutocompleteController: kubik_autocomplete_controller_default
 };
 export { index as default };

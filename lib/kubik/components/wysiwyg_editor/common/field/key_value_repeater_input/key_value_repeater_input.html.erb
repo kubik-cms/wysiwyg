@@ -1,0 +1,13 @@
+<div class='input' data-controller='kubik-key-value-repeater'
+     data-action='kubik-key-value-repeater:updateData->kubik-widget#overrideData'
+     data-kubik-key-value-repeater-data-value="<%= @field_value.to_json %>"
+     data-kubik-key-value-repeater-prefix-value='<%= @prefix %>'
+     data-kubik-key-value-repeater-widget-id-value='<%= @widget_id %>'
+     data-kubik-key-value-repeater-fields-value='<%= @fields.to_json %>'
+     data-kubik-key-value-repeater-field-name-value='<%= @field_name%>'>
+  <label class='label' for='<%= @field[:name] %>-<% @widget_id %>'><%= @field_label %></label>
+  <div data-kubik-key-value-repeater-target='valuesContainer'>
+  </div>
+  <div data-action='click->kubik-key-value-repeater#addField'>Add another</div>
+  <p class='inline-hints'><%= @field[:hint] %></p>
+</div>

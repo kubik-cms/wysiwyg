@@ -1,0 +1,11 @@
+.kubik--key_value_repeater {
+  display: flex;
+  flex-direction: row;
+  column-gap: .5rem;
+  justify-content: center;
+  align-items: center;
+  &--prefix {
+    color: var(--kubik-interface-color-grey-500);
+    font-weight: bold;
+  }
+}

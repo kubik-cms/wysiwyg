@@ -22,19 +22,16 @@ module Kubik
                   case field[:type]
                   when 'text'
                     tab_data[field[:name].to_sym] = ''
-                    break;
                   when 'textarea'
                     tab_data[field[:name].to_sym] = ''
-                    break
                   when 'select'
                     tab_data[field[:name].to_sym] = field[:options].try(:first)
-                    break
                   when 'media'
                     tab_data[field[:name].to_sym] = nil
-                    break
                   when 'resource'
                     tab_data[field[:name].to_sym] = nil
-                    break
+                  when 'key_value_repeater'
+                    tab_data[field[:name].to_sym] = field[:fields].map{|f| {f.to_sym => ''}}
                   end
                 end
               end

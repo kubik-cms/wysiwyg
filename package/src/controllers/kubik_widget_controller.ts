@@ -1,5 +1,6 @@
 import { Controller } from "@hotwired/stimulus"
 import set from 'lodash/set'
+import get from 'lodash/get'
 import isEqual from 'lodash/isEqual'
 import { updatedDiff } from 'deep-object-diff'
 import deepKeys from 'deep-keys';
@@ -88,6 +89,13 @@ export default class extends Controller {
     }
   }
 
+  overrideData(event):void {
+    const fieldName = event.detail.fieldName
+    const value = event.detail.newValues
+    const duplicateData = set(this.dataValue, fieldName, value)
+    this.dataValue = duplicateData
+  }
+
   updateField(event):void {
      const name = event.currentTarget.name
      let v = event.currentTarget.value
@@ -97,7 +105,19 @@ export default class extends Controller {
      if(event.currentTarget.dataset.checkbox === 'true' && event.currentTarget.type === 'checkbox') {
        v = Array.from(event.currentTarget.parentElement.parentElement.querySelectorAll("[name=`${event.currentTarget.name}`]")).map( (el:HTMLInputElement) => el.checked ? el.value : null).filter( (el) => el !== null)
      }
-
+     if(event.currentTarget.dataset.repeatedKeyValue === 'true') {
+       const [field, idx, ...rest] = event.currentTarget.name.split('.').reverse()
+       const fieldName = [rest.reverse().join('.'), idx.toString(), field].join('.')
+       const fieldValues = get(this.dataValue, fieldName, '')
+       //v = set(fieldValues, field, v)
+     }
+     if(event.currentTarget.dataset.repeated === 'true') {
+       const i = event.currentTarget.dataset.index
+       const [field, index, ...rest] = event.currentTarget.name.split('.').reverse()
+       const fieldName = rest.reverse().join('.')
+       const fieldValues = get(this.dataValue, fieldName)
+       v = set(fieldValues[index], field, v)
+     }
      const duplicateData = set(this.dataValue, name, v)
      this.dataValue = duplicateData
   }
