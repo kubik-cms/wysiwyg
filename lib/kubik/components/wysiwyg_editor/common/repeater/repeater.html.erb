@@ -19,7 +19,7 @@
               </div>
             <% end %>
           <% else %>
-            <% @fields.drop(1).each do |field| %>
+            <% @fields.each do |field| %>
               <%= render Kubik::WysiwygEditor::Common::Field.new(field, @data, @widget_id, @tab, index) %>
             <% end %>
           <% end %>

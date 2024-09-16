@@ -47,7 +47,14 @@
     flex: 1;
     overflow: hidden;
     .input input,
-    .input.text textarea { background-color: white; }
+    .input.text textarea,
+    .input.select .input { 
+      border-color: var(--kubik-interface-color-grey-200);
+      background-color: white; 
+    }
+    .input.select .input {
+      border-right-width: 1px;
+    }
     &-container {
       border-top: 1px solid var(--kubik-interface-color-grey-200);
       padding: 1rem 1rem;
@@ -67,6 +74,25 @@
     .fields {
       max-height: 1000px;
     }
+  }
+  &--add-new {
+    @include kubik-label;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    color: var(--kubik-interface-color-brand-400);
+    cursor: pointer;
+    &:before {
+      content: '+';
+      margin-right: .5rem;
+    }
+    &:hover {
+      text-decoration: underline;
+      color: var(--kubik-interface-color-brand-600)
+    }
+  }
+  &--items-container {
+    margin-bottom: .5rem;
   }
 }
 

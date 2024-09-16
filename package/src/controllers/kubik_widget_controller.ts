@@ -58,6 +58,7 @@ export default class extends Controller {
     const newValues = Object.assign({}, this.dataValue)
     newValues[tab]['repeated_items'] = newOrder
     this.dataValue = newValues
+    this.getNewWidget()
   }
 
   removeItem(event):void {

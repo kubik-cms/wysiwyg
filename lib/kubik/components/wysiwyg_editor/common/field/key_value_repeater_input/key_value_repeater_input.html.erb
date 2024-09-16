@@ -6,8 +6,8 @@
      data-kubik-key-value-repeater-fields-value='<%= @fields.to_json %>'
      data-kubik-key-value-repeater-field-name-value='<%= @field_name%>'>
   <label class='label' for='<%= @field[:name] %>-<% @widget_id %>'><%= @field_label %></label>
-  <div data-kubik-key-value-repeater-target='valuesContainer'>
+  <div class='kubik-wysiwyg-repeated-item--items-container' data-kubik-key-value-repeater-target='valuesContainer'>
   </div>
-  <div data-action='click->kubik-key-value-repeater#addField'>Add another</div>
+  <div class='kubik-wysiwyg-repeated-item--add-new' data-action='click->kubik-key-value-repeater#addField'>Add another</div>
   <p class='inline-hints'><%= @field[:hint] %></p>
 </div>

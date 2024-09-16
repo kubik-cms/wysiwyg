@@ -4,7 +4,6 @@ import KubikKeyValueRepeaterController from "./controllers/kubik_key_value_repea
 import KubikAutocompleteController from "./controllers/kubik_autocomplete_controller"
 import PluginFactory from "./plugins/plugin_factory"
 
-
 export default {
   KubikWidgetController,
   KubikRepeaterController,

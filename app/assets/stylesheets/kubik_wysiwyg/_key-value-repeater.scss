@@ -8,4 +8,18 @@
     color: var(--kubik-interface-color-grey-500);
     font-weight: bold;
   }
+  &--delete_button.material-symbols-outlined {
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    color: white;
+    font-size: .9rem;
+    line-height: 1;
+    padding: .2rem;
+    cursor: pointer;
+    background-color: var(--kubik-interface-color-brand-400);
+    &:hover {
+      background-color: var(--kubik-interface-color-brand-600);
+    }
+  }
 }

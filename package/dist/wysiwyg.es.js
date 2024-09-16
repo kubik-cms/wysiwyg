@@ -964,6 +964,7 @@ class kubik_widget_controller_default extends Controller {
     const newValues = Object.assign({}, this.dataValue);
     newValues[tab]["repeated_items"] = newOrder;
     this.dataValue = newValues;
+    this.getNewWidget();
   }
   removeItem(event) {
     const target = event.currentTarget;
@@ -1114,9 +1115,9 @@ class KubikKeyValueRepeaterController extends Controller {
         >`;
       }).join("");
       const deleteButton = `<button 
-        class='kubik--key_value_repeater--delete_button' 
+        class='kubik--key_value_repeater--delete_button material-symbols-outlined' 
         data-action='click->kubik-key-value-repeater#deleteField'
-        data-index='${index2}'>Delete</button>
+        data-index='${index2}'>close</button>
       `;
       this.valuesContainerTarget.insertAdjacentHTML(
         "beforeend",

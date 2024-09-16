@@ -45,9 +45,9 @@ export default class extends Controller {
         >`
       }).join('')
       const deleteButton = `<button 
-        class='kubik--key_value_repeater--delete_button' 
+        class='kubik--key_value_repeater--delete_button material-symbols-outlined' 
         data-action='click->kubik-key-value-repeater#deleteField'
-        data-index='${index}'>Delete</button>
+        data-index='${index}'>close</button>
       `
       this.valuesContainerTarget.insertAdjacentHTML('beforeend', `
         <div class='kubik--key_value_repeater'>
