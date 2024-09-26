@@ -1,20 +1,28 @@
 <div class='kubik--item'>
   <div class='kubik--item-static-content'>
-    <div class='kubik--item-static-content--thumb'>
-      <%= image_tag @item[:thumb], alt: '' %>
-    </div>
-    <div class='kubik--item-static-content--main-info'>
-      <%= @item[:display_name] %>
-    </div>
-    <div class='kubik--item-static-content--additional-info'>
-      <%= @item[:additional_info] %>
-    </div>
-    <div class='kubik--item-static-content--status-info'>
-      <% @item[:status_info].each do |key, value| %>
-        <span class='kubik-pill kubik-pill--<%= key %>'>
-          <%= value %>
-        </span>
-      <% end %>
-    </div>
+    <% if @item.present? %>
+      <div class='kubik--item-static-content--thumb'>
+        <% if @item[:thumb].present? %>
+          <%= image_tag @item[:thumb], alt: '' %>
+        <% else %>
+          This content has been removed or the thumb is not available.
+        <% end %>
+      </div>
+      <div class='kubik--item-static-content--main-info'>
+        <%= @item[:display_name] %>
+      </div>
+      <div class='kubik--item-static-content--additional-info'>
+        <%= @item[:additional_info] %>
+      </div>
+      <div class='kubik--item-static-content--status-info'>
+        <% @item.fetch(:status_info, []).each do |key, value| %>
+          <span class='kubik-pill kubik-pill--<%= key %>'>
+            <%= value %>
+          </span>
+        <% end %>
+      </div>
+    <% else %>
+      This content has been removed or the thumbnail is not available.
+    <% end %>
   </div>
 </div>

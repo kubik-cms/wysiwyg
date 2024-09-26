@@ -2,31 +2,8 @@ import { makeElement } from '../plugins/templates/widget_generation_tools'
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-
-  srcValue: string
-  errorValue: string
-  queryValue: string
-  returnControllerValueValue: string
-  resultActiveValue?: number
-  hasResultActiveValue: boolean
-  resultsValue: Array<Object>
-  resultsListTarget: HTMLElement
-  resultTargets: Array<HTMLElement>
-  errorResultTarget: HTMLElement
-  inputTarget: HTMLInputElement
-  feedbackTarget: HTMLElement
-  connectionController: AbortController
-  fieldNameValue: string
-  loadingClass: string
-  fetchErrorClass: string
-  activeClass: string
-  activeResultClass: string
-  activeListClass: string
-  noResultsClass: string
-
   static classes = ['fetchError', 'loading', 'active', 'activeResult', 'noResults', 'activeList']
   static targets = ['feedback', 'input', 'resultsList', 'result']
-
   static values = {
     returnController: String,
     src: String,
@@ -37,52 +14,52 @@ export default class extends Controller {
     resultActive: Number
   }
 
-  connect():void {
+  connect() {
     this._loadDefaultResults()
     //this.inputTarget.focus()
   }
 
-  showForm():void {
+  showForm() {
     this.element.classList.add(this.activeListClass)
   }
 
-  cancel(event):void {
+  cancel(event) {
     event.preventDefault()
     this.element.classList.remove(this.activeListClass)
   }
 
-  errorValueChanged():void {
-    if(this.errorValue == '') {
+  errorValueChanged() {
+    if (this.errorValue === '') {
       this.element.classList.remove(this.fetchErrorClass)
     } else {
       this.element.classList.add(this.fetchErrorClass)
     }
   }
 
-  resultActiveValueChanged():void {
-    this.resultTargets.forEach( (result) => {
+  resultActiveValueChanged() {
+    this.resultTargets.forEach((result) => {
       result.classList.remove(this.activeResultClass)
     })
-    if(!isNaN(this.resultActiveValue)) {
+    if (!isNaN(this.resultActiveValue)) {
       const activeResult = this.resultActiveValue
       this.resultTargets[activeResult].classList.add(this.activeResultClass)
     }
   }
 
-  mouseOver(e: MouseEvent):void {
-    const target = e.currentTarget as HTMLElement
+  mouseOver(event) {
+    const target = event.currentTarget
     this.resultActiveValue = parseInt(target.dataset['index'])
   }
 
-  mouseOut(e: MouseEvent):void {
+  mouseOut() {
     this.resultActiveValue = null
   }
 
-  resultsValueChanged():void {
+  resultsValueChanged() {
     const fieldNameValue = this.fieldNameValue
     this.resultTargets.forEach(result => result.remove())
     this.resultActiveValue = null
-    this.resultsValue.forEach( (result, index) => {
+    this.resultsValue.forEach((result, index) => {
       const returnObject = Object.assign(
         { receive_index: this.inputTarget.dataset['itemIndex'] },
         result
@@ -99,21 +76,21 @@ export default class extends Controller {
       }, result['return_object']['display_name'])
       this.resultsListTarget.insertBefore(li, this.feedbackTarget)
     })
-    if(this.resultActiveValue > this.resultsValue.length) {
+    if (this.resultActiveValue > this.resultsValue.length) {
       this.resultActiveValue = this.resultsValue.length - 1
     }
   }
 
-  load():void {
+  load() {
     this._fetchResults()
   }
 
-  focus():void {
+  focus() {
     this.element.classList.add(this.activeClass)
   }
 
-  blur():void {
-    this.errorValue = '';
+  blur() {
+    this.errorValue = ''
     this.inputTarget.blur()
     this.connectionController.abort()
     this.element.classList.remove(this.fetchErrorClass)
@@ -121,107 +98,107 @@ export default class extends Controller {
     this.element.classList.remove(this.activeClass)
   }
 
-  _sourceURL():URL {
+  _sourceURL() {
     const baseUrl = [window.location.protocol, window.location.host].join('//')
     const params = new URLSearchParams({
       kubik_search: '1',
       q: this.inputTarget.value
     })
-    const url = new URL([this.srcValue, '.json?', params.toString()].join(''), baseUrl);
+    const url = new URL([this.srcValue, '.json?', params.toString()].join(''), baseUrl)
     return url
   }
 
-  _loadDefaultResults():void {
+  _loadDefaultResults() {
     this._fetchResults()
   }
 
-  keyCheck(e: KeyboardEvent):void {
-    switch(e.key) {
+  keyCheck(event) {
+    switch (event.key) {
       case "Down":
       case "ArrowDown":
         this._nextResult()
-        e.preventDefault()
-        e.stopImmediatePropagation()
-        return;
+        event.preventDefault()
+        event.stopImmediatePropagation()
+        return
       case "Up":
       case "ArrowUp":
         this._previousResult()
-        e.preventDefault()
-        e.stopImmediatePropagation()
-        return;
+        event.preventDefault()
+        event.stopImmediatePropagation()
+        return
       case "Enter":
-        const selectedElement = this.resultTargets[this.resultActiveValue] as HTMLElement
-        if(selectedElement) {
+        const selectedElement = this.resultTargets[this.resultActiveValue]
+        if (selectedElement) {
           selectedElement.dispatchEvent(new Event('mousedown'))
         }
-        e.preventDefault()
-        e.stopImmediatePropagation()
-        return;
+        event.preventDefault()
+        event.stopImmediatePropagation()
+        return
       case "Backspace":
-        e.stopImmediatePropagation()
-        return;
+        event.stopImmediatePropagation()
+        return
     }
   }
 
-  _previousResult():void {
-    if(isNaN(this.resultActiveValue)) {
+  _previousResult() {
+    if (isNaN(this.resultActiveValue)) {
       this.resultActiveValue = this.resultTargets.length > 1 ? this.resultTargets.length - 1 : 0
     } else {
-      this.resultActiveValue = this.resultActiveValue == 0 ? this.resultTargets.length - 1 : this.resultActiveValue - 1
+      this.resultActiveValue = this.resultActiveValue === 0 ? this.resultTargets.length - 1 : this.resultActiveValue - 1
     }
   }
 
-  _nextResult():void {
-    if(isNaN(this.resultActiveValue)) {
+  _nextResult() {
+    if (isNaN(this.resultActiveValue)) {
       this.resultActiveValue = 0
     } else {
-      this.resultActiveValue = this.resultActiveValue + 1 == this.resultTargets.length ? 0 : this.resultActiveValue + 1
+      this.resultActiveValue = this.resultActiveValue + 1 === this.resultTargets.length ? 0 : this.resultActiveValue + 1
     }
   }
 
-  _fetchResults():void {
+  _fetchResults() {
     this.errorValue = ''
 
     this.feedbackTarget.innerHTML = 'Loading...'
 
-    this.connectionController = new AbortController();
+    this.connectionController = new AbortController()
 
     fetch(this._sourceURL(), {
       headers: {
         'Content-Type': 'application/json'
       },
     })
-    .then((response) => { return response.json()})
-    .then((result) => {
-      this.errorValue = ''
-      if(result.length > 0) {
-        this.resultsValue = result
-        this.queryValue = this.inputTarget.value
-      }
-      if(this.inputTarget.value == '') {
-        this.queryValue = ''
-        this.feedbackTarget.innerHTML = ''
-        this.feedbackTarget.insertAdjacentHTML('beforeend', `Showing latest <span>${result.length}</span> results`);
-      } else {
-        this.feedbackTarget.innerHTML = ''
-        if(this.queryValue == '') {
-          this.feedbackTarget.insertAdjacentHTML('beforeend', `Showing latest <span>${result.length}</span> results`);
-        } else {
-          this.feedbackTarget.insertAdjacentHTML('beforeend', `Showing results for <span>${this.queryValue}</span>`);
+      .then((response) => response.json())
+      .then((result) => {
+        this.errorValue = ''
+        if (result.length > 0) {
+          this.resultsValue = result
+          this.queryValue = this.inputTarget.value
         }
-      }
-      if(this.queryValue == this.inputTarget.value) {
-        this.element.classList.remove(this.noResultsClass)
-      } else {
-        this.element.classList.add(this.noResultsClass)
-      }
-    })
-    .catch((error) => {
-      this.feedbackTarget.innerHTML = ''
-      this.errorValue = 'Error loading the results';
-      if(process.env.NODE_ENV == 'development') {
-        console.warn('Error:', error);
-      }
-    })
+        if (this.inputTarget.value === '') {
+          this.queryValue = ''
+          this.feedbackTarget.innerHTML = ''
+          this.feedbackTarget.insertAdjacentHTML('beforeend', `Showing latest <span>${result.length}</span> results`)
+        } else {
+          this.feedbackTarget.innerHTML = ''
+          if (this.queryValue === '') {
+            this.feedbackTarget.insertAdjacentHTML('beforeend', `Showing latest <span>${result.length}</span> results`)
+          } else {
+            this.feedbackTarget.insertAdjacentHTML('beforeend', `Showing results for <span>${this.queryValue}</span>`)
+          }
+        }
+        if (this.queryValue === this.inputTarget.value) {
+          this.element.classList.remove(this.noResultsClass)
+        } else {
+          this.element.classList.add(this.noResultsClass)
+        }
+      })
+      .catch((error) => {
+        this.feedbackTarget.innerHTML = ''
+        this.errorValue = 'Error loading the results'
+        if (process.env.NODE_ENV === 'development') {
+          console.warn('Error:', error)
+        }
+      })
   }
 }

@@ -9,7 +9,8 @@ module Kubik
         @field_value = @tab[:repeated] || @index.present? ?
           @data.dig(@tab[:name].to_sym, :repeated_items, (@index || 0), @field[:name].to_sym, :id) :
           @data.fetch(@tab[:name].to_sym, {}).fetch(@field[:name].to_sym, {}).fetch(:id, nil)
-        @item = @field[:model].classify.constantize.find(@field_value).return_object
+        klass = @field[:model].classify.constantize
+        @item = klass.find_by_id(@field_value).try(:return_object) || {}
       end
     end
   end

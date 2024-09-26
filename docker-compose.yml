@@ -8,14 +8,13 @@ volumes:
 services:
   source:
     build:
-      contenxt: .
+      context: .
       dockerfile: Dockerfile
     volumes:
       - ./:/kubik_wysiwyg
     env_file: ./.env
     tty: true
     stdin_open: true
-    build: .
     command: rake
     ports:
       - "8080:8080"

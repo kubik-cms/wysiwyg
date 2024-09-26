@@ -1,24 +1,22 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  hasExpandedClass: Boolean
-  expandedClass: string
-  headerTarget: HTMLElement
-
   static targets = ['header']
-
-  static classes = [ 'expanded' ]
+  static classes = ['expanded']
 
   connect() {
+    // Initialization code if needed
   }
 
   updateHeader(event) {
     this.headerTarget.innerHTML = event.currentTarget.value
   }
 
-  toggleItem(event):void {
-    Array.from(this.element.classList).includes(this.expandedClass) ?
-      this.element.classList.remove(this.expandedClass) :
+  toggleItem(event) {
+    if (this.element.classList.contains(this.expandedClass)) {
+      this.element.classList.remove(this.expandedClass)
+    } else {
       this.element.classList.add(this.expandedClass)
+    }
   }
 }
