@@ -8,3 +8,13 @@
 .kubik_widget_section__fileds {
   flex: 1 1 15rem;
 }
+
+.kubik_widget_section__additional {
+  flex: 0 0 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+  .input {
+    flex: 1 1 calc(50% - .25rem);
+  }
+}

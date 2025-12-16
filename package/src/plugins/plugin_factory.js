@@ -24,6 +24,7 @@ export default class PluginFactory {
 
   render() {
     const widgetId = [this.config.widget_name, this.randomString].join('-')
+    const widgetClass = `widget_${this.api.ui.nodes.wrapper.parentElement.dataset.editorId}`
 
     //const dataPoint = this.api.ui.nodes.wrapper.parentElement.dataset.editorWidgetsValue
 
@@ -34,6 +35,7 @@ export default class PluginFactory {
         src: this.config.data_src,
         widget_id: widgetId,
         widget_type: this.config.widget_name,
+        widget_class: widgetClass,
         config: this.config
       },
     }, this.data)

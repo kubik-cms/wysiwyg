@@ -30,8 +30,10 @@
 }
 
 .kubik-wysiwyg-component {
+  display: block;
   border: 1px solid var(--kubik-interface-color-grey-200);
   border-radius: .2rem;
+  overflow: hidden;
   &--header {
     display: flex;
     flex-direction: row;
@@ -144,8 +146,13 @@
   font-weight: normal;
 }
 .kubik-wysiwyg-tabs-container {
+  max-height: 0;
+
   display: flex;
   flex-wrap: wrap;
+  .kubik-widget__expanded & {
+    max-height: 1000vh;
+  }
   .kubik-wysiwyg-tab-input {
     display: none;
     &:checked + .kubik-wysiwyg-tab-label {
@@ -168,8 +175,8 @@
     order: 100;
     flex: 0 0 100%;
     display: none;
-    border-top: 1px solid var(--kubik-interface-color-grey-200);
     padding: 1.5rem;
+    border: 1px solid var(--kubik-interface-color-grey-200);
   }
 }
 
@@ -298,9 +305,12 @@
   height: 204px;
   img {
     max-width: 100%;
+    object-fit: contain;
+    display: block;
   }
   &--image {
     margin: .5rem 0;
+    overflow: hidden;
   }
   &--image__broken {
     display: flex;

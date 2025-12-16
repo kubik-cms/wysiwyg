@@ -1,6 +1,9 @@
-<div class='kubik-wysiwyg-widget-header'>
-  <span class='kubik-wysiwyg-widget-icon'><%= @icon.html_safe %></span>
-  <h3 class='kubik-wysiwyg-widget-title'><%= @config[:label] %></h3>
+<div class='kubik-wysiwyg-widget-header' data-action='click->kubik-widget#toggleExpanded' >
+  <div class='kubik-wysiwyg-widget--header-info'>
+    <span class='kubik-wysiwyg-widget-icon'><%= @icon.html_safe %></span>
+    <h3 class='kubik-wysiwyg-widget-title'><%= @config[:label] %></h3>
+  </div>
+  <div class='kubik-wysiwyg-widget--expand-toggle'></div>
 </div>
 <% if @tabs.present? %>
   <%= render Kubik::WysiwygEditor::Common::TabbedContent.new(@tabs, @config, @data) %>

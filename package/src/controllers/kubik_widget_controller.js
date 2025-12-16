@@ -28,20 +28,42 @@ export default class extends Controller {
     widgetId: String,
     setup: Object,
     data: Object,
-    maxItems: { type: Number, default: 0 }
+    maxItems: { type: Number, default: 0 },
+    expanded: { type: Boolean, default: false }
   }
+
+  static targets = ['expandedInput']
+
+  static classes = ['expanded']
 
   connect() {
     this.getNewWidget();
-    console.log('connected widget');
     const element = this.element;
+    if(this.expandedValue) {
+      element.classList.add(this.expandedClass);
+    } else {
+      element.classList.remove(this.expandedClass);
+    }
     element.addEventListener("keydown", this.handleKeyDown.bind(this));
     element.addEventListener("paste", this.handlePaste.bind(this));
   }
 
+  toggleExpanded() {
+    this.expandedValue = !this.expandedValue; 
+    this.expandedInputTarget.value = this.expandedValue;
+    this.dataValue = Object.assign({}, this.dataValue, { expanded: this.expandedValue} );
+  }
+
+  expandedValueChanged() {
+    if(this.expandedValue) {
+      this.element.classList.add(this.expandedClass);
+    } else {
+      this.element.classList.remove(this.expandedClass);
+    }
+  }
+
   handleKeyDown(event) {
     const element = this.element;
-    console.log(event.key);
     if (element.contains(document.activeElement) && (event.key === 'Tab' || event.key === 'Enter')) {
       event.stopPropagation();
     }
@@ -104,8 +126,9 @@ export default class extends Controller {
   }
 
   dataValueChanged(value, previousValue) {
-    const diff = updatedDiff(value, previousValue);
+    const diff = updatedDiff(previousValue, value);
     const changedKeys = deepKeys(diff);
+    console.log(changedKeys, diff);
     const addedItem = diff['items'] && diff['items']['repeated_items'] && JSON.stringify(Object.values(diff['items']['repeated_items'])[0]) === JSON.stringify({});
     if (addedItem || changedKeys.filter((key) => key.match(/^id$|\.id$/g)).length > 0) {
       this.getNewWidget();
@@ -174,10 +197,11 @@ export default class extends Controller {
   }
 
   getNewWidget() {
-    fetch(`${this.setupValue['src']}.json`, {
+    fetch(`${this.setupValue['src']}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Accept': 'text/vnd.turbo-stream.html',
         'X-CSRF-Token': getMetaValue("csrf-token")
       },
       body: JSON.stringify({
@@ -186,9 +210,8 @@ export default class extends Controller {
         setup: this.setupValue,
         max_items: this.maxItemsValue
       })
-    }).then(response => response.json()).then((data) => {
-      const element = this.element;
-      element.innerHTML = data.html_data;
+    }).then(response => response.text()).then((html) => {
+      Turbo.renderStreamMessage(html)
     });
   }
 }

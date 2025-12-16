@@ -5,6 +5,7 @@ module Kubik
     def to_html
       @url = options[:url]
       @widgets = options[:widgets].to_json
+      @unique_id = SecureRandom.hex(5)
       input_wrapping do
         div_wrapper(
           label_html << builder.hidden_field(method, input_html_options.merge('data-editor-target': 'input')),
@@ -16,7 +17,7 @@ module Kubik
 
     def div_wrapper(input)
       "
-        <div data-controller='editor' data-editor-widgets-url-value='#{@url}' data-editor-widgets-value='#{@widgets}'>
+        <div data-controller='editor' data-editor-id='#{@unique_id}' data-editor-widgets-url-value='#{@url}' data-editor-widgets-value='#{@widgets}'>
           #{input} <div data-editor-target='editor'></div>
         </div>
       ".html_safe

@@ -9006,14 +9006,29 @@ function array_move(arr, old_index, new_index) {
 class KubikWidgetController extends Controller {
   connect() {
     this.getNewWidget();
-    console.log("connected widget");
     const element = this.element;
+    if (this.expandedValue) {
+      element.classList.add(this.expandedClass);
+    } else {
+      element.classList.remove(this.expandedClass);
+    }
     element.addEventListener("keydown", this.handleKeyDown.bind(this));
     element.addEventListener("paste", this.handlePaste.bind(this));
   }
+  toggleExpanded() {
+    this.expandedValue = !this.expandedValue;
+    this.expandedInputTarget.value = this.expandedValue;
+    this.dataValue = Object.assign({}, this.dataValue, { expanded: this.expandedValue });
+  }
+  expandedValueChanged() {
+    if (this.expandedValue) {
+      this.element.classList.add(this.expandedClass);
+    } else {
+      this.element.classList.remove(this.expandedClass);
+    }
+  }
   handleKeyDown(event) {
     const element = this.element;
-    console.log(event.key);
     if (element.contains(document.activeElement) && (event.key === "Tab" || event.key === "Enter")) {
       event.stopPropagation();
     }
@@ -9070,8 +9085,9 @@ class KubikWidgetController extends Controller {
     this.getNewWidget();
   }
   dataValueChanged(value, previousValue) {
-    const diff = updatedDiff(value, previousValue);
+    const diff = updatedDiff(previousValue, value);
     const changedKeys = deepKeys_1(diff);
+    console.log(changedKeys, diff);
     const addedItem = diff["items"] && diff["items"]["repeated_items"] && JSON.stringify(Object.values(diff["items"]["repeated_items"])[0]) === JSON.stringify({});
     if (addedItem || changedKeys.filter((key) => key.match(/^id$|\.id$/g)).length > 0) {
       this.getNewWidget();
@@ -9132,10 +9148,11 @@ class KubikWidgetController extends Controller {
     this.getNewWidget();
   }
   getNewWidget() {
-    fetch(`${this.setupValue["src"]}.json`, {
+    fetch(`${this.setupValue["src"]}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "Accept": "text/vnd.turbo-stream.html",
         "X-CSRF-Token": getMetaValue("csrf-token")
       },
       body: JSON.stringify({
@@ -9144,9 +9161,8 @@ class KubikWidgetController extends Controller {
         setup: this.setupValue,
         max_items: this.maxItemsValue
       })
-    }).then((response) => response.json()).then((data) => {
-      const element = this.element;
-      element.innerHTML = data.html_data;
+    }).then((response) => response.text()).then((html) => {
+      Turbo.renderStreamMessage(html);
     });
   }
 }
@@ -9154,8 +9170,11 @@ __publicField(KubikWidgetController, "values", {
   widgetId: String,
   setup: Object,
   data: Object,
-  maxItems: { type: Number, default: 0 }
+  maxItems: { type: Number, default: 0 },
+  expanded: { type: Boolean, default: false }
 });
+__publicField(KubikWidgetController, "targets", ["expandedInput"]);
+__publicField(KubikWidgetController, "classes", ["expanded"]);
 class KubikRepeaterController extends Controller {
   connect() {
   }
@@ -9446,20 +9465,24 @@ __publicField(KubikAutocompleteController, "values", {
 const widgetWrapper = function widgetWrapper2(details = {}, data) {
   let wrapperAttributes = {
     "data-controller": "kubik-widget",
+    "data-kubik-widget-expanded-class": "kubik-widget__expanded",
+    "data-kubik-widget-expanded-value": JSON.stringify(data.expanded) || false,
     "data-kubik-widget-setup-value": JSON.stringify(details.setup),
     "data-kubik-widget-data-value": JSON.stringify(data),
     "data-kubik-widget-widget-id-value": details.setup.widget_id,
     "data-kubik-widget-widget-icon": details.setup.config.icon,
+    "refresh": "morph",
     id: details.setup.widget_id
   };
   if (details.items_limit) {
     wrapperAttributes["data-kubik-widget-items-max-items-value"] = details.items_limit;
   }
   const wrapper = makeElement(
-    "div",
+    "turbo-frame",
     [
       "kubik_media_wrapper",
-      "kubik-wysiwyg-component"
+      "kubik-wysiwyg-component",
+      details.setup.widget_class
     ],
     wrapperAttributes
   );
@@ -9485,6 +9508,7 @@ class PluginFactory {
   }
   render() {
     const widgetId = [this.config.widget_name, this.randomString].join("-");
+    const widgetClass = `widget_${this.api.ui.nodes.wrapper.parentElement.dataset.editorId}`;
     const wrapper = widgetWrapper({
       setup: {
         label: this.label,
@@ -9492,6 +9516,7 @@ class PluginFactory {
         src: this.config.data_src,
         widget_id: widgetId,
         widget_type: this.config.widget_name,
+        widget_class: widgetClass,
         config: this.config
       }
     }, this.data);

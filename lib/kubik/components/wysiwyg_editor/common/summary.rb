@@ -34,7 +34,8 @@ module Kubik
         {
           data: {
             "kubik-repeater-target": "header",
-            "header-placeholder": "#{@header_placeholder} #{@index + 1}"
+            "header-placeholder": "#{@header_placeholder} #{@index + 1}",
+            "action": 'click->kubik-repeater#toggleItem',
           }
         }
       end
