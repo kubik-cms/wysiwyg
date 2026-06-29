@@ -10,8 +10,8 @@ module KubikWysiwyg
 
       initializer "kubik_wysiwyg.autoloading", before: :set_autoload_paths do
         lib_kubik = root.join("lib/kubik")
-        Rails.autoloaders.main.push_dir(lib_kubik, namespace: Kubik)
-        Rails.autoloaders.main.collapse(root.join("lib/kubik/components"))
+        ::Rails.autoloaders.main.push_dir(lib_kubik, namespace: Kubik)
+        ::Rails.autoloaders.main.collapse(root.join("lib/kubik/components"))
       end
 
       initializer "kubik_wysiwyg.helper" do
