@@ -5,17 +5,16 @@ require "view_component"
 module KubikWysiwyg
   module Rails
     class Engine < ::Rails::Engine
-      isolate_namespace KubikWysiwyg
+      config.assets.precompile += %w(kubik_wysiwyg.js)
+      config.autoload_paths << root.join("app/inputs")
 
-      config.assets.precompile += %w( kubik_wysiwyg.js )
-      initializer :kubik_wysiwyg do
-        ActiveAdmin.application.load_paths += Dir[File.dirname(__FILE__) + '/kubik/components/**/']
-        ActiveAdmin.application.load_paths += Dir[File.dirname(__FILE__) + '/kubik/helpers/**/']
-        ActiveAdmin.application.load_paths += Dir[File.dirname(__FILE__) + '/kubik/editorjs_blocks/**/']
-        ActiveAdmin.application.load_paths += Dir[File.dirname(__FILE__) + '/active_admin']
-        #ActiveAdmin.application.load_paths += Dir[File.dirname(__FILE__) + '/active_admin/views']
+      initializer "kubik_wysiwyg.autoloading", before: :set_autoload_paths do
+        lib_kubik = root.join("lib/kubik")
+        Rails.autoloaders.main.push_dir(lib_kubik, namespace: Kubik)
+        Rails.autoloaders.main.collapse(root.join("lib/kubik/components"))
       end
-      initializer 'kubik_wysiwyg.helper' do |app|
+
+      initializer "kubik_wysiwyg.helper" do
         ActiveSupport.on_load(:action_controller) do
           helper Kubik::WysiwygHelper
         end

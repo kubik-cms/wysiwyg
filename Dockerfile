@@ -23,7 +23,7 @@ RUN apt-get install --allow-unauthenticated -y -f \
             libvips \
             libvips-dev \
             libvips-tools
-RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
 RUN apt-get install -y -f nodejs
 # Install required libraries
 RUN mkdir -p /vendor/bundle

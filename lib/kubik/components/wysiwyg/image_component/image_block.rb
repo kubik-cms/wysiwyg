@@ -1,6 +1,6 @@
 module Kubik
   module Wysiwyg
-    class ImageComponent::ImageBlock < RenderEditorjs::Blocks::Base
+    class ImageComponent::ImageBlock < ::RenderEditorjs::Blocks::Base
         SCHEMA = YAML.safe_load(<<~YAML)
           type: object
           additionalProperties: false
