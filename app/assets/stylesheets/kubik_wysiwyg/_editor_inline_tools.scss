@@ -1,0 +1,16 @@
+// editorjs-hyperlink reuses Editor.js link tool classes; match built-in link/unlink icon visibility.
+[data-controller='editor'] {
+  .ce-inline-tool--link .icon--unlink,
+  .ce-inline-tool--unlink .icon--link {
+    display: none;
+  }
+
+  .ce-inline-tool--unlink .icon--unlink {
+    display: inline-block;
+    margin-bottom: -1px;
+  }
+
+  .ce-inline-tool .icon {
+    fill: currentColor;
+  }
+}

@@ -1,0 +1,28 @@
+# frozen_string_literal: true
+
+module WysiwygRenderer
+  class <%= class_name %> < RenderEditorjs::Blocks::Base
+    include RenderContext
+
+    SCHEMA = YAML.safe_load(<<~YAML)
+      type: object
+      additionalProperties: false
+      properties:
+        content:
+          type: object
+        settings:
+          type: object
+    YAML
+
+    def render(data)
+      return unless valid?(data)
+
+      symbolized_data = Kubik::Wysiwyg::BlockData.strip_ui(data).deep_symbolize_keys
+      # TODO: render a ViewComponent or partial for "<%= @block_type %>"
+      view_context = wysiwyg_view_context
+      view_context.tag.div(class: "wysiwyg-block wysiwyg-block--<%= @block_type %>") do
+        view_context.tag.h2(symbolized_data.dig(:content, :title).to_s)
+      end
+    end
+  end
+end

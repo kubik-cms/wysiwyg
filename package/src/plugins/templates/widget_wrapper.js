@@ -1,11 +1,17 @@
 import { makeElement } from './widget_generation_tools'
 
+function widgetExpanded(data) {
+  if (!data || typeof data !== 'object') return false
+  if (data._ui && typeof data._ui.expanded === 'boolean') return data._ui.expanded
+  return !!data.expanded
+}
+
 export const widgetWrapper = function widgetWrapper (details = {}, data) {
 
   let wrapperAttributes = {
     'data-controller': 'kubik-widget',
     'data-kubik-widget-expanded-class': 'kubik-widget__expanded',
-    'data-kubik-widget-expanded-value': (JSON.stringify(data.expanded) || false),
+    'data-kubik-widget-expanded-value': JSON.stringify(widgetExpanded(data)),
     'data-kubik-widget-setup-value': JSON.stringify(details.setup),
     'data-kubik-widget-data-value': JSON.stringify(data),
     'data-kubik-widget-widget-id-value': details.setup.widget_id,

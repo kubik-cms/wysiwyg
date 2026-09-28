@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 require "activeadmin"
 require "view_component"
+require_relative "kubik/wysiwyg/block_data"
 
 module KubikWysiwyg
   module Rails

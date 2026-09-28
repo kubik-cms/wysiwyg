@@ -14,8 +14,7 @@ export default class extends Controller {
   }
 
   dataValueChanged() {
-    console.log('dataValueChanged', this.dataValue)
-    this.dispatch('updateData', { 
+    this.dispatch('updateData', {
       detail: {
         fieldName: this.fieldNameValue,
         newValues: this.dataValue

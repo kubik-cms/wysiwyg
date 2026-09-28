@@ -1,6 +1,12 @@
 <div class='kubik-wysiwyg-tabs-container' id="<%= @widget_id %>-tabs">
   <% @repeated_items.each_with_index do |item, index| %>
-    <div data-controller='kubik-repeater' class='kubik-wysiwyg-repeated-item' data-kubik-repeater-expanded-class='kubik-widget-expanded'>
+    <div data-controller='kubik-repeater'
+         class='kubik-wysiwyg-repeated-item <%= 'kubik-widget-expanded' if item_expanded?(item) %>'
+         data-kubik-repeater-expanded-class='kubik-widget-expanded'
+         data-kubik-repeater-tab-value='<%= @tab[:name] %>'
+         data-kubik-repeater-index-value='<%= index %>'
+         data-kubik-repeater-expanded-value='<%= item_expanded?(item) %>'
+         data-action='kubik-repeater:toggle->kubik-widget#repeaterToggle'>
       <div class='kubik-wysiwyg-repeated-item-header'>
         <%= render Kubik::WysiwygEditor::Common::ExpandAction.new(index) %>
         <%= render Kubik::WysiwygEditor::Common::Summary.new(fields: @fields, data: @data, tab: @tab, index: index) %>
@@ -28,4 +34,3 @@
     </div>
   <% end %>
 </div>
-

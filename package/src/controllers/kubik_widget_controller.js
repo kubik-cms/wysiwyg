@@ -1,6 +1,5 @@
 import set from 'lodash/set';
 import get from 'lodash/get';
-import isEqual from 'lodash/isEqual';
 import { updatedDiff } from 'deep-object-diff';
 import deepKeys from 'deep-keys';
 import sanitizeHtml from 'sanitize-html';
@@ -20,7 +19,49 @@ function array_move(arr, old_index, new_index) {
     }
   }
   arr.splice(new_index, 0, arr.splice(old_index, 1)[0]);
-  return arr; // for testing
+  return arr;
+}
+
+function uiPatch(data, patch) {
+  const ui = Object.assign({}, data._ui || {}, patch);
+  return Object.assign({}, data, { _ui: ui });
+}
+
+function parseAdditionalInformation(payload) {
+  const raw = payload?.additional_information ?? payload?.additional_info;
+  if (raw == null || raw === '') return null;
+  if (typeof raw === 'object') return raw;
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
+
+function itemPathForResourceId(idPath) {
+  const withoutId = idPath.replace(/\.id$/, '');
+  const lastDot = withoutId.lastIndexOf('.');
+  if (lastDot === -1) return withoutId;
+  return withoutId.substring(0, lastDot);
+}
+
+function applyMediaMetadataFromGallery(data, resourceIdPath, payload) {
+  const info = parseAdditionalInformation(payload);
+  if (!info) return data;
+
+  const itemPath = itemPathForResourceId(resourceIdPath);
+  const mappings = [
+    ['alt_text', info.alt_text],
+    ['caption', info.img_title ?? info.caption],
+    ['credit', info.img_credit ?? info.credit],
+  ];
+
+  let result = data;
+  mappings.forEach(([field, value]) => {
+    if (value == null || String(value).trim() === '') return;
+    result = set(result, `${itemPath}.${field}`, String(value).trim());
+  });
+  return result;
 }
 
 export default class extends Controller {
@@ -37,6 +78,7 @@ export default class extends Controller {
   static classes = ['expanded']
 
   connect() {
+    this.syncExpandedFromData();
     this.getNewWidget();
     const element = this.element;
     if(this.expandedValue) {
@@ -48,10 +90,40 @@ export default class extends Controller {
     element.addEventListener("paste", this.handlePaste.bind(this));
   }
 
+  syncExpandedFromData() {
+    const ui = this.dataValue._ui || {};
+    if (typeof ui.expanded === 'boolean') {
+      this.expandedValue = ui.expanded;
+    } else if (typeof this.dataValue.expanded === 'boolean') {
+      this.expandedValue = this.dataValue.expanded;
+    }
+  }
+
   toggleExpanded() {
-    this.expandedValue = !this.expandedValue; 
-    this.expandedInputTarget.value = this.expandedValue;
-    this.dataValue = Object.assign({}, this.dataValue, { expanded: this.expandedValue} );
+    this.expandedValue = !this.expandedValue;
+    if (this.hasExpandedInputTarget) {
+      this.expandedInputTarget.value = this.expandedValue;
+    }
+    this.dataValue = uiPatch(this.dataValue, { expanded: this.expandedValue });
+  }
+
+  setActiveTab(event) {
+    const tab = event.currentTarget.value;
+    this.dataValue = uiPatch(this.dataValue, { active_tab: tab });
+  }
+
+  repeaterToggle(event) {
+    const { tab, index, expanded } = event.detail;
+    if (tab == null || index == null) return;
+
+    const items = [...(this.dataValue[tab]?.repeated_items || [])];
+    if (!items[index]) return;
+
+    items[index] = Object.assign({}, items[index], {
+      _ui: Object.assign({}, items[index]._ui || {}, { expanded: expanded })
+    });
+    const tabData = Object.assign({}, this.dataValue[tab], { repeated_items: items });
+    this.dataValue = Object.assign({}, this.dataValue, { [tab]: tabData });
   }
 
   expandedValueChanged() {
@@ -126,11 +198,20 @@ export default class extends Controller {
   }
 
   dataValueChanged(value, previousValue) {
+    if (!previousValue || !value) return;
+
     const diff = updatedDiff(previousValue, value);
     const changedKeys = deepKeys(diff);
-    console.log(changedKeys, diff);
+    if (changedKeys.length === 0) return;
+
+    if (changedKeys.every((key) => key === '_ui' || key.startsWith('_ui.'))) {
+      return;
+    }
+
     const addedItem = diff['items'] && diff['items']['repeated_items'] && JSON.stringify(Object.values(diff['items']['repeated_items'])[0]) === JSON.stringify({});
-    if (addedItem || changedKeys.filter((key) => key.match(/^id$|\.id$/g)).length > 0) {
+    const resourceIdChange = changedKeys.some((key) => key.match(/(^|\.)id$/));
+
+    if (addedItem || resourceIdChange) {
       this.getNewWidget();
     }
   }
@@ -150,12 +231,6 @@ export default class extends Controller {
     }
     if (event.currentTarget.dataset.checkbox === 'true' && event.currentTarget.type === 'checkbox') {
       v = Array.from(event.currentTarget.parentElement.parentElement.querySelectorAll(`[name="${event.currentTarget.name}"]`)).map((el) => el.checked ? el.value : null).filter((el) => el !== null);
-    }
-    if (event.currentTarget.dataset.repeatedKeyValue === 'true') {
-      const [field, idx, ...rest] = event.currentTarget.name.split('.').reverse();
-      const fieldName = [rest.reverse().join('.'), idx.toString(), field].join('.');
-      const fieldValues = get(this.dataValue, fieldName, '');
-      //v = set(fieldValues, field, v)
     }
     if (event.currentTarget.dataset.repeated === 'true') {
       const i = event.currentTarget.dataset.index;
@@ -191,7 +266,13 @@ export default class extends Controller {
 
   receiveModalReturn(return_value) {
     const returnObject = return_value;
-    const duplicateData = set(this.dataValue, returnObject['return_payload']['field_name'], returnObject['payload']['id']);
+    const fieldPath = returnObject['return_payload']['field_name'];
+    let duplicateData = set(this.dataValue, fieldPath, returnObject['payload']['id']);
+    duplicateData = applyMediaMetadataFromGallery(
+      duplicateData,
+      fieldPath,
+      returnObject['payload']
+    );
     this.dataValue = duplicateData;
     this.getNewWidget();
   }
@@ -212,6 +293,12 @@ export default class extends Controller {
       })
     }).then(response => response.text()).then((html) => {
       Turbo.renderStreamMessage(html)
+      this.syncExpandedFromData();
+      if(this.expandedValue) {
+        this.element.classList.add(this.expandedClass);
+      } else {
+        this.element.classList.remove(this.expandedClass);
+      }
     });
   }
 }

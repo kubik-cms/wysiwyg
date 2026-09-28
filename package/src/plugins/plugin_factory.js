@@ -1,5 +1,10 @@
 import { widgetWrapper } from './templates/widget_wrapper';
 
+function uiFromData(data) {
+  if (!data || typeof data !== 'object') return {};
+  return data._ui && typeof data._ui === 'object' ? data._ui : {};
+}
+
 export default class PluginFactory {
 
   static get defaultWidgetConfig() {
@@ -9,7 +14,7 @@ export default class PluginFactory {
   }
 
   constructor({ data, api }) {
-    this.data = data;
+    this.data = data || {};
     this.api = api;
     this.randomString = Math.random().toString(36).substring(2,7);
     this.label = this.constructor.toolbox.title;
@@ -20,13 +25,18 @@ export default class PluginFactory {
       defaultConfig,
       localConfig
     )
+
+    const ui = uiFromData(this.data);
+    if (this.data.expanded !== undefined && ui.expanded === undefined) {
+      this.data = Object.assign({}, this.data, {
+        _ui: Object.assign({}, ui, { expanded: this.data.expanded })
+      });
+    }
   }
 
   render() {
     const widgetId = [this.config.widget_name, this.randomString].join('-')
     const widgetClass = `widget_${this.api.ui.nodes.wrapper.parentElement.dataset.editorId}`
-
-    //const dataPoint = this.api.ui.nodes.wrapper.parentElement.dataset.editorWidgetsValue
 
     const wrapper = widgetWrapper({
       setup: {
@@ -49,6 +59,11 @@ export default class PluginFactory {
     this.config.tabs.forEach((tab) => {
       widgetData[tab['name']] = data[tab['name']]
     })
+    if (data._ui) {
+      widgetData._ui = data._ui
+    } else if (data.expanded !== undefined) {
+      widgetData._ui = { expanded: data.expanded }
+    }
     return widgetData;
   }
 

@@ -8,7 +8,16 @@ export default defineConfig({
       name: 'wysiwyg'
     },
     rollupOptions: {
-      external: ['@hotwired/stimulus'],
+      external: [
+        '@hotwired/stimulus',
+        '@editorjs/header',
+        '@editorjs/nested-list',
+        '@editorjs/underline',
+        '@editorjs/embed',
+        '@editorjs/paragraph',
+        '@editorjs/quote',
+        'editorjs-hyperlink',
+      ],
       output: {
         globals: {
           "@hotwired/stimulus": 'Stimulus'

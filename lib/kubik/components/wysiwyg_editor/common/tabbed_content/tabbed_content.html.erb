@@ -1,7 +1,7 @@
 <div class='kubik-wysiwyg-tabs-container' id="<%= @widget_id %>-tabs">
-  <input class='kubik-wysiwyg-tab-input' id='<%= @widget_id %>-expanded' type='hidden' data-kubik-widget-target='expandedInput' value='<%= @data[:expanded] %>' name='<%= @widget_id %>-expanded' />
+  <input class='kubik-wysiwyg-tab-input' id='<%= @widget_id %>-expanded' type='hidden' data-kubik-widget-target='expandedInput' value='<%= ui_expanded %>' name='<%= @widget_id %>-expanded' />
   <% @tabs.each_with_index do |tab,index| %>
-    <input class='kubik-wysiwyg-tab-input' id='<%= @widget_id %>-tabs-<%= tab[:name] %>' type='radio' value='<%= tab[:name] %>' name='<%= @widget_id %>-tabs' <%= 'checked' if index.zero? %> />
+    <input class='kubik-wysiwyg-tab-input' id='<%= @widget_id %>-tabs-<%= tab[:name] %>' type='radio' value='<%= tab[:name] %>' name='<%= @widget_id %>-tabs' <%= 'checked' if tab_checked?(tab, index) %> data-action='change->kubik-widget#setActiveTab' />
     <label class='kubik-wysiwyg-tab-label' for="<%= @widget_id %>-tabs-<%= tab[:name] %>"><%= tab[:label] %></label>
     <div class='kubik-wysiwyg-tab-content <%= @widget_id %>-tabs-<%= tab[:name] %>'>
       <div class='kubik-wysiwyg--standard-fields' data-kubik-widget-content-target='<%= tab[:name] %>TabContainer'>
@@ -29,4 +29,3 @@
     </div>
   <% end %>
 </div>
-

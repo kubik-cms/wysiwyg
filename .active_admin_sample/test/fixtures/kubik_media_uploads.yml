@@ -1,4 +1,0 @@
-test_cover:
-  image_data: <%= TestData.image_data %>
-  created_at: <%= DateTime.now %>
-  updated_at: <%= DateTime.now %>

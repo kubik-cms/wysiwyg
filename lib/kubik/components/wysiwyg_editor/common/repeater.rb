@@ -6,8 +6,14 @@ module Kubik
         @widget_id = options[:widget_id]
         @data = options[:data]
         @config = options[:config]
-        @repeated_items = @data.deep_symbolize_keys.fetch(options[:tab][:name].to_sym, nil).fetch(:repeated_items || [])
+        tab_data = @data.deep_symbolize_keys.fetch(options[:tab][:name].to_sym, {})
+        @repeated_items = tab_data.fetch(:repeated_items, [])
         @tab = options[:tab]
+      end
+
+      def item_expanded?(item)
+        item = item.deep_symbolize_keys
+        item.dig(:_ui, :expanded) == true
       end
     end
   end

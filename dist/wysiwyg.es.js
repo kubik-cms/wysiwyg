@@ -5,13 +5,6 @@ var __publicField = (obj, key, value) => {
   return value;
 };
 import { Controller } from "@hotwired/stimulus";
-import Header from "@editorjs/header";
-import NestedList from "@editorjs/nested-list";
-import Underline from "@editorjs/underline";
-import Embed from "@editorjs/embed";
-import Paragraph from "@editorjs/paragraph";
-import Quote from "@editorjs/quote";
-import Hyperlink from "editorjs-hyperlink";
 var commonjsGlobal = typeof globalThis !== "undefined" ? globalThis : typeof window !== "undefined" ? window : typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : {};
 function getAugmentedNamespace(n) {
   if (n.__esModule)
@@ -8921,45 +8914,6 @@ function uiPatch(data, patch) {
   const ui = Object.assign({}, data._ui || {}, patch);
   return Object.assign({}, data, { _ui: ui });
 }
-function parseAdditionalInformation(payload) {
-  var _a;
-  const raw = (_a = payload == null ? void 0 : payload.additional_information) != null ? _a : payload == null ? void 0 : payload.additional_info;
-  if (raw == null || raw === "")
-    return null;
-  if (typeof raw === "object")
-    return raw;
-  try {
-    return JSON.parse(raw);
-  } catch {
-    return null;
-  }
-}
-function itemPathForResourceId(idPath) {
-  const withoutId = idPath.replace(/\.id$/, "");
-  const lastDot = withoutId.lastIndexOf(".");
-  if (lastDot === -1)
-    return withoutId;
-  return withoutId.substring(0, lastDot);
-}
-function applyMediaMetadataFromGallery(data, resourceIdPath, payload) {
-  var _a, _b;
-  const info = parseAdditionalInformation(payload);
-  if (!info)
-    return data;
-  const itemPath = itemPathForResourceId(resourceIdPath);
-  const mappings = [
-    ["alt_text", info.alt_text],
-    ["caption", (_a = info.img_title) != null ? _a : info.caption],
-    ["credit", (_b = info.img_credit) != null ? _b : info.credit]
-  ];
-  let result2 = data;
-  mappings.forEach(([field, value]) => {
-    if (value == null || String(value).trim() === "")
-      return;
-    result2 = set_1(result2, `${itemPath}.${field}`, String(value).trim());
-  });
-  return result2;
-}
 class KubikWidgetController extends Controller {
   connect() {
     this.syncExpandedFromData();
@@ -9131,13 +9085,7 @@ class KubikWidgetController extends Controller {
   }
   receiveModalReturn(return_value) {
     const returnObject = return_value;
-    const fieldPath = returnObject["return_payload"]["field_name"];
-    let duplicateData = set_1(this.dataValue, fieldPath, returnObject["payload"]["id"]);
-    duplicateData = applyMediaMetadataFromGallery(
-      duplicateData,
-      fieldPath,
-      returnObject["payload"]
-    );
+    const duplicateData = set_1(this.dataValue, returnObject["return_payload"]["field_name"], returnObject["payload"]["id"]);
     this.dataValue = duplicateData;
     this.getNewWidget();
   }
@@ -9704,79 +9652,6 @@ const presets = {
   manualItemsTab,
   resourceListSettingsTab
 };
-const DEFAULT_INLINE_TOOLBAR = ["bold", "italic", "underline", "hyperlink"];
-const WIDGET_INLINE_TOOLBAR = ["underline", "hyperlink"];
-const EDITORJS_INLINE_ICON_SPRITE_ID = "kubik-editorjs-inline-icons";
-const EDITORJS_LINK_ICON_SPRITE = `
-<symbol id="link" viewBox="0 0 14 10">
-  <path d="M6 0v2H5a3 3 0 000 6h1v2H5A5 5 0 115 0h1zm2 0h1a5 5 0 110 10H8V8h1a3 3 0 000-6H8V0zM5 4h4a1 1 0 110 2H5a1 1 0 110-2z"/>
-</symbol>
-<symbol id="unlink" viewBox="0 0 15 11">
-  <path d="M13.073 2.099l-1.448 1.448A3 3 0 009 2H8V0h1c1.68 0 3.166.828 4.073 2.099zM6.929 4l-.879.879L7.172 6H5a1 1 0 110-2h1.929zM6 0v2H5a3 3 0 100 6h1v2H5A5 5 0 115 0h1zm6.414 7l2.122 2.121-1.415 1.415L11 8.414l-2.121 2.122L7.464 9.12 9.586 7 7.464 4.879 8.88 3.464 11 5.586l2.121-2.122 1.415 1.415L12.414 7z"/>
-</symbol>
-`;
-function ensureEditorJsInlineIcons() {
-  if (document.getElementById(EDITORJS_INLINE_ICON_SPRITE_ID))
-    return;
-  if (document.getElementById("link"))
-    return;
-  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  svg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
-  svg.setAttribute("aria-hidden", "true");
-  svg.style.display = "none";
-  svg.id = EDITORJS_INLINE_ICON_SPRITE_ID;
-  svg.innerHTML = EDITORJS_LINK_ICON_SPRITE;
-  document.body.appendChild(svg);
-}
-function buildBaseEditorTools({
-  widgetInlineToolbar = WIDGET_INLINE_TOOLBAR,
-  richInlineToolbar = DEFAULT_INLINE_TOOLBAR
-} = {}) {
-  return {
-    paragraph: {
-      class: Paragraph,
-      inlineToolbar: widgetInlineToolbar
-    },
-    hyperlink: {
-      class: Hyperlink,
-      config: {}
-    },
-    embed: {
-      class: Embed,
-      config: {
-        services: {
-          youtube: true,
-          vimeo: true,
-          twitter: true,
-          instagram: true
-        }
-      }
-    },
-    header: {
-      class: Header,
-      config: {
-        placeholder: "Add header text",
-        levels: [2, 3, 4, 5, 6],
-        defaultLevel: 2
-      },
-      inlineToolbar: richInlineToolbar
-    },
-    nested_list: {
-      class: NestedList,
-      inlineToolbar: richInlineToolbar
-    },
-    quote: {
-      class: Quote,
-      inlineToolbar: richInlineToolbar,
-      shortcut: "CMD+SHIFT+O",
-      config: {
-        quotePlaceholder: "Enter a quote",
-        captionPlaceholder: "Quote's author"
-      }
-    },
-    underline: Underline
-  };
-}
 var index = {
   KubikWidgetController,
   KubikRepeaterController,
@@ -9784,10 +9659,6 @@ var index = {
   PluginFactory,
   KubikAutocompleteController,
   defineBlock,
-  presets,
-  DEFAULT_INLINE_TOOLBAR,
-  WIDGET_INLINE_TOOLBAR,
-  ensureEditorJsInlineIcons,
-  buildBaseEditorTools
+  presets
 };
-export { DEFAULT_INLINE_TOOLBAR, KubikAutocompleteController, KubikKeyValueRepeaterController, KubikRepeaterController, KubikWidgetController, PluginFactory, WIDGET_INLINE_TOOLBAR, buildBaseEditorTools, index as default, defineBlock, ensureEditorJsInlineIcons, presets };
+export { KubikAutocompleteController, KubikKeyValueRepeaterController, KubikRepeaterController, KubikWidgetController, PluginFactory, index as default, defineBlock, presets };

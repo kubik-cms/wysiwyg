@@ -1,7 +1,0 @@
-<% @books.each do |book| %>
-  <%= book.title %>
-  <div>
-    <%= book.description %>
-    <%= render_kubik_editor(book.description).html_safe %>
-  </div>
-<% end %>

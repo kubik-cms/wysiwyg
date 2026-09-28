@@ -1,6 +1,0 @@
-# frozen_string_literal: true
-
-gem "devise"
-gem "pg"
-gem "kubik_media_library"
-gem "rails"
