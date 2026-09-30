@@ -25,6 +25,10 @@ Each custom block saves data like:
 - **`_ui`** is admin-only. Strip it before public rendering with `Kubik::Wysiwyg::BlockData.strip_ui`.
 - **`repeated_items[]. _ui`** stores repeater row expand/collapse in the editor.
 
+### Plain text from WYSIWYG
+
+`Kubik::Wysiwyg::PlainText.from(content)` turns Editor.js JSON or HTML into plain text (for AI prompts, search, etc.). When `kubik_ai` is loaded, the gem registers `KubikAi.config.plain_text_from_wysiwyg` automatically. `Kubik::WysiwygPlainText` is a deprecated alias.
+
 ## JavaScript API (npm `@kubik-cms/wysiwyg`)
 
 Pin the built bundle in importmap (recommended: local `vendor/javascript/kubik_wysiwyg/wysiwyg.es.js` after `yarn build` in `package/`).

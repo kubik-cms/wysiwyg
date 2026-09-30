@@ -1,0 +1,21 @@
+// Editor.js toolbox popover must not be clipped by Active Admin / widget chrome
+[data-controller="editor"] {
+  overflow: visible;
+
+  .codex-editor {
+    overflow: visible;
+  }
+
+  .ce-popover__items {
+    max-height: min(270px, 50vh);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  // editorjs-hyperlink link symbol is wider than bold/italic; scale to match toolbar rhythm
+  .ce-inline-tool--link .icon,
+  .ce-inline-tool--unlink .icon {
+    transform: scale(0.6);
+    transform-origin: center;
+  }
+}

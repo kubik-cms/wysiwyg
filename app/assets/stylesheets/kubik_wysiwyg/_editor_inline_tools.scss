@@ -13,4 +13,10 @@
   .ce-inline-tool .icon {
     fill: currentColor;
   }
+
+  .ce-inline-tool--link .icon,
+  .ce-inline-tool--unlink .icon {
+    transform: scale(0.6);
+    transform-origin: center;
+  }
 }
