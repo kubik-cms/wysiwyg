@@ -53,7 +53,7 @@ module Kubik
          Kubik::EditorjsBlocks.const_defined?(:Image, false)
         Kubik::EditorjsBlocks::Image
       else
-        Kubik::Wysiwyg::ImageComponent::ImageBlock
+        Kubik::Wysiwyg::ImageBlock
       end
     end
   end

@@ -18,6 +18,7 @@ module KubikWysiwyg
         lib_kubik = root.join("lib/kubik")
         ::Rails.autoloaders.main.push_dir(lib_kubik, namespace: Kubik)
         ::Rails.autoloaders.main.collapse(root.join("lib/kubik/components"))
+        ::Rails.autoloaders.main.collapse(root.join("lib/kubik/components/wysiwyg/image_component"))
       end
 
       initializer "kubik_wysiwyg.helper" do
