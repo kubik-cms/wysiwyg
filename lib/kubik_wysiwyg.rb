@@ -13,7 +13,7 @@ module KubikWysiwyg
         kubik_wysiwyg/wysiwyg_editor_controller.js
       ]
       config.autoload_paths << root.join("app/inputs")
-
+ 
       # ActiveAdmin DSL files (register_page blocks) must not be Zeitwerk-managed.
       initializer "kubik_wysiwyg.ignore_admin_for_zeitwerk", before: :setup_main_autoloader do
         admin_dir = root.join("app/admin").to_s
@@ -21,10 +21,10 @@ module KubikWysiwyg
         ::Rails.autoloaders.once.ignore(admin_dir) if ::Rails.autoloaders.respond_to?(:once)
       end
 
-      initializer "kubik_wysiwyg.active_admin_load_paths" do
+      initializer "kubik_wysiwyg.active_admin_load_paths", after: "active_admin.load_app_path" do
         admin_dir = root.join("app/admin")
         paths = ::ActiveAdmin.application.load_paths
-        paths << admin_dir unless paths.include?(admin_dir)
+        paths << admin_dir unless paths.map(&:to_s).include?(admin_dir.to_s)
       end
 
       initializer "kubik_wysiwyg.autoloading", before: :set_autoload_paths do
