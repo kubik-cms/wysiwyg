@@ -1,9 +1,81 @@
 import Wysiwyg from "@kubik-cms/wysiwyg"
 
-const EDITOR_UI_SELECTOR = ".ce-popover, .cdx-search-field, .ce-inline-toolbar, .ce-inline-tool-hyperlink-wrapper"
+const EDITOR_UI_SELECTOR =
+  ".ce-popover, .cdx-search-field, .ce-inline-toolbar, .ce-inline-tool-hyperlink-wrapper, .ce-settings, .ce-conversion-toolbar"
+
+const TABBABLE_SELECTOR =
+  'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+
+function editorRootFor(holder) {
+  return holder.closest(".codex-editor") || holder
+}
 
 function isEditorChromeElement(element) {
   return element?.closest?.(EDITOR_UI_SELECTOR) != null
+}
+
+function tabbableInScope(scope) {
+  return [...scope.querySelectorAll(TABBABLE_SELECTOR)].filter((element) => {
+    if (element.closest("[hidden]")) return false
+    return element.getClientRects().length > 0
+  })
+}
+
+function focusAdjacentTabbable(from, scope, forward) {
+  const tabbables = tabbableInScope(scope)
+  const index = tabbables.indexOf(from)
+  if (index === -1) return false
+  const next = tabbables[index + (forward ? 1 : -1)]
+  if (!next) return false
+  next.focus()
+  return true
+}
+
+function openBlockSettings(editorRoot) {
+  const settingsButton =
+    editorRoot.querySelector(
+      ".ce-block--focused .ce-toolbar__settings-btn:not(.ce-toolbar__settings-btn--hidden)"
+    ) || editorRoot.querySelector(".ce-toolbar__settings-btn:not(.ce-toolbar__settings-btn--hidden)")
+
+  if (!settingsButton) return
+
+  settingsButton.dispatchEvent(new MouseEvent("mousedown", { bubbles: true, cancelable: true }))
+}
+
+export function installEditorTabKeyBehavior(holder) {
+  const editorRoot = () => editorRootFor(holder)
+  const tabScope = () => holder.closest("form") || editorRoot()
+
+  const handler = (event) => {
+    if (event.key !== "Tab") return
+    if (!editorRoot().contains(event.target)) return
+    if (isEditorChromeElement(event.target)) return
+
+    if (event.shiftKey) {
+      event.preventDefault()
+      event.stopImmediatePropagation()
+      openBlockSettings(editorRoot())
+      return
+    }
+
+    event.stopImmediatePropagation()
+
+    const target = event.target
+    const nativeField =
+      target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.tagName === "SELECT"
+
+    if (nativeField) {
+      return
+    }
+
+    if (target.isContentEditable) {
+      event.preventDefault()
+      focusAdjacentTabbable(target, tabScope(), true)
+    }
+  }
+
+  document.addEventListener("keydown", handler, true)
+  return () => document.removeEventListener("keydown", handler, true)
 }
 
 const REPEATER_FIELD_NAME = /^(\w+)\[repeated_items\]\[(\d+)\]\.(.+)$/
@@ -114,7 +186,9 @@ function patchKubikWidgetController() {
     if (isEditorChromeElement(active)) return
     if (active.tagName === "INPUT" || active.tagName === "TEXTAREA" || active.tagName === "SELECT") return
     if (active.isContentEditable !== true) return
-    return originalHandleKeyDown.call(this, event)
+    if (event.key === "Enter") {
+      return originalHandleKeyDown.call(this, event)
+    }
   }
 
   Controller.prototype.updateField = function updateField(event) {

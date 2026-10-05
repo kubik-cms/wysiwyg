@@ -10481,7 +10481,7 @@ class KubikWidgetController extends Controller {
   }
   handleKeyDown(event) {
     const element = this.element;
-    if (element.contains(document.activeElement) && (event.key === "Tab" || event.key === "Enter")) {
+    if (element.contains(document.activeElement) && event.key === "Enter") {
       event.stopPropagation();
     }
   }

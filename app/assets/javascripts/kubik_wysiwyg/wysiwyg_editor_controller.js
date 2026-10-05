@@ -1,6 +1,9 @@
 import EditorJS from '@editorjs/editorjs'
 import { ensureEditorJsInlineIcons } from '@kubik-cms/wysiwyg'
-import { flushAllKubikWidgetFields } from 'kubik_wysiwyg/admin_editor_patches'
+import {
+  flushAllKubikWidgetFields,
+  installEditorTabKeyBehavior,
+} from 'kubik_wysiwyg/admin_editor_patches'
 import { Controller } from '@hotwired/stimulus'
 import debounce from 'lodash.debounce'
 
@@ -12,6 +15,15 @@ let configuredInlineToolbar = []
 export function configureKubikWysiwygEditor({ tools, inlineToolbar }) {
   if (tools) configuredEditorTools = tools
   if (inlineToolbar) configuredInlineToolbar = inlineToolbar
+}
+
+export function filterEditorTools(tools, disabledTools) {
+  if (!disabledTools?.length) return tools
+
+  const disabled = new Set(disabledTools.map((tool) => String(tool)))
+  return Object.fromEntries(
+    Object.entries(tools).filter(([key]) => !disabled.has(key)),
+  )
 }
 
 function persistAllEditorsOnForm(form, binding) {
@@ -102,7 +114,7 @@ function unbindFormSubmit(controller) {
 
 export default class KubikWysiwygEditorController extends Controller {
   static targets = ['editor', 'input']
-  static values = { content: Object, widgets: Object, url: String }
+  static values = { content: Object, widgets: Object, url: String, disabledTools: Array }
 
   connect() {
     this.fetchContents()
@@ -116,6 +128,8 @@ export default class KubikWysiwygEditorController extends Controller {
     if (this.saveContentsDebounced?.cancel) {
       this.saveContentsDebounced.cancel()
     }
+    this._removeTabKeyBehavior?.()
+    this._removeTabKeyBehavior = null
     if (this.editor?.destroy) {
       this.editor.destroy()
       this.editor = null
@@ -142,11 +156,14 @@ export default class KubikWysiwygEditorController extends Controller {
     if (!holder.id) {
       holder.id = `kubik-editor-${this.element.dataset.editorId || Math.random().toString(36).slice(2, 9)}`
     }
+    this._removeTabKeyBehavior?.()
+    this._removeTabKeyBehavior = installEditorTabKeyBehavior(holder)
     this.editor = new EditorJS({
       holder,
       minHeight: 100,
+      logLevel: 'ERROR',
       inlineToolbar: configuredInlineToolbar,
-      tools: configuredEditorTools,
+      tools: filterEditorTools(configuredEditorTools, this.disabledToolsValue),
       data: this.contentValue,
       onChange: () => {
         this.saveContentsDebounced()

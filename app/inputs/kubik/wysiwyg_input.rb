@@ -5,6 +5,7 @@ module Kubik
     def to_html
       @url = options[:url]
       @widgets = options[:widgets].to_json
+      @disabled_tools = Array(options[:disabled_tools]).map(&:to_s).to_json
       @unique_id = SecureRandom.hex(5)
       input_wrapping do
         div_wrapper(
@@ -17,7 +18,7 @@ module Kubik
 
     def div_wrapper(input)
       "
-        <div data-controller='editor' data-editor-id='#{@unique_id}' data-editor-widgets-url-value='#{@url}' data-editor-widgets-value='#{@widgets}'>
+        <div data-controller='editor' data-editor-id='#{@unique_id}' data-editor-widgets-url-value='#{@url}' data-editor-widgets-value='#{@widgets}' data-editor-disabled-tools-value='#{@disabled_tools}'>
           #{input} <div data-editor-target='editor'></div>
         </div>
       ".html_safe

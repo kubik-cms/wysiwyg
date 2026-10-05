@@ -97,7 +97,7 @@ Repeated tabs: set `repeated: true` and `repeater_settings: { add_label, summary
 
 1. **Gem** in `Gemfile`: `gem 'kubik_wysiwyg', github: 'kubik-cms/wysiwyg'`
 2. **Active Admin** pages `Kubik Wysiwyg` and `Kubik Wysiwyg Widget` (menu false) — provided by gem.
-3. **Input**: `as: :'kubik/wysiwyg'` on JSON columns.
+3. **Input**: `as: :'kubik/wysiwyg'` on JSON columns. Optional `disabled_tools:` (array of Editor.js tool keys) hides blocks from the toolbox for that field only, e.g. `disabled_tools: %w[hero listing]`.
 4. **Tools**: `app/javascript/admin/controllers/wysiwyg_tools.js` spreads `buildBaseEditorTools()` from `@kubik-cms/wysiwyg` and adds app widget classes.
 5. **Render**: `Kubik::EditorRenderer` (or equivalent) maps block `type` → `WysiwygRenderer::*`.
 

@@ -70,8 +70,10 @@ module KubikWysiwyg
         if editor_js.exist?
           map.pin "kubik_wysiwyg/wysiwyg_editor_controller", to: "kubik_wysiwyg/wysiwyg_editor_controller.js"
         end
+      end
+
       initializer "kubik_wysiwyg.active_admin_head" do
-        require_relative "../kubik_wysiwyg/active_admin_head_extension"
+        require_relative "kubik_wysiwyg/active_admin_head_extension"
         ActiveAdmin::Views::Pages::Base.prepend(KubikWysiwyg::ActiveAdminHeadExtension)
       end
     end
