@@ -1,6 +1,8 @@
 module Kubik
   module WysiwygEditor
     class Common::Field::Media < ViewComponent::Base
+      include Kubik::WysiwygHelper
+
       def initialize(field, data, widget_id, tab, index=nil)
         @field = field
         @data = data.deep_symbolize_keys

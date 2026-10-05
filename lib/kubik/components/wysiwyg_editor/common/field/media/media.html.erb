@@ -1,6 +1,6 @@
 <div class='input'>
   <div class='label'><%= @field[:label] %></div>
-  <div src="/admin/kubik_media_uploads?modal=true"
+  <div src="<%= kubik_media_uploads_modal_src %>"
        data-kubik-modal-header-text="Select <%= @field[:label] %>"
        data-kubik-modal-action="return"
        data-kubik-modal-return-controller="kubik-widget#<%= @widget_id %>"

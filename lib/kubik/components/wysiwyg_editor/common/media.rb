@@ -1,6 +1,8 @@
 module Kubik
   module WysiwygEditor
     class Common::Media < ViewComponent::Base
+      include Kubik::WysiwygHelper
+
       def initialize(field_value, field, data, widget_id, tab, index=nil)
         @field_value = field_value
         @field = field

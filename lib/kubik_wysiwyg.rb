@@ -2,6 +2,7 @@
 require "activeadmin"
 require "view_component"
 require_relative "kubik/wysiwyg/block_data"
+require_relative "kubik_wysiwyg/configuration"
 
 module KubikWysiwyg
   module Rails
@@ -13,7 +14,7 @@ module KubikWysiwyg
         kubik_wysiwyg/wysiwyg_editor_controller.js
       ]
       config.autoload_paths << root.join("app/inputs")
- 
+
       # ActiveAdmin DSL files (register_page blocks) must not be Zeitwerk-managed.
       initializer "kubik_wysiwyg.ignore_admin_for_zeitwerk", before: :setup_main_autoloader do
         admin_dir = root.join("app/admin").to_s
@@ -69,6 +70,9 @@ module KubikWysiwyg
         if editor_js.exist?
           map.pin "kubik_wysiwyg/wysiwyg_editor_controller", to: "kubik_wysiwyg/wysiwyg_editor_controller.js"
         end
+      initializer "kubik_wysiwyg.active_admin_head" do
+        require_relative "../kubik_wysiwyg/active_admin_head_extension"
+        ActiveAdmin::Views::Pages::Base.prepend(KubikWysiwyg::ActiveAdminHeadExtension)
       end
     end
   end

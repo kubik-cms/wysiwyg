@@ -1,4 +1,5 @@
 import { widgetWrapper } from './templates/widget_wrapper';
+import { kubikWysiwygWidgetSrc } from '../admin_paths';
 
 function uiFromData(data) {
   if (!data || typeof data !== 'object') return {};
@@ -9,7 +10,7 @@ export default class PluginFactory {
 
   static get defaultWidgetConfig() {
     return {
-      data_src: '/admin/kubik_wysiwyg_widget/show'
+      data_src: kubikWysiwygWidgetSrc()
     }
   }
 

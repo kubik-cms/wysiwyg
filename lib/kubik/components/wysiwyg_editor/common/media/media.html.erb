@@ -1,7 +1,7 @@
 <div class='input'>
   <div class='label'><%= @field[:label] %></div>
   <div class="kubik-media-gallery--media_item_container kubik-wysiwyg-widget--media_item_container">
-    <div src="/admin/kubik_media_uploads?modal=true"
+    <div src="<%= kubik_media_uploads_modal_src %>"
          data-kubik-modal-header-text="Select <%= @field[:label] %>"
          data-kubik-modal-action="return"
          data-kubik-modal-return-controller="kubik-widget#<%= @widget_id %>"
@@ -9,7 +9,7 @@
          class="kubik-media-gallery--media_item_action kubik-media-gallery--media_item_action__brand">
       <span class="material-symbols-outlined kubik-media-gallery--media_item_container--icon">autorenew</span>
       <span
-        src="/admin/kubik_media_uploads?modal=true"
+        src="<%= kubik_media_uploads_modal_src %>"
         data-kubik-modal-header-text="Select <%= @field[:label] %>"
         data-kubik-modal-return-controller="kubik-widget#<%= @widget_id %>"
         data-kubik-modal-action="return"

@@ -1,5 +1,21 @@
 module Kubik
   module WysiwygHelper
+    def kubik_admin_path
+      "/#{KubikWysiwyg.config.admin_path}"
+    end
+
+    def kubik_media_uploads_modal_src
+      url_helpers.admin_kubik_media_uploads_path(modal: true)
+    rescue NoMethodError
+      "#{kubik_admin_path}/kubik_media_uploads?modal=true"
+    end
+
+    def kubik_wysiwyg_widget_show_src
+      url_helpers.admin_kubik_wysiwyg_widget_show_path
+    rescue NoMethodError
+      "#{kubik_admin_path}/kubik_wysiwyg_widget/show"
+    end
+
     def render_kubik_editor(json)
       renderer = RenderEditorjs::DefaultRenderer.new(
         "image" => kubik_editor_image_block.new
@@ -47,6 +63,10 @@ module Kubik
     end
 
     private
+
+    def url_helpers
+      respond_to?(:helpers) ? helpers : self
+    end
 
     def kubik_editor_image_block
       if Kubik.const_defined?(:EditorjsBlocks, false) &&

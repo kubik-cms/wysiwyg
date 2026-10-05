@@ -1,10 +1,11 @@
 import { makeElement } from '../index'
+import { kubikMediaUploadsModalSrc } from '../../../../admin_paths'
 
 export default function imageSelector(widgetId, fieldName, selectLabel = 'Select image') {
 
   const imageMediaLibrarySelect = makeElement('div', ['kubik-wysiwyg-component--item-image'], {
     'id': [widgetId, fieldName].join('-'),
-    'src': '/admin/kubik_media_uploads?modal=true',
+    'src': kubikMediaUploadsModalSrc(),
     'data-controller': 'kubik-image-select',
     'data-kubik-modal-header-text': 'Select images',
     'data-kubik-modal-action': 'return',
