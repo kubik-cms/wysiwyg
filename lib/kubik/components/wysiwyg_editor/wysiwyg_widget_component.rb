@@ -36,7 +36,7 @@ module Kubik
                   when 'media', 'resource'
                     tab_data[field[:name].to_sym] = nil
                   when 'key_value_repeater'
-                    tab_data[field[:name].to_sym] = [key_value_row(field)]
+                    tab_data[field[:name].to_sym] = []
                   end
                 end
               end

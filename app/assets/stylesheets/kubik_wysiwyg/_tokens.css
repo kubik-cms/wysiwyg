@@ -1,0 +1,7 @@
+/* WYSIWYG-specific tokens; layout rules stay in Sass until migrated. */
+.kubik-wysiwyg-component {
+  --kubik-wysiwyg-border-color: var(--kubik-interface-color-grey-200);
+  --kubik-wysiwyg-radius: var(--kubik-interface-radius-100, 0.2rem);
+  --kubik-wysiwyg-header-bg: var(--kubik-interface-color-white);
+  --kubik-wysiwyg-field-bg: var(--kubik-interface-color-white);
+}

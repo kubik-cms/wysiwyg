@@ -64,6 +64,98 @@ function applyMediaMetadataFromGallery(data, resourceIdPath, payload) {
   return result;
 }
 
+const REPEATER_FIELD_NAME = /^(\w+)\[repeated_items\]\[(\d+)\]\.(.+)$/;
+
+function parseRepeaterFieldName(name) {
+  const match = name?.match(REPEATER_FIELD_NAME);
+  if (!match) return null;
+  return { tab: match[1], index: Number(match[2]), field: match[3] };
+}
+
+function assignRepeaterField(item, fieldPath, value) {
+  const next = { ...item };
+  if (fieldPath === 'image' || fieldPath.endsWith('.id')) {
+    const parentKey = fieldPath === 'image' ? 'image' : fieldPath.slice(0, -3);
+    next[parentKey] = { ...(next[parentKey] || {}), id: value };
+  } else {
+    next[fieldPath] = value;
+  }
+  return next;
+}
+
+function applyRepeaterFieldValue(dataValue, fieldName, value) {
+  const parsed = parseRepeaterFieldName(fieldName);
+  if (!parsed) return null;
+
+  const tabData = { ...(dataValue[parsed.tab] || {}) };
+  const items = [...(tabData.repeated_items || [])];
+  const item = assignRepeaterField(items[parsed.index] || {}, parsed.field, value);
+  items[parsed.index] = item;
+  tabData.repeated_items = items;
+  return { ...dataValue, [parsed.tab]: tabData };
+}
+
+function applyRepeaterMediaMetadata(dataValue, fieldName, payload) {
+  const parsed = parseRepeaterFieldName(fieldName);
+  if (!parsed) return dataValue;
+
+  const info = parseAdditionalInformation(payload);
+  if (!info) return dataValue;
+
+  const mappings = [
+    ['alt_text', info.alt_text],
+    ['caption', info.img_title ?? info.caption],
+    ['credit', info.img_credit ?? info.credit],
+  ];
+
+  let next = dataValue;
+  mappings.forEach(([field, value]) => {
+    if (value == null || String(value).trim() === '') return;
+    const fullName = `${parsed.tab}[repeated_items][${parsed.index}].${field}`;
+    next = applyRepeaterFieldValue(next, fullName, String(value).trim()) || next;
+  });
+  return next;
+}
+
+function ensureRepeaterItemExpanded(dataValue, fieldName) {
+  const parsed = parseRepeaterFieldName(fieldName);
+  if (!parsed) return dataValue;
+
+  const tabData = { ...(dataValue[parsed.tab] || {}) };
+  const items = [...(tabData.repeated_items || [])];
+  const item = items[parsed.index] || {};
+  items[parsed.index] = {
+    ...item,
+    _ui: { ...(item._ui || {}), expanded: true },
+  };
+  tabData.repeated_items = items;
+  return { ...dataValue, [parsed.tab]: tabData };
+}
+
+function syncRepeaterExpandedFromDom(dataValue, root) {
+  if (!root) return dataValue;
+
+  let next = dataValue;
+  root.querySelectorAll('.kubik-wysiwyg-repeated-item[data-kubik-repeater-tab-value]').forEach((element) => {
+    const tab = element.dataset.kubikRepeaterTabValue;
+    const index = Number(element.dataset.kubikRepeaterIndexValue);
+    if (!tab || Number.isNaN(index)) return;
+
+    const expanded = element.classList.contains('kubik-widget-expanded');
+    const tabData = { ...(next[tab] || {}) };
+    const items = [...(tabData.repeated_items || [])];
+    if (!items[index]) return;
+
+    items[index] = {
+      ...items[index],
+      _ui: { ...(items[index]._ui || {}), expanded },
+    };
+    tabData.repeated_items = items;
+    next = { ...next, [tab]: tabData };
+  });
+  return next;
+}
+
 export default class extends Controller {
   static values = {
     widgetId: String,
@@ -252,7 +344,16 @@ export default class extends Controller {
   selectResult(event) {
     const target = event.currentTarget;
     const returnObject = JSON.parse(target.dataset.returnObject);
-    const duplicateData = set(this.dataValue, target.dataset.fieldName, returnObject.id);
+    const fieldName = target.dataset.fieldName;
+    const repeaterData = applyRepeaterFieldValue(this.dataValue, fieldName, returnObject.id);
+    if (repeaterData) {
+      let next = applyRepeaterMediaMetadata(repeaterData, fieldName, returnObject);
+      next = ensureRepeaterItemExpanded(next, fieldName);
+      this.dataValue = next;
+      this.getNewWidget();
+      return;
+    }
+    const duplicateData = set(this.dataValue, fieldName, returnObject.id);
     this.dataValue = duplicateData;
     this.getNewWidget();
   }
@@ -267,17 +368,23 @@ export default class extends Controller {
   receiveModalReturn(return_value) {
     const returnObject = return_value;
     const fieldPath = returnObject['return_payload']['field_name'];
-    let duplicateData = set(this.dataValue, fieldPath, returnObject['payload']['id']);
-    duplicateData = applyMediaMetadataFromGallery(
-      duplicateData,
-      fieldPath,
-      returnObject['payload']
-    );
+    const payload = returnObject['payload'];
+    const repeaterData = applyRepeaterFieldValue(this.dataValue, fieldPath, payload['id']);
+    if (repeaterData) {
+      let next = applyRepeaterMediaMetadata(repeaterData, fieldPath, payload);
+      next = ensureRepeaterItemExpanded(next, fieldPath);
+      this.dataValue = next;
+      this.getNewWidget();
+      return;
+    }
+    let duplicateData = set(this.dataValue, fieldPath, payload['id']);
+    duplicateData = applyMediaMetadataFromGallery(duplicateData, fieldPath, payload);
     this.dataValue = duplicateData;
     this.getNewWidget();
   }
 
   getNewWidget() {
+    this.dataValue = syncRepeaterExpandedFromDom(this.dataValue, this.element);
     fetch(`${this.setupValue['src']}`, {
       method: 'POST',
       headers: {

@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ['valuesContainer']
+  static targets = ['valuesContainer', 'addButton']
   static values = { 
     data: Array,
     widgetId: String,
@@ -10,7 +10,9 @@ export default class extends Controller {
     prefix: String
   }
   connect() {
+    this.dataValue = this.compactRows(this.dataValue)
     this.renderFields()
+    this.updateAddButton()
   }
 
   dataValueChanged() {
@@ -20,6 +22,14 @@ export default class extends Controller {
         newValues: this.dataValue
       }
     })
+  }
+
+  compactRows(rows) {
+    return rows.filter((row) => !this.rowIsEmpty(row))
+  }
+
+  rowIsEmpty(row) {
+    return this.fieldsValue.every((field) => (row[field] || '').trim() === '')
   }
 
   renderFields() {
@@ -57,7 +67,16 @@ export default class extends Controller {
         `
       )
     })
+    this.updateAddButton()
   }
+
+  updateAddButton() {
+    if (!this.hasAddButtonTarget) return
+
+    const hasRows = this.dataValue.length > 0
+    this.addButtonTarget.textContent = hasRows ? 'Add another' : 'Add'
+  }
+
   deleteField(event) {
     const index = event.target.dataset.index
     this.dataValue = this.dataValue.filter((_, i) => i != index)
@@ -89,5 +108,6 @@ export default class extends Controller {
     }, {});
     this.dataValue = [...this.dataValue, newField];
     this.renderFields()
+    this.updateAddButton()
   }
 }

@@ -8,6 +8,8 @@
   <label class='label' for='<%= @field[:name] %>-<% @widget_id %>'><%= @field_label %></label>
   <div class='kubik-wysiwyg-repeated-item--items-container' data-kubik-key-value-repeater-target='valuesContainer'>
   </div>
-  <div class='kubik-wysiwyg-repeated-item--add-new' data-action='click->kubik-key-value-repeater#addField'>Add another</div>
+  <div class='kubik-wysiwyg-repeated-item--add-new'
+       data-kubik-key-value-repeater-target='addButton'
+       data-action='click->kubik-key-value-repeater#addField'><%= @field_value.present? ? 'Add another' : 'Add' %></div>
   <p class='inline-hints'><%= @field[:hint] %></p>
 </div>

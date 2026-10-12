@@ -86,6 +86,17 @@ function parseRepeaterFieldName(name) {
   return { tab: match[1], index: Number(match[2]), field: match[3] }
 }
 
+function parseAdditionalInformation(payload) {
+  const raw = payload?.additional_information ?? payload?.additional_info
+  if (raw == null || raw === "") return null
+  if (typeof raw === "object") return raw
+  try {
+    return JSON.parse(raw)
+  } catch {
+    return null
+  }
+}
+
 function assignRepeaterField(item, fieldPath, value) {
   const next = { ...item }
   if (fieldPath === "image" || fieldPath.endsWith(".id")) {
@@ -94,6 +105,67 @@ function assignRepeaterField(item, fieldPath, value) {
   } else {
     next[fieldPath] = value
   }
+  return next
+}
+
+function applyRepeaterMediaMetadata(dataValue, fieldName, payload) {
+  const parsed = parseRepeaterFieldName(fieldName)
+  if (!parsed) return dataValue
+
+  const info = parseAdditionalInformation(payload)
+  if (!info) return dataValue
+
+  const mappings = [
+    ["alt_text", info.alt_text],
+    ["caption", info.img_title ?? info.caption],
+    ["credit", info.img_credit ?? info.credit],
+  ]
+
+  let next = dataValue
+  mappings.forEach(([field, value]) => {
+    if (value == null || String(value).trim() === "") return
+    const fullName = `${parsed.tab}[repeated_items][${parsed.index}].${field}`
+    next = applyRepeaterFieldValue(next, fullName, String(value).trim()) || next
+  })
+  return next
+}
+
+function ensureRepeaterItemExpanded(dataValue, fieldName) {
+  const parsed = parseRepeaterFieldName(fieldName)
+  if (!parsed) return dataValue
+
+  const tabData = { ...(dataValue[parsed.tab] || {}) }
+  const items = [...(tabData.repeated_items || [])]
+  const item = items[parsed.index] || {}
+  items[parsed.index] = {
+    ...item,
+    _ui: { ...(item._ui || {}), expanded: true },
+  }
+  tabData.repeated_items = items
+  return { ...dataValue, [parsed.tab]: tabData }
+}
+
+function syncRepeaterExpandedFromDom(dataValue, root) {
+  if (!root) return dataValue
+
+  let next = dataValue
+  root.querySelectorAll(".kubik-wysiwyg-repeated-item[data-kubik-repeater-tab-value]").forEach((element) => {
+    const tab = element.dataset.kubikRepeaterTabValue
+    const index = Number(element.dataset.kubikRepeaterIndexValue)
+    if (!tab || Number.isNaN(index)) return
+
+    const expanded = element.classList.contains("kubik-widget-expanded")
+    const tabData = { ...(next[tab] || {}) }
+    const items = [...(tabData.repeated_items || [])]
+    if (!items[index]) return
+
+    items[index] = {
+      ...items[index],
+      _ui: { ...(items[index]._ui || {}), expanded },
+    }
+    tabData.repeated_items = items
+    next = { ...next, [tab]: tabData }
+  })
   return next
 }
 
@@ -214,8 +286,10 @@ function patchKubikWidgetController() {
   Controller.prototype.selectResult = function selectResult(event) {
     const fieldName = event.currentTarget.dataset.fieldName
     const returnObject = JSON.parse(event.currentTarget.dataset.returnObject)
-    const next = applyRepeaterFieldValue(this.dataValue, fieldName, returnObject.id)
+    let next = applyRepeaterFieldValue(this.dataValue, fieldName, returnObject.id)
     if (next) {
+      next = applyRepeaterMediaMetadata(next, fieldName, returnObject)
+      next = ensureRepeaterItemExpanded(next, fieldName)
       this.dataValue = next
       this.getNewWidget()
       return
@@ -225,8 +299,9 @@ function patchKubikWidgetController() {
 
   Controller.prototype.removeResource = function removeResource(event) {
     const fieldName = event.currentTarget.dataset.fieldName
-    const next = applyRepeaterFieldValue(this.dataValue, fieldName, null)
+    let next = applyRepeaterFieldValue(this.dataValue, fieldName, null)
     if (next) {
+      next = ensureRepeaterItemExpanded(next, fieldName)
       this.dataValue = next
       this.getNewWidget()
       return
@@ -236,14 +311,22 @@ function patchKubikWidgetController() {
 
   Controller.prototype.receiveModalReturn = function receiveModalReturn(return_value) {
     const fieldPath = return_value["return_payload"]["field_name"]
-    const id = return_value["payload"]["id"]
-    const next = applyRepeaterFieldValue(this.dataValue, fieldPath, id)
+    const payload = return_value["payload"]
+    let next = applyRepeaterFieldValue(this.dataValue, fieldPath, payload["id"])
     if (next) {
+      next = applyRepeaterMediaMetadata(next, fieldPath, payload)
+      next = ensureRepeaterItemExpanded(next, fieldPath)
       this.dataValue = next
       this.getNewWidget()
       return
     }
     return originalReceiveModalReturn.call(this, return_value)
+  }
+
+  const originalGetNewWidget = Controller.prototype.getNewWidget
+  Controller.prototype.getNewWidget = function getNewWidget() {
+    this.dataValue = syncRepeaterExpandedFromDom(this.dataValue, this.element)
+    return originalGetNewWidget.call(this)
   }
 
   Controller.__kubikWidgetPatched = true

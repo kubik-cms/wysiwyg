@@ -10426,6 +10426,93 @@ function applyMediaMetadataFromGallery(data, resourceIdPath, payload) {
   });
   return result2;
 }
+const REPEATER_FIELD_NAME = /^(\w+)\[repeated_items\]\[(\d+)\]\.(.+)$/;
+function parseRepeaterFieldName(name) {
+  const match = name == null ? void 0 : name.match(REPEATER_FIELD_NAME);
+  if (!match)
+    return null;
+  return { tab: match[1], index: Number(match[2]), field: match[3] };
+}
+function assignRepeaterField(item, fieldPath, value) {
+  const next = { ...item };
+  if (fieldPath === "image" || fieldPath.endsWith(".id")) {
+    const parentKey = fieldPath === "image" ? "image" : fieldPath.slice(0, -3);
+    next[parentKey] = { ...next[parentKey] || {}, id: value };
+  } else {
+    next[fieldPath] = value;
+  }
+  return next;
+}
+function applyRepeaterFieldValue(dataValue, fieldName, value) {
+  const parsed = parseRepeaterFieldName(fieldName);
+  if (!parsed)
+    return null;
+  const tabData = { ...dataValue[parsed.tab] || {} };
+  const items = [...tabData.repeated_items || []];
+  const item = assignRepeaterField(items[parsed.index] || {}, parsed.field, value);
+  items[parsed.index] = item;
+  tabData.repeated_items = items;
+  return { ...dataValue, [parsed.tab]: tabData };
+}
+function applyRepeaterMediaMetadata(dataValue, fieldName, payload) {
+  var _a, _b;
+  const parsed = parseRepeaterFieldName(fieldName);
+  if (!parsed)
+    return dataValue;
+  const info = parseAdditionalInformation(payload);
+  if (!info)
+    return dataValue;
+  const mappings = [
+    ["alt_text", info.alt_text],
+    ["caption", (_a = info.img_title) != null ? _a : info.caption],
+    ["credit", (_b = info.img_credit) != null ? _b : info.credit]
+  ];
+  let next = dataValue;
+  mappings.forEach(([field, value]) => {
+    if (value == null || String(value).trim() === "")
+      return;
+    const fullName = `${parsed.tab}[repeated_items][${parsed.index}].${field}`;
+    next = applyRepeaterFieldValue(next, fullName, String(value).trim()) || next;
+  });
+  return next;
+}
+function ensureRepeaterItemExpanded(dataValue, fieldName) {
+  const parsed = parseRepeaterFieldName(fieldName);
+  if (!parsed)
+    return dataValue;
+  const tabData = { ...dataValue[parsed.tab] || {} };
+  const items = [...tabData.repeated_items || []];
+  const item = items[parsed.index] || {};
+  items[parsed.index] = {
+    ...item,
+    _ui: { ...item._ui || {}, expanded: true }
+  };
+  tabData.repeated_items = items;
+  return { ...dataValue, [parsed.tab]: tabData };
+}
+function syncRepeaterExpandedFromDom(dataValue, root2) {
+  if (!root2)
+    return dataValue;
+  let next = dataValue;
+  root2.querySelectorAll(".kubik-wysiwyg-repeated-item[data-kubik-repeater-tab-value]").forEach((element) => {
+    const tab = element.dataset.kubikRepeaterTabValue;
+    const index2 = Number(element.dataset.kubikRepeaterIndexValue);
+    if (!tab || Number.isNaN(index2))
+      return;
+    const expanded = element.classList.contains("kubik-widget-expanded");
+    const tabData = { ...next[tab] || {} };
+    const items = [...tabData.repeated_items || []];
+    if (!items[index2])
+      return;
+    items[index2] = {
+      ...items[index2],
+      _ui: { ...items[index2]._ui || {}, expanded }
+    };
+    tabData.repeated_items = items;
+    next = { ...next, [tab]: tabData };
+  });
+  return next;
+}
 class KubikWidgetController extends Controller {
   connect() {
     this.syncExpandedFromData();
@@ -10585,7 +10672,16 @@ class KubikWidgetController extends Controller {
   selectResult(event) {
     const target = event.currentTarget;
     const returnObject = JSON.parse(target.dataset.returnObject);
-    const duplicateData = set_1(this.dataValue, target.dataset.fieldName, returnObject.id);
+    const fieldName = target.dataset.fieldName;
+    const repeaterData = applyRepeaterFieldValue(this.dataValue, fieldName, returnObject.id);
+    if (repeaterData) {
+      let next = applyRepeaterMediaMetadata(repeaterData, fieldName, returnObject);
+      next = ensureRepeaterItemExpanded(next, fieldName);
+      this.dataValue = next;
+      this.getNewWidget();
+      return;
+    }
+    const duplicateData = set_1(this.dataValue, fieldName, returnObject.id);
     this.dataValue = duplicateData;
     this.getNewWidget();
   }
@@ -10598,16 +10694,22 @@ class KubikWidgetController extends Controller {
   receiveModalReturn(return_value) {
     const returnObject = return_value;
     const fieldPath = returnObject["return_payload"]["field_name"];
-    let duplicateData = set_1(this.dataValue, fieldPath, returnObject["payload"]["id"]);
-    duplicateData = applyMediaMetadataFromGallery(
-      duplicateData,
-      fieldPath,
-      returnObject["payload"]
-    );
+    const payload = returnObject["payload"];
+    const repeaterData = applyRepeaterFieldValue(this.dataValue, fieldPath, payload["id"]);
+    if (repeaterData) {
+      let next = applyRepeaterMediaMetadata(repeaterData, fieldPath, payload);
+      next = ensureRepeaterItemExpanded(next, fieldPath);
+      this.dataValue = next;
+      this.getNewWidget();
+      return;
+    }
+    let duplicateData = set_1(this.dataValue, fieldPath, payload["id"]);
+    duplicateData = applyMediaMetadataFromGallery(duplicateData, fieldPath, payload);
     this.dataValue = duplicateData;
     this.getNewWidget();
   }
   getNewWidget() {
+    this.dataValue = syncRepeaterExpandedFromDom(this.dataValue, this.element);
     fetch(`${this.setupValue["src"]}`, {
       method: "POST",
       headers: {
@@ -10676,7 +10778,9 @@ __publicField(KubikRepeaterController, "values", {
 });
 class KubikKeyValueRepeaterController extends Controller {
   connect() {
+    this.dataValue = this.compactRows(this.dataValue);
     this.renderFields();
+    this.updateAddButton();
   }
   dataValueChanged() {
     this.dispatch("updateData", {
@@ -10685,6 +10789,12 @@ class KubikKeyValueRepeaterController extends Controller {
         newValues: this.dataValue
       }
     });
+  }
+  compactRows(rows) {
+    return rows.filter((row) => !this.rowIsEmpty(row));
+  }
+  rowIsEmpty(row) {
+    return this.fieldsValue.every((field) => (row[field] || "").trim() === "");
   }
   renderFields() {
     this.valuesContainerTarget.innerHTML = "";
@@ -10721,6 +10831,13 @@ class KubikKeyValueRepeaterController extends Controller {
         `
       );
     });
+    this.updateAddButton();
+  }
+  updateAddButton() {
+    if (!this.hasAddButtonTarget)
+      return;
+    const hasRows = this.dataValue.length > 0;
+    this.addButtonTarget.textContent = hasRows ? "Add another" : "Add";
   }
   deleteField(event) {
     const index2 = event.target.dataset.index;
@@ -10749,9 +10866,10 @@ class KubikKeyValueRepeaterController extends Controller {
     }, {});
     this.dataValue = [...this.dataValue, newField];
     this.renderFields();
+    this.updateAddButton();
   }
 }
-__publicField(KubikKeyValueRepeaterController, "targets", ["valuesContainer"]);
+__publicField(KubikKeyValueRepeaterController, "targets", ["valuesContainer", "addButton"]);
 __publicField(KubikKeyValueRepeaterController, "values", {
   data: Array,
   widgetId: String,

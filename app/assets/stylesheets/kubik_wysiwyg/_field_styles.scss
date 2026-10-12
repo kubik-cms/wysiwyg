@@ -31,8 +31,8 @@
 
 .kubik-wysiwyg-component {
   display: block;
-  border: 1px solid var(--kubik-interface-color-grey-200);
-  border-radius: .2rem;
+  border: 1px solid var(--kubik-wysiwyg-border-color, var(--kubik-interface-color-grey-200));
+  border-radius: var(--kubik-wysiwyg-radius, 0.2rem);
   overflow: hidden;
   &--header {
     display: flex;

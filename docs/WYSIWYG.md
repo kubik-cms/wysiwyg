@@ -168,6 +168,6 @@ Symlink or copy `dist/wysiwyg.es.js` to the host app `vendor/javascript/kubik_wy
 - **`defineBlock` + `presets`** for smaller host widget files
 - **`_ui` persistence** (widget expanded, active tab, repeater row expanded)
 - **Fewer full Turbo refreshes** on plain field edits; refresh on resource id changes and repeater structure changes
-- **`key_value_repeater` defaults** — one empty row `{ key, value }`, not one row per field
+- **`key_value_repeater` defaults** — empty array; blank rows are omitted until the user clicks Add
 - **`Kubik::Wysiwyg::BlockData.strip_ui`** for public output
 - **`bin/rails g kubik:wysiwyg_block`**
