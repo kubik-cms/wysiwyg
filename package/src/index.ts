@@ -8,8 +8,10 @@ import { presets } from "./block_presets"
 import { DEFAULT_INLINE_TOOLBAR, WIDGET_INLINE_TOOLBAR } from "./editor/inline_toolbar"
 import { ensureEditorJsInlineIcons } from "./editor/editor_icons"
 import { buildBaseEditorTools } from "./editor/base_editor_tools"
+import KubikNavigableLinkTool from "./editor/navigable_link_tool"
 
 export default {
+  KubikNavigableLinkTool,
   KubikWidgetController,
   KubikRepeaterController,
   KubikKeyValueRepeaterController,
@@ -24,6 +26,7 @@ export default {
 }
 
 export {
+  KubikNavigableLinkTool,
   KubikWidgetController,
   KubikRepeaterController,
   KubikKeyValueRepeaterController,

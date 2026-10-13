@@ -7,6 +7,7 @@ import Quote from '@editorjs/quote'
 import Hyperlink from 'editorjs-hyperlink'
 
 import { DEFAULT_INLINE_TOOLBAR, WIDGET_INLINE_TOOLBAR } from './inline_toolbar'
+import KubikNavigableLinkTool from './navigable_link_tool'
 
 /**
  * Standard Editor.js block/inline tools shared across Kubik host apps.
@@ -24,6 +25,9 @@ export function buildBaseEditorTools({
     hyperlink: {
       class: Hyperlink,
       config: {},
+    },
+    kubikNavigableLink: {
+      class: KubikNavigableLinkTool,
     },
     embed: {
       class: Embed,
