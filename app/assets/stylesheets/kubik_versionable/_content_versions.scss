@@ -1,0 +1,90 @@
+.active_admin {
+  .kubik-content-version-selector {
+    margin-bottom: 1rem;
+    padding: 0.75rem 1rem;
+    background: var(--kubik-interface-color-grey-50, #f8f9fa);
+    border: 1px solid var(--kubik-interface-color-grey-200);
+
+    &__form {
+      margin: 0;
+    }
+
+    &__label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 0.35rem;
+      font-size: 0.9rem;
+    }
+
+    &__controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.5rem 0.75rem;
+    }
+
+    &__select {
+      min-width: min(100%, 22rem);
+      max-width: 100%;
+      padding: 0.35rem 0.5rem;
+      border: 1px solid var(--kubik-interface-color-grey-200);
+      background: white;
+    }
+  }
+
+  .kubik-content-versions {
+    &__toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.5rem 1rem;
+      margin-bottom: 1rem;
+    }
+
+    &__hint {
+      color: var(--kubik-interface-color-grey-600, #6c757d);
+      font-size: 0.875rem;
+      max-width: 36rem;
+    }
+
+    &__table {
+      margin-top: 0;
+    }
+
+    &__row--live td:first-child {
+      font-weight: 600;
+    }
+
+    &__actions {
+      white-space: nowrap;
+      font-size: 0.875rem;
+    }
+  }
+
+  .kubik-content-version-edit-banner {
+    margin: 0 0 1rem;
+    padding: 0.75rem 1rem;
+    background: #fff8e6;
+    border: 1px solid #f0d78c;
+
+    p {
+      margin: 0;
+      font-size: 0.9rem;
+    }
+  }
+
+  .kubik-admin-fieldset__actions .kubik-content-version-selector {
+    margin-bottom: 0;
+    padding: 0;
+    background: transparent;
+    border: 0;
+
+    &__label {
+      display: none;
+    }
+
+    &__select {
+      min-width: 14rem;
+    }
+  }
+}

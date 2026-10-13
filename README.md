@@ -1,53 +1,50 @@
-# KubikMediaLibrary
+# kubik_versionable
 
-Add the ability to preview individual model pages.
+Editorial content versions with a single live published snapshot for Kubik CMS.
+
+Depends on [kubik_publishable](https://github.com/kubik-cms/kubik_publishable).
 
 ## Installation
 
-Add this line to your application's Gemfile:
-
 ```ruby
-gem 'kubik_previewable', github: 'primate_inc/kubik_previewable'
+gem "kubik_versionable", github: "kubik-cms/kubik_versionable"
 ```
 
-And then execute:
+For local development, use `path: "vendor/kubik_versionable"` or a devcontainer mount at `/kubik_versionable`.
 
-    $ bundle install
-    $ gem install kubik_wysiwyg
+```bash
+bundle install
+bin/rails generate kubik:versionable:install
+bin/rails db:migrate
+```
+
+Add a `published_version` reference on each versionable model in a host migration (foreign key to `kubik_content_versions`).
 
 ## Usage
 
-You can quickly add the ability to preview individual model pages.
-
 ```ruby
-class Blog < ApplicationRecord
-  include include Kubik::Uploadable
-  has_one_kubik_upload(self, :header_image)
-  has_many_kubik_uploads(self, :gallery)
-  ...
+class Page < ApplicationRecord
+  include Kubik::Versionable
+
+  kubik_versionable fields: %i[title body], meta_tag: true
 end
 ```
 
-By default uplodable doesn't validate presence of attachments.
+`Kubik::Versionable` includes `Kubik::AdminContentVersioning` for admin snapshot helpers (`admin_content_snapshot_for`, version selector options, etc.).
 
-```ruby
-  has_one_kubik_upload(self, :header_image, { validate_presence: true })
+### ActiveAdmin
+
+- Member actions: `Kubik::VersionableAdminAction` (create / publish / duplicate versions).
+- Edit-form versioning: `include Kubik::ContentVersionAdminSupport` in the ActiveAdmin resource.
+
+### Styles
+
+In `active_admin.scss`:
+
+```scss
+@import "kubik_versionable/content_versions";
 ```
 
-## Development
+Admin versioning UI partials remain in the host app (resource-specific preview routes).
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake test` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
-
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
-
-## Contributing
-
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/kubik_previewable. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/primate-inc/kubik_previewable/blob/master/CODE_OF_CONDUCT.md).
-
-## License
-
-The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
-
-## Code of Conduct
-
-Everyone interacting in the KubikPreviewable project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/primate-inc/kubik_previewable/blob/master/CODE_OF_CONDUCT.md).
+Public site reads use `published_snapshot`.
