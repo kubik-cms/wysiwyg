@@ -3,6 +3,11 @@ require "activeadmin"
 require "view_component"
 require_relative "kubik/wysiwyg/block_data"
 require_relative "kubik_wysiwyg/configuration"
+require_relative "kubik_wysiwyg/record_list_model_config"
+require_relative "kubik/wysiwyg/wysiwyg_pickable"
+require_relative "kubik/wysiwyg/wysiwyg_autocomplete"
+require_relative "kubik/wysiwyg/record_list_resolver"
+require_relative "wysiwyg_renderer"
 
 module KubikWysiwyg
   module Rails
@@ -33,6 +38,12 @@ module KubikWysiwyg
         ::Rails.autoloaders.main.push_dir(lib_kubik, namespace: Kubik)
         ::Rails.autoloaders.main.collapse(root.join("lib/kubik/components"))
         ::Rails.autoloaders.main.collapse(root.join("lib/kubik/components/wysiwyg/image_component"))
+        ::WysiwygRenderer = Module.new unless defined?(::WysiwygRenderer)
+        ::Rails.autoloaders.main.push_dir(root.join("lib/wysiwyg_renderer"), namespace: ::WysiwygRenderer)
+      end
+
+      initializer "kubik_wysiwyg.view_paths" do
+        ::Rails.application.config.paths["app/views"] << root.join("app/views")
       end
 
       initializer "kubik_wysiwyg.helper" do

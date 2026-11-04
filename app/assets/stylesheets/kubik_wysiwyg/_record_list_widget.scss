@@ -1,0 +1,174 @@
+// Record-list widgets (hand-picked rows, drag reorder, autocomplete picker).
+// Applied when Editor.js block sets widget_model (see plugin_factory.js).
+
+.kubik-wysiwyg-component--item-autocomplete-wrapper.kubik-wysiwyg--standard-fields {
+  width: 100%;
+  max-width: 100%;
+
+  .kubik-wysiwyg-component--item-autocomplete.input {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  input.kubik-wysiwyg-component--item-autocomplete {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+}
+
+.kubik-wysiwyg-component--item-autocomplete-results-list {
+  background-color: #fff;
+}
+
+.kubik-wysiwyg-component--item-autocomplete-results-list-item.kubik-wysiwyg-autocomplete-result--unpublished {
+  color: var(--kubik-interface-color-grey-600, #6b7280);
+  background-color: var(--kubik-interface-color-grey-100, #f3f4f6);
+}
+
+turbo-frame.kubik-wysiwyg-component.kubik-wysiwyg-record-list {
+  .kubik-repeater-expand-action,
+  .kubik-wysiwyg-repeated-item-header > .kubik-wysiwyg-component--items-action:has(.kubik-repeater-expand-action) {
+    display: none !important;
+  }
+
+  .kubik-wysiwyg-repeated-item-drop-placeholder {
+    box-sizing: border-box;
+    width: 100%;
+    margin: 0;
+    border: 2px dashed var(--kubik-interface-color-grey-400, #9ca3af);
+    border-radius: 4px;
+    background: var(--kubik-interface-color-grey-100, #f3f4f6);
+    pointer-events: none;
+    transition: min-height 0.12s ease-out;
+  }
+
+  .kubik-wysiwyg-repeated-item .fields {
+    display: none !important;
+    max-height: 0 !important;
+    overflow: hidden !important;
+    visibility: hidden !important;
+    padding: 0 !important;
+    border: none !important;
+  }
+
+  .kubik-wysiwyg-repeated-item.kubik-widget-expanded:not(:has(.kubik-wysiwyg-repeated-item-header .kubik--item)) .fields {
+    display: block !important;
+    visibility: visible !important;
+    max-height: 1000px !important;
+    overflow: visible !important;
+    padding: 0 !important;
+  }
+
+  .fields-container {
+    padding-top: 0.75rem !important;
+    padding-bottom: 0.75rem !important;
+  }
+
+  .kubik-wysiwyg-repeated-item-header .kubik-wysiwyg-component--items-action--more {
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+
+    &:active {
+      cursor: grabbing;
+    }
+
+    .kubik-wysiwyg-component--items-more-actions {
+      display: none !important;
+    }
+
+    > .material-symbols-outlined {
+      font-size: 0;
+      line-height: 1;
+      width: 20px;
+      height: 20px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+
+      &::after {
+        content: 'drag_indicator';
+        font-family: 'Material Symbols Outlined';
+        font-size: 20px;
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+      }
+    }
+  }
+
+  .fields__with-sections {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .kubik_widget_section__thumb {
+    flex: 1 1 100%;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .kubik-autocomplete-wrapper {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .kubik-wysiwyg-component--item-autocomplete-wrapper {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .kubik-wysiwyg-component--item-autocomplete.input {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  input.kubik-wysiwyg-component--item-autocomplete {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box;
+  }
+
+  .kubik-autocomplete-wrapper__active .kubik-wysiwyg-component--item-autocomplete-results-list {
+    width: 100% !important;
+    max-height: calc(2.5rem * 5 + 3rem);
+    overflow-y: auto;
+    background-color: #fff;
+  }
+
+  [class*="-tabs-items"] {
+    position: relative;
+  }
+}
+
+.kubik-wysiwyg-repeated-item.kubik-wysiwyg-repeated-item-drag-ghost {
+  position: fixed;
+  display: block !important;
+  visibility: visible !important;
+  margin: 0;
+  pointer-events: none;
+  z-index: 100;
+  opacity: 0.98;
+  box-shadow: 0 10px 32px rgb(0 0 0 / 18%);
+  cursor: grabbing;
+  background: #fff;
+  min-height: 2.75rem;
+  border: 1px solid var(--kubik-interface-color-grey-300, #d1d5db);
+  border-radius: 4px;
+  box-sizing: border-box;
+
+  .fields {
+    display: none !important;
+  }
+
+  .kubik-repeater-expand-action,
+  .kubik-wysiwyg-repeated-item-header > .kubik-wysiwyg-component--items-action:has(.kubik-repeater-expand-action) {
+    display: none !important;
+  }
+
+  .kubik-wysiwyg-repeated-item-header {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    box-sizing: border-box;
+  }
+}

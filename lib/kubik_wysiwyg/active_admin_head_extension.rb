@@ -7,6 +7,9 @@ module KubikWysiwyg
         text_node tag.meta(name: "active-admin-path", content: helpers.kubik_admin_path)
         text_node tag.meta(name: "kubik-wysiwyg-widget-src", content: helpers.kubik_wysiwyg_widget_show_src)
         text_node tag.meta(name: "kubik-media-uploads-src", content: helpers.kubik_media_uploads_modal_src)
+        if helpers.respond_to?(:link_targets_admin_kubik_navigation_items_path)
+          text_node tag.meta(name: "kubik-navigable-wysiwyg", content: "true")
+        end
       end
     end
   end

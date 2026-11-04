@@ -1,0 +1,50 @@
+# frozen_string_literal: true
+
+# Merge onto <%= @model_class %> (or a concern included by the model).
+# Adjust table/column names and tag contexts for your app.
+
+# include Kubik::WysiwygPickable
+
+# def wysiwyg_thumb_url
+#   listing_image&.image_url(:square_400)
+# end
+#
+# def wysiwyg_display_name
+#   title
+# end
+#
+# def wysiwyg_status_info
+#   published? ? {} : { unpublished: 'Unpublished' }
+# end
+#
+# class << self
+#   def wysiwyg_scopes
+#     {
+<% @queries.each do |query| -%>
+#       <%= query[:value] %>: lambda { |limit: 5, **params|
+#         # TODO: scope published records for <%= query[:label] %>
+#         published.limit(limit)
+#       },
+<% end -%>
+#     }
+#   end
+#
+#   def wysiwyg_list_item(record, view_context:)
+#     # TODO: paths, decorate, listing fields
+#     {
+#       record_id: record.id,
+#       title: record.title,
+#       summary: record.listing_summary,
+#       path: view_context.example_path(record),
+#       image: record.listing_image,
+#     }
+#   end
+#
+#   def wysiwyg_autocomplete_filter(relation, query)
+#     sanitized = query.to_s.downcase
+#     relation.where('LOWER(<%= @model_underscore %>.title) LIKE ?', "%#{ActiveRecord::Base.sanitize_sql_like(sanitized)}%")
+#   end
+# end
+
+# Active Admin resource:
+# Kubik::WysiwygAutocomplete.register_collection_search!(self)

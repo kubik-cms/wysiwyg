@@ -1,0 +1,9 @@
+// Paste into app/javascript/admin/controllers/wysiwyg_tools.js
+// 1. Add to import from "admin/wysiwyg_widgets_bundle":
+//    <%= class_name.gsub("::", "") %>ListingWidget,
+// 2. Add tool entry:
+
+  <%= @widget_name %>: {
+    class: <%= class_name.gsub("::", "") %>ListingWidget,
+    inlineToolbar: WIDGET_INLINE_TOOLBAR,
+  },

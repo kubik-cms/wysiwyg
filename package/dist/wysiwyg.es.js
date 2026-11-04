@@ -2406,7 +2406,7 @@ var Document$4 = function(_super) {
   return Document2;
 }(NodeWithChildren);
 node.Document = Document$4;
-var Element = function(_super) {
+var Element$1 = function(_super) {
   __extends(Element2, _super);
   function Element2(name, attribs, children, type) {
     if (children === void 0) {
@@ -2456,7 +2456,7 @@ var Element = function(_super) {
   });
   return Element2;
 }(NodeWithChildren);
-node.Element = Element;
+node.Element = Element$1;
 function isTag(node2) {
   return (0, domelementtype_1$1.isTag)(node2);
 }
@@ -2496,7 +2496,7 @@ function cloneNode$1(node2, recursive) {
     result2 = new Comment$5(node2.data);
   } else if (isTag(node2)) {
     var children = recursive ? cloneChildren(node2.children) : [];
-    var clone_1 = new Element(node2.name, __assign$1({}, node2.attribs), children);
+    var clone_1 = new Element$1(node2.name, __assign$1({}, node2.attribs), children);
     children.forEach(function(child) {
       return child.parent = clone_1;
     });
@@ -9618,7 +9618,7 @@ and ensure you are accounting for this risk.
       if (skip) {
         if (options.disallowedTagsMode === "discard" || options.disallowedTagsMode === "completelyDiscard") {
           if (frame.innerText && !hasText) {
-            const escaped = escapeHtml(frame.innerText);
+            const escaped = escapeHtml2(frame.innerText);
             if (options.textFilter) {
               result2 += options.textFilter(escaped, name);
             } else {
@@ -9641,7 +9641,7 @@ and ensure you are accounting for this risk.
       const shouldPreserveEscapedAttributes = isBeingEscaped && options.preserveEscapedAttributes;
       if (shouldPreserveEscapedAttributes) {
         each(attribs, function(value, a) {
-          result2 += " " + a + '="' + escapeHtml(value || "", true) + '"';
+          result2 += " " + a + '="' + escapeHtml2(value || "", true) + '"';
         });
       } else if (!allowedAttributesMap || has(allowedAttributesMap, name) || allowedAttributesMap["*"]) {
         each(attribs, function(value, a) {
@@ -9812,7 +9812,7 @@ and ensure you are accounting for this risk.
             }
             result2 += " " + a;
             if (value && value.length) {
-              result2 += '="' + escapeHtml(value, true) + '"';
+              result2 += '="' + escapeHtml2(value, true) + '"';
             } else if (options.allowedEmptyAttributes.includes(a)) {
               result2 += '=""';
             }
@@ -9826,12 +9826,12 @@ and ensure you are accounting for this risk.
       } else {
         result2 += ">";
         if (frame.innerText && !hasText && !options.textFilter) {
-          result2 += escapeHtml(frame.innerText);
+          result2 += escapeHtml2(frame.innerText);
           addedText = true;
         }
       }
       if (skip) {
-        result2 = tempResult + escapeHtml(result2);
+        result2 = tempResult + escapeHtml2(result2);
         tempResult = "";
       }
       frame.openingTagLength = result2.length - frame.tagPosition;
@@ -9853,7 +9853,7 @@ and ensure you are accounting for this risk.
       } else if (tag && tagAllowed(tag) && (options.disallowedTagsMode === "discard" || options.disallowedTagsMode === "completelyDiscard") && (tag === "textarea" || tag === "xmp")) {
         result2 += text;
       } else if (!addedText) {
-        const escaped = escapeHtml(text, false);
+        const escaped = escapeHtml2(text, false);
         if (options.textFilter) {
           result2 += options.textFilter(escaped, tag);
         } else {
@@ -9926,7 +9926,7 @@ and ensure you are accounting for this risk.
       }
       result2 += "</" + name + ">";
       if (skip) {
-        result2 = tempResult + escapeHtml(result2);
+        result2 = tempResult + escapeHtml2(result2);
         tempResult = "";
       }
       addedText = false;
@@ -9938,9 +9938,9 @@ and ensure you are accounting for this risk.
     const lastParsedIndex = parser2.endIndex;
     if (lastParsedIndex != null && lastParsedIndex >= 0 && lastParsedIndex < html.length) {
       const unparsed = html.substring(lastParsedIndex);
-      result2 += escapeHtml(unparsed);
+      result2 += escapeHtml2(unparsed);
     } else if ((lastParsedIndex == null || lastParsedIndex < 0) && html.length > 0 && result2 === "") {
-      result2 = escapeHtml(html);
+      result2 = escapeHtml2(html);
     }
   }
   return result2;
@@ -9953,7 +9953,7 @@ and ensure you are accounting for this risk.
     skipText = false;
     skipTextDepth = 0;
   }
-  function escapeHtml(s, quote) {
+  function escapeHtml2(s, quote) {
     if (typeof s !== "string") {
       s = s + "";
     }
@@ -10635,7 +10635,8 @@ class KubikWidgetController extends Controller {
     }
     const addedItem = diff["items"] && diff["items"]["repeated_items"] && JSON.stringify(Object.values(diff["items"]["repeated_items"])[0]) === JSON.stringify({});
     const resourceIdChange = changedKeys.some((key) => key.match(/(^|\.)id$/));
-    if (addedItem || resourceIdChange) {
+    const sourceChange = changedKeys.some((key) => key === "settings.source" || key.startsWith("settings.source."));
+    if (addedItem || resourceIdChange || sourceChange) {
       this.getNewWidget();
     }
   }
@@ -10776,6 +10777,9 @@ __publicField(KubikRepeaterController, "values", {
   index: Number,
   expanded: { type: Boolean, default: false }
 });
+function escapeHtml(value) {
+  return String(value != null ? value : "").replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
 class KubikKeyValueRepeaterController extends Controller {
   connect() {
     this.dataValue = this.compactRows(this.dataValue);
@@ -10796,30 +10800,49 @@ class KubikKeyValueRepeaterController extends Controller {
   rowIsEmpty(row) {
     return this.fieldsValue.every((field) => (row[field] || "").trim() === "");
   }
-  renderFields() {
-    this.valuesContainerTarget.innerHTML = "";
-    this.dataValue.forEach((item, index2) => {
-      const prefix = this.prefixValue != "" ? `<span class='kubik--key_value_repeater--prefix para--small'>${this.prefixValue}</span>` : "";
-      const formFields = this.fieldsValue.map((field) => {
-        return `<input 
-          id='${this.fieldNameValue}-${this.widgetIdValue}' 
-          name='${field}' 
-          tabindex='1' 
-          type='text' 
-          value='${item[field]}' 
-          class='input' 
-          placeholder='${field}' 
-          data-index='${index2}' 
+  fieldMarkup(field, item, index2) {
+    const config = (this.fieldConfigValue || {})[field] || {};
+    const value = escapeHtml(item[field] || "");
+    if (config.type === "select") {
+      const options = (config.options || []).map(
+        (option) => `<option value='${escapeHtml(option.value)}' ${option.value === (item[field] || "") ? "selected" : ""}>${escapeHtml(option.label)}</option>`
+      ).join("");
+      return `<div class="input select kubik--key_value_repeater--field-select">
+        <select
+          id='${this.fieldNameValue}-${this.widgetIdValue}-${field}-${index2}'
+          name='${field}'
+          tabindex='1'
+          class='input'
+          data-index='${index2}'
+          data-repeated-key-value='true'
+          data-action='change->kubik-key-value-repeater#updateField'
+          data-item-index='${index2}'
+        >${options}</select>
+      </div>`;
+    }
+    return `<input
+          id='${this.fieldNameValue}-${this.widgetIdValue}-${field}-${index2}'
+          name='${field}'
+          tabindex='1'
+          type='text'
+          value='${value}'
+          class='input'
+          placeholder='${field}'
+          data-index='${index2}'
           data-repeated-key-value='true'
           data-action='input->kubik-key-value-repeater#updateField'
           data-item-index='${index2}'
         >`;
-      }).join("");
-      const deleteButton = `<button 
-        class='kubik--key_value_repeater--delete_button material-symbols-outlined' 
+  }
+  renderFields() {
+    this.valuesContainerTarget.innerHTML = "";
+    this.dataValue.forEach((item, index2) => {
+      const prefix = this.prefixValue !== "" ? `<span class='kubik--key_value_repeater--prefix para--small'>${this.prefixValue}</span>` : "";
+      const formFields = this.fieldsValue.map((field) => this.fieldMarkup(field, item, index2)).join("");
+      const deleteButton = `<button
+        class='kubik--key_value_repeater--delete_button material-symbols-outlined'
         data-action='click->kubik-key-value-repeater#deleteField'
-        data-index='${index2}'>close</button>
-      `;
+        data-index='${index2}'>close</button>`;
       this.valuesContainerTarget.insertAdjacentHTML(
         "beforeend",
         `
@@ -10853,11 +10876,7 @@ class KubikKeyValueRepeaterController extends Controller {
       ...this.dataValue[index2],
       [name]: value
     };
-    this.dataValue = [
-      ...this.dataValue.slice(0, index2),
-      updatedField,
-      ...this.dataValue.slice(index2 + 1)
-    ];
+    this.dataValue = [...this.dataValue.slice(0, index2), updatedField, ...this.dataValue.slice(index2 + 1)];
   }
   addField() {
     const newField = this.fieldsValue.reduce((acc, field) => {
@@ -10875,15 +10894,16 @@ __publicField(KubikKeyValueRepeaterController, "values", {
   widgetId: String,
   fields: Array,
   fieldName: String,
-  prefix: String
+  prefix: String,
+  fieldConfig: Object
 });
-function activeAdminPath() {
+function activeAdminPath$1() {
   var _a;
   return ((_a = document.querySelector("meta[name='active-admin-path']")) == null ? void 0 : _a.content) || "/admin";
 }
 function kubikWysiwygWidgetSrc() {
   var _a;
-  return ((_a = document.querySelector("meta[name='kubik-wysiwyg-widget-src']")) == null ? void 0 : _a.content) || `${activeAdminPath()}/kubik_wysiwyg_widget/show`;
+  return ((_a = document.querySelector("meta[name='kubik-wysiwyg-widget-src']")) == null ? void 0 : _a.content) || `${activeAdminPath$1()}/kubik_wysiwyg_widget/show`;
 }
 function makeElement(tagName, classNames = [], attributes = {}, textContent2 = "") {
   const el = document.createElement(tagName);
@@ -11092,12 +11112,13 @@ const widgetWrapper = function widgetWrapper2(details = {}, data) {
   if (details.items_limit) {
     wrapperAttributes["data-kubik-widget-items-max-items-value"] = details.items_limit;
   }
+  const extraClasses = details.setup.widget_classes || (details.setup.widget_class ? details.setup.widget_class.split(/\s+/).filter(Boolean) : []);
   const wrapper = makeElement(
     "turbo-frame",
     [
       "kubik_media_wrapper",
       "kubik-wysiwyg-component",
-      details.setup.widget_class
+      ...extraClasses
     ],
     wrapperAttributes
   );
@@ -11133,8 +11154,14 @@ class PluginFactory {
     }
   }
   render() {
+    var _a;
     const widgetId = [this.config.widget_name, this.randomString].join("-");
-    const widgetClass = `widget_${this.api.ui.nodes.wrapper.parentElement.dataset.editorId}`;
+    const editorRoot = this.api.ui.nodes.wrapper.parentElement;
+    const editorId = (_a = editorRoot == null ? void 0 : editorRoot.dataset) == null ? void 0 : _a.editorId;
+    const widgetClasses = [
+      editorId ? `widget_${editorId}` : null,
+      this.config.widget_model ? "kubik-wysiwyg-record-list" : null
+    ].filter(Boolean);
     const wrapper = widgetWrapper({
       setup: {
         label: this.label,
@@ -11142,7 +11169,7 @@ class PluginFactory {
         src: this.config.data_src,
         widget_id: widgetId,
         widget_type: this.config.widget_name,
-        widget_class: widgetClass,
+        widget_classes: widgetClasses,
         config: this.config
       }
     }, this.data);
@@ -11181,16 +11208,327 @@ function defineBlock({ toolbox, sanitize = {}, widgetConfig }) {
     }
   };
 }
-function contentTab(fields = []) {
+const DEFAULT_HEADING_LEVEL_OPTIONS = [
+  { value: "h2", label: "H2" },
+  { value: "h3", label: "H3" },
+  { value: "h4", label: "H4" },
+  { value: "h5", label: "H5" },
+  { value: "h6", label: "H6" }
+];
+const DEFAULT_IMAGE_HINT = "Should be at least 1200px wide and not bigger than 4MB";
+const DEFAULT_DOCUMENT_HINT = "PDF or other downloadable file from the media library";
+function kubikNavigableWysiwygEnabled() {
+  const meta = document.querySelector("meta[name='kubik-navigable-wysiwyg']");
+  return (meta == null ? void 0 : meta.content) === "true";
+}
+function headingLevelField({
+  name = "header_level",
+  label = "Heading level",
+  options = DEFAULT_HEADING_LEVEL_OPTIONS,
+  section
+} = {}) {
+  const field = {
+    name,
+    label,
+    type: "select",
+    options
+  };
+  if (section)
+    field.section = section;
+  return field;
+}
+function titleWithHeadingLevel({
+  titleName = "title",
+  titleLabel = "Title",
+  levelName = "title_header_level",
+  levelLabel = "Title heading level",
+  levels = DEFAULT_HEADING_LEVEL_OPTIONS,
+  section
+} = {}) {
+  const title = { name: titleName, label: titleLabel, type: "text" };
+  const level = headingLevelField({ name: levelName, label: levelLabel, options: levels, section });
+  if (section)
+    title.section = section;
+  return [title, level];
+}
+function imageResourceField({
+  name = "image",
+  label = "Image",
+  model = "Kubik::MediaUpload",
+  section = "thumb",
+  hint = DEFAULT_IMAGE_HINT,
+  variant = "media"
+} = {}) {
+  return {
+    name,
+    label,
+    model,
+    type: "resource",
+    section,
+    hint,
+    variant
+  };
+}
+function documentResourceField({
+  name = "document",
+  label = "Document",
+  model = "Kubik::MediaUpload",
+  section = "thumb",
+  hint = DEFAULT_DOCUMENT_HINT,
+  variant = "document"
+} = {}) {
+  return {
+    name,
+    label,
+    model,
+    type: "resource",
+    section,
+    hint,
+    variant
+  };
+}
+function urlLinkFields({
+  linkName = "link",
+  linkLabel = "Link URL",
+  linkTextName = "link_text",
+  linkTextLabel = "Link text",
+  section
+} = {}) {
+  const link = { name: linkName, label: linkLabel, type: "text" };
+  const linkText = { name: linkTextName, label: linkTextLabel, type: "text" };
+  if (section) {
+    link.section = section;
+    linkText.section = section;
+  }
+  return [link, linkText];
+}
+function navigableLinkField({
+  name = "nav_link",
+  label = "Link",
+  section,
+  fallbackToUrl = true
+} = {}) {
+  if (!kubikNavigableWysiwygEnabled()) {
+    if (!fallbackToUrl)
+      return [];
+    return urlLinkFields({ linkName: "link", linkTextName: "link_text", section });
+  }
+  const field = {
+    name,
+    label,
+    type: "navigable_link",
+    hint: "Pick a navigation item or published resource. Stored as structured link data."
+  };
+  if (section)
+    field.section = section;
+  return [field];
+}
+function linkFieldsForHost({ section, preferNavigable = "auto" } = {}) {
+  const useNavigable = preferNavigable === true || preferNavigable === "auto" && kubikNavigableWysiwygEnabled();
+  if (useNavigable) {
+    return navigableLinkField({ section, fallbackToUrl: true });
+  }
+  return urlLinkFields({ section });
+}
+function dataAttributesRepeater({ section } = {}) {
+  const field = {
+    name: "data_attributes",
+    label: "Data attributes",
+    type: "key_value_repeater",
+    prefix: "data",
+    fields: ["key", "value"]
+  };
+  if (section)
+    field.section = section;
+  return field;
+}
+function linksKeyValueRepeater({
+  name = "links",
+  label = "Links",
+  prefix = "link",
+  fields = ["text", "url", "target", "style"],
+  styleOptions = [],
+  hint
+} = {}) {
+  const repeater = {
+    name,
+    label,
+    type: "key_value_repeater",
+    prefix,
+    fields
+  };
+  if (hint)
+    repeater.hint = hint;
+  if (styleOptions.length > 0) {
+    repeater.field_config = {
+      style: {
+        type: "select",
+        options: styleOptions
+      }
+    };
+  }
+  return repeater;
+}
+function standardListingItemFields({
+  includeDataAttributes = true,
+  includeHeadingLevel = false,
+  headingLevelOptions = DEFAULT_HEADING_LEVEL_OPTIONS,
+  sections
+} = {}) {
+  const sectionThumb = sections ? "thumb" : void 0;
+  const sectionFields = sections ? "fields" : void 0;
+  const titleBlock = includeHeadingLevel ? titleWithHeadingLevel({ section: sectionFields, levels: headingLevelOptions }) : [{ name: "title", label: "Title", type: "text", ...sectionFields ? { section: sectionFields } : {} }];
+  const fields = [
+    imageResourceField({ section: sectionThumb }),
+    ...titleBlock,
+    { name: "subtitle", label: "Subtitle", type: "text", ...sectionFields ? { section: sectionFields } : {} },
+    { name: "alt_text", label: "Alt text", type: "text", ...sectionFields ? { section: sectionFields } : {} },
+    { name: "caption", label: "Caption", type: "textarea", ...sectionFields ? { section: sectionFields } : {} },
+    { name: "credit", label: "Credit", type: "text", ...sectionFields ? { section: sectionFields } : {} },
+    { name: "description", label: "Description", type: "textarea", ...sectionFields ? { section: sectionFields } : {} },
+    ...urlLinkFields({ section: sectionFields })
+  ];
+  if (includeDataAttributes) {
+    fields.push(dataAttributesRepeater({ section: sectionFields }));
+  }
+  return fields;
+}
+function standardListingItemTabConfig(options = {}) {
+  const sections = options.sections !== false;
+  const sectionDefs = sections ? [
+    { name: "thumb", classes: "thumb" },
+    { name: "fields", classes: "fields" }
+  ] : void 0;
+  return {
+    sections: sectionDefs,
+    fields: standardListingItemFields({ ...options, sections })
+  };
+}
+const mediaTypeField = {
+  name: "media_type",
+  label: "Media type",
+  type: "select",
+  section: "fields",
+  options: [
+    { label: "Image", value: "image" },
+    { label: "Video", value: "video" }
+  ]
+};
+function mediaTypeSelectField({ types = ["image", "video"], section = "fields" } = {}) {
+  const labelMap = { image: "Image", video: "Video", document: "Document" };
+  return {
+    name: "media_type",
+    label: "Media type",
+    type: "select",
+    section,
+    options: types.map((value) => ({ label: labelMap[value] || value, value }))
+  };
+}
+const imageMediaField = {
+  name: "media",
+  label: "Image",
+  model: "Kubik::MediaUpload",
+  type: "resource",
+  section: "thumb",
+  hint: "For image media, or poster frame when using video. At least 1200px wide, max 4MB.",
+  variant: "media"
+};
+const videoProviderField = {
+  name: "video_provider",
+  label: "Video source",
+  type: "select",
+  section: "fields",
+  hint: "YouTube and Vimeo accept watch or embed URLs. Stream is for HLS (.m3u8) with Plyr.",
+  options: [
+    { label: "YouTube", value: "youtube" },
+    { label: "Vimeo", value: "vimeo" },
+    { label: "Stream (HLS)", value: "stream" },
+    { label: "Other URL", value: "url" }
+  ]
+};
+const videoUrlField = {
+  name: "video_url",
+  label: "Video URL",
+  type: "text",
+  section: "fields",
+  hint: "Embed, watch, direct MP4/WebM, or HLS playlist URL."
+};
+const videoPosterField = {
+  name: "video_poster_url",
+  label: "Poster image URL",
+  type: "text",
+  section: "fields",
+  hint: "Optional poster frame for stream or self-hosted video."
+};
+const videoCaptionsField = {
+  name: "video_captions_url",
+  label: "Captions URL (English)",
+  type: "text",
+  section: "fields"
+};
+const videoCaptionsScotsField = {
+  name: "video_captions_scots_url",
+  label: "Captions URL (Scots)",
+  type: "text",
+  section: "fields"
+};
+const videoFields = [
+  videoProviderField,
+  videoUrlField,
+  videoPosterField,
+  videoCaptionsField,
+  videoCaptionsScotsField
+];
+const videoVisibleWhen = { visible_when: { field: "media_type", eq: "video" } };
+const contentWithMediaVideoFields = [
+  { ...videoProviderField, ...videoVisibleWhen },
+  { ...videoUrlField, ...videoVisibleWhen },
+  { ...videoCaptionsField, ...videoVisibleWhen },
+  { ...videoCaptionsScotsField, ...videoVisibleWhen }
+];
+function mediaTabFields({ mode = "full" } = {}) {
+  if (mode === "content_with_media") {
+    return [mediaTypeField, imageMediaField, ...contentWithMediaVideoFields];
+  }
+  return [mediaTypeField, imageMediaField, ...videoFields];
+}
+var fieldPresets = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  __proto__: null,
+  DEFAULT_HEADING_LEVEL_OPTIONS,
+  kubikNavigableWysiwygEnabled,
+  headingLevelField,
+  titleWithHeadingLevel,
+  imageResourceField,
+  documentResourceField,
+  urlLinkFields,
+  navigableLinkField,
+  linkFieldsForHost,
+  dataAttributesRepeater,
+  linksKeyValueRepeater,
+  standardListingItemFields,
+  standardListingItemTabConfig,
+  mediaTypeField,
+  mediaTypeSelectField,
+  imageMediaField,
+  videoProviderField,
+  videoUrlField,
+  videoPosterField,
+  videoCaptionsField,
+  videoCaptionsScotsField,
+  videoFields,
+  contentWithMediaVideoFields,
+  mediaTabFields
+}, Symbol.toStringTag, { value: "Module" }));
+function contentTab(extraFields = [], { links = "default" } = {}) {
+  const linkFields = links === "none" ? [] : links === "navigable_auto" ? linkFieldsForHost() : urlLinkFields();
   return {
     name: "content",
     label: "Content",
     fields: [
       { name: "title", label: "Title", type: "text" },
       { name: "intro", label: "Intro", type: "textarea" },
-      { name: "link", label: "Link", type: "text" },
-      { name: "link_text", label: "Link text", type: "text" },
-      ...fields
+      ...linkFields,
+      ...extraFields
     ]
   };
 }
@@ -11257,6 +11595,125 @@ function manualItemsTab({
     }
   };
 }
+function activeAdminPath() {
+  var _a;
+  return ((_a = document.querySelector("meta[name='active-admin-path']")) == null ? void 0 : _a.content) || "/admin";
+}
+function recordListSourceField({ allowLiveQuery = true, allowSnapshot = false }) {
+  return {
+    name: "source",
+    label: "Item source",
+    type: "select",
+    store_path: "settings.source",
+    options: [
+      { value: "manual", label: "Hand-picked items (default)" },
+      ...allowLiveQuery ? [{ value: "live_query", label: "Live query (updates on each page view)" }] : [],
+      ...allowSnapshot ? [{ value: "snapshot", label: "Snapshot (fixed list of IDs)" }] : []
+    ]
+  };
+}
+function recordListQueryFields(queries = []) {
+  if (queries.length === 0)
+    return [];
+  const liveQueryVisible = { tab: "settings", field: "source", eq: "live_query" };
+  return [
+    {
+      name: "query_key",
+      label: "Query preset",
+      type: "select",
+      store_path: "settings.query_key",
+      visible_when: liveQueryVisible,
+      options: queries.map((q) => ({
+        value: q.value,
+        label: q.label
+      }))
+    },
+    {
+      name: "query_limit",
+      label: "Limit",
+      type: "text",
+      store_path: "settings.query_limit",
+      visible_when: liveQueryVisible,
+      hint: "Number of records (e.g. 5)"
+    },
+    {
+      name: "query_params",
+      label: "Query parameters (JSON)",
+      type: "textarea",
+      store_path: "settings.query_params",
+      visible_when: liveQueryVisible,
+      hint: 'e.g. {"article_type":"news"}'
+    }
+  ];
+}
+function recordListItemsTab({
+  name = "items",
+  label = "Items",
+  model,
+  adminSearchPath,
+  itemFields,
+  addLabel = "Add item",
+  summary = "record",
+  sections = thumbAndFieldsSections(),
+  queries = [],
+  allowLiveQuery = true,
+  allowSnapshot = false
+}) {
+  const base = activeAdminPath().replace(/\/$/, "");
+  let path = adminSearchPath.startsWith("/") ? adminSearchPath : `/${adminSearchPath}`;
+  if (!path.startsWith(base)) {
+    path = `${base}${path}`;
+  }
+  if (!path.endsWith("/wysiwyg_search")) {
+    path = `${path.replace(/\/$/, "")}/wysiwyg_search`;
+  }
+  const fields = itemFields || [
+    {
+      name: "record",
+      label: "Record",
+      model,
+      type: "resource",
+      src: path,
+      section: "thumb"
+    }
+  ];
+  const manualTab = manualItemsTab({
+    name,
+    label,
+    itemFields: fields,
+    addLabel,
+    summary,
+    sections
+  });
+  return {
+    ...manualTab,
+    header_fields: [
+      recordListSourceField({ allowLiveQuery, allowSnapshot }),
+      ...recordListQueryFields(queries)
+    ],
+    repeater_visible_when: { tab: "settings", field: "source", not_eq: "live_query" }
+  };
+}
+function recordListSettingsTab({
+  layouts = [],
+  extras = []
+}) {
+  const fields = [];
+  if (layouts.length > 0) {
+    fields.push({
+      name: "layout",
+      label: "Layout",
+      type: "select",
+      options: layouts
+    });
+  }
+  fields.push(
+    { name: "additional_classes", type: "text", label: "Additional classes" },
+    { name: "element_id", type: "text", label: "Element ID" },
+    ...extras
+  );
+  return { name: "settings", label: "Settings", fields };
+}
 function resourceListSettingsTab({
   filterField = "filter",
   filterLabel = "Filter",
@@ -11294,10 +11751,136 @@ const presets = {
   standardSettingsExtras,
   thumbAndFieldsSections,
   manualItemsTab,
-  resourceListSettingsTab
+  recordListItemsTab,
+  recordListSettingsTab,
+  resourceListSettingsTab,
+  ...fieldPresets
 };
-const DEFAULT_INLINE_TOOLBAR = ["bold", "italic", "underline", "hyperlink"];
-const WIDGET_INLINE_TOOLBAR = ["underline", "hyperlink"];
+function normalizeSearchPath$1(adminSearchPath) {
+  const base = activeAdminPath$1().replace(/\/$/, "");
+  let path = adminSearchPath.startsWith("/") ? adminSearchPath : `/${adminSearchPath}`;
+  if (!path.startsWith(base)) {
+    path = `${base}${path}`;
+  }
+  if (!path.endsWith("/wysiwyg_search")) {
+    path = `${path.replace(/\/$/, "")}/wysiwyg_search`;
+  }
+  return path;
+}
+function defaultRecordItemFields(model, adminSearchPath) {
+  return [
+    {
+      name: "record",
+      label: "Record",
+      model,
+      type: "resource",
+      src: normalizeSearchPath$1(adminSearchPath),
+      section: "thumb"
+    }
+  ];
+}
+function defineRecordListBlock({
+  toolbox,
+  sanitize = { intro: { br: true } },
+  widget_name,
+  model,
+  adminSearchPath,
+  itemFields,
+  queries = [],
+  layouts = [],
+  settingsExtras = [],
+  addLabel = "Add item",
+  allowLiveQuery = true,
+  allowSnapshot = false
+}) {
+  if (!toolbox || !widget_name || !model || !adminSearchPath) {
+    throw new Error("defineRecordListBlock requires toolbox, widget_name, model, and adminSearchPath");
+  }
+  const fields = itemFields || defaultRecordItemFields(model, adminSearchPath);
+  return defineBlock({
+    toolbox,
+    sanitize,
+    widgetConfig: {
+      widget_name,
+      widget_model: model,
+      icon: toolbox.icon,
+      tabs: [
+        presets.recordListItemsTab({
+          model,
+          adminSearchPath,
+          itemFields: fields,
+          addLabel,
+          queries,
+          allowLiveQuery,
+          allowSnapshot
+        }),
+        presets.contentTab(),
+        presets.recordListSettingsTab({
+          layouts,
+          extras: settingsExtras
+        })
+      ]
+    }
+  });
+}
+function normalizeSearchPath(adminSearchPath) {
+  const base = activeAdminPath$1().replace(/\/$/, "");
+  let path = adminSearchPath.startsWith("/") ? adminSearchPath : `/${adminSearchPath}`;
+  if (!path.startsWith(base)) {
+    path = `${base}${path}`;
+  }
+  if (!path.endsWith("/wysiwyg_search")) {
+    path = `${path.replace(/\/$/, "")}/wysiwyg_search`;
+  }
+  return path;
+}
+function defineResourceReferenceBlock({
+  toolbox,
+  sanitize = {},
+  widget_name,
+  model,
+  adminSearchPath,
+  referenceTabName = "reference",
+  referenceFieldName,
+  referenceLabel,
+  contentFields = [],
+  settings = {}
+}) {
+  var _a, _b;
+  const fieldName = referenceFieldName || referenceTabName;
+  const searchPath = normalizeSearchPath(adminSearchPath);
+  const referenceTab = {
+    name: referenceTabName,
+    label: referenceLabel || model.split("::").pop(),
+    fields: [
+      {
+        name: fieldName,
+        label: referenceLabel || model.split("::").pop(),
+        model,
+        type: "resource",
+        src: searchPath
+      }
+    ]
+  };
+  const tabs = [
+    referenceTab,
+    presets.contentTab(contentFields)
+  ];
+  if (((_a = settings.layouts) == null ? void 0 : _a.length) || ((_b = settings.extras) == null ? void 0 : _b.length)) {
+    tabs.push(presets.settingsTab(settings));
+  }
+  return defineBlock({
+    toolbox,
+    sanitize,
+    widgetConfig: {
+      widget_name,
+      widget_model: model,
+      tabs
+    }
+  });
+}
+const DEFAULT_INLINE_TOOLBAR = ["bold", "italic", "underline", "hyperlink", "kubikNavigableLink"];
+const WIDGET_INLINE_TOOLBAR = ["underline", "hyperlink", "kubikNavigableLink"];
 const EDITORJS_INLINE_ICON_SPRITE_ID = "kubik-editorjs-inline-icons";
 const EDITORJS_LINK_ICON_SPRITE = `
 <symbol id="link" viewBox="0 0 14 10">
@@ -11320,6 +11903,63 @@ function ensureEditorJsInlineIcons() {
   svg.innerHTML = EDITORJS_LINK_ICON_SPRITE;
   document.body.appendChild(svg);
 }
+class KubikNavigableLinkTool {
+  static get isInline() {
+    return true;
+  }
+  static get title() {
+    return "Kubik link";
+  }
+  constructor({ api }) {
+    this.api = api;
+    this.button = null;
+    this.state = false;
+  }
+  render() {
+    this.button = document.createElement("button");
+    this.button.type = "button";
+    this.button.textContent = "Nav";
+    this.button.classList.add(this.api.styles.inlineToolButton);
+    return this.button;
+  }
+  surround(range) {
+    const selected = range.toString();
+    const kind = window.prompt("Link kind: item, resource, or url", "url");
+    if (!kind)
+      return;
+    const anchor = document.createElement("a");
+    if (kind === "url") {
+      const href = window.prompt("URL", "https://");
+      if (!href)
+        return;
+      anchor.setAttribute("href", href);
+      anchor.setAttribute("data-kubik-nav", JSON.stringify({ kind: "url", href }));
+    } else if (kind === "item") {
+      const id = window.prompt("Navigation item id");
+      if (!id)
+        return;
+      anchor.setAttribute("href", "#");
+      anchor.setAttribute("data-kubik-nav", JSON.stringify({ kind: "item", navigation_item_id: id }));
+    } else {
+      const resourceType = window.prompt("Resource type (e.g. Page)");
+      const resourceId = window.prompt("Resource id");
+      const locationId = window.prompt("Navigation item id (blank = canonical)", "");
+      if (!resourceType || !resourceId)
+        return;
+      const payload = { kind: "resource", resource_type: resourceType, resource_id: resourceId };
+      if (locationId)
+        payload.navigation_item_id = locationId;
+      anchor.setAttribute("href", "#");
+      anchor.setAttribute("data-kubik-nav", JSON.stringify(payload));
+    }
+    anchor.textContent = selected;
+    range.deleteContents();
+    range.insertNode(anchor);
+  }
+  checkState() {
+    return false;
+  }
+}
 function buildBaseEditorTools({
   widgetInlineToolbar = WIDGET_INLINE_TOOLBAR,
   richInlineToolbar = DEFAULT_INLINE_TOOLBAR
@@ -11332,6 +11972,9 @@ function buildBaseEditorTools({
     hyperlink: {
       class: Hyperlink,
       config: {}
+    },
+    kubikNavigableLink: {
+      class: KubikNavigableLinkTool
     },
     embed: {
       class: Embed,
@@ -11369,17 +12012,476 @@ function buildBaseEditorTools({
     underline: Underline
   };
 }
+const RECORD_LIST_FRAME_SELECTOR = "turbo-frame.kubik-wysiwyg-component.kubik-wysiwyg-record-list";
+const ITEMS_TAB = "items";
+function stimulusApplication() {
+  return window.KubikInterfaceStimulus;
+}
+function recordListFrames(scope = document) {
+  return scope.querySelectorAll(RECORD_LIST_FRAME_SELECTOR);
+}
+function widgetController(frame) {
+  var _a;
+  const app = stimulusApplication();
+  if (!app || !((_a = frame == null ? void 0 : frame.hasAttribute) == null ? void 0 : _a.call(frame, "data-controller")))
+    return null;
+  return app.getControllerForElementAndIdentifier(frame, "kubik-widget");
+}
+function itemsRepeaterContainer(frame) {
+  const panel = frame.querySelector(`[class*="-tabs-${ITEMS_TAB}"]`);
+  if (!panel)
+    return null;
+  return panel.querySelector(".kubik-wysiwyg-tabs-container:has(> .kubik-wysiwyg-repeated-item)");
+}
+const DRAG_HANDLE_SELECTOR = ".kubik-wysiwyg-repeated-item-header .kubik-wysiwyg-component--items-action--more";
+function enhanceDragHandles(frame) {
+  frame.querySelectorAll(DRAG_HANDLE_SELECTOR).forEach((more) => {
+    var _a;
+    more.classList.add("kubik-wysiwyg-repeater-drag-handle");
+    more.setAttribute("title", "Drag to reorder");
+    more.removeAttribute("tabindex");
+    const icon = more.querySelector(".material-symbols-outlined");
+    if (icon) {
+      icon.textContent = "drag_indicator";
+    }
+    (_a = more.querySelector(".kubik-wysiwyg-component--items-more-actions")) == null ? void 0 : _a.remove();
+  });
+}
+function watchRecordListFrame(frame) {
+  if (frame._recordListMutationObserver)
+    return;
+  let scheduled = false;
+  const scheduleEnhance = () => {
+    if (scheduled)
+      return;
+    scheduled = true;
+    requestAnimationFrame(() => {
+      scheduled = false;
+      enhanceDragHandles(frame);
+    });
+  };
+  frame._recordListMutationObserver = new MutationObserver(scheduleEnhance);
+  frame._recordListMutationObserver.observe(frame, { childList: true, subtree: true });
+}
+const DROP_PLACEHOLDER_CLASS = "kubik-wysiwyg-repeated-item-drop-placeholder";
+function createDropPlaceholder(row) {
+  const placeholder = document.createElement("div");
+  placeholder.className = DROP_PLACEHOLDER_CLASS;
+  placeholder.setAttribute("aria-hidden", "true");
+  const rowHeight = row.offsetHeight;
+  const header = row.querySelector(".kubik-wysiwyg-repeated-item-header");
+  const slotHeight = header ? header.offsetHeight : rowHeight;
+  placeholder.style.minHeight = `${Math.max(slotHeight, 40)}px`;
+  return placeholder;
+}
+function dropInsertReference(container2, over, placeholder, insertBefore) {
+  let ref = insertBefore ? over : over.nextSibling;
+  while (ref && ref === placeholder) {
+    ref = ref.nextSibling;
+  }
+  return ref;
+}
+function movePlaceholder(dragging, over, insertBefore) {
+  const { container: container2, placeholder } = dragging;
+  const ref = dropInsertReference(container2, over, placeholder, insertBefore);
+  if (!ref) {
+    container2.appendChild(placeholder);
+    return;
+  }
+  container2.insertBefore(placeholder, ref);
+}
+function sanitizeDragGhost(ghost) {
+  ghost.querySelectorAll("[id]").forEach((element) => element.removeAttribute("id"));
+  ghost.querySelectorAll("[data-controller]").forEach((element) => element.removeAttribute("data-controller"));
+  ghost.querySelectorAll("[data-action]").forEach((element) => element.removeAttribute("data-action"));
+  ghost.querySelectorAll(".kubik-repeater-expand-action").forEach((icon) => {
+    var _a;
+    (_a = icon.closest(".kubik-wysiwyg-component--items-action")) == null ? void 0 : _a.remove();
+  });
+}
+function createDragGhost(row) {
+  const ghost = row.cloneNode(true);
+  ghost.classList.add("kubik-wysiwyg-repeated-item-drag-ghost");
+  ghost.classList.remove("kubik-widget-expanded");
+  ghost.setAttribute("aria-hidden", "true");
+  sanitizeDragGhost(ghost);
+  return ghost;
+}
+function mountDragGhost(ghost, row, frame, event, rowRect) {
+  ghost.style.width = `${rowRect.width}px`;
+  ghost.style.maxWidth = `${rowRect.width}px`;
+  ghost.style.boxSizing = "border-box";
+  ghost.style.position = "fixed";
+  ghost.style.margin = "0";
+  ghost.style.zIndex = "100000";
+  ghost.style.pointerEvents = "none";
+  frame.classList.add("kubik-wysiwyg-component--drag-active");
+  document.body.appendChild(ghost);
+  const offsets = {
+    offsetX: event.clientX - rowRect.left,
+    offsetY: event.clientY - rowRect.top
+  };
+  moveDragGhost(ghost, event, offsets);
+  return offsets;
+}
+function moveDragGhost(ghost, event, offsets) {
+  ghost.style.left = `${event.clientX - offsets.offsetX}px`;
+  ghost.style.top = `${event.clientY - offsets.offsetY}px`;
+}
+function removeDragGhost(ghost, frame) {
+  frame == null ? void 0 : frame.classList.remove("kubik-wysiwyg-component--drag-active");
+  ghost == null ? void 0 : ghost.remove();
+}
+function dropTargetRow(container2, event) {
+  const target = document.elementFromPoint(event.clientX, event.clientY);
+  let over = target == null ? void 0 : target.closest(".kubik-wysiwyg-repeated-item");
+  if (!over && (target == null ? void 0 : target.closest(`.${DROP_PLACEHOLDER_CLASS}`))) {
+    const placeholder = target.closest(`.${DROP_PLACEHOLDER_CLASS}`);
+    const prev = placeholder.previousElementSibling;
+    const next = placeholder.nextElementSibling;
+    if (prev == null ? void 0 : prev.classList.contains("kubik-wysiwyg-repeated-item")) {
+      over = prev;
+    } else if (next == null ? void 0 : next.classList.contains("kubik-wysiwyg-repeated-item")) {
+      over = next;
+    }
+  }
+  if (!over || !container2.contains(over)) {
+    return null;
+  }
+  return over;
+}
+function finishDragPlacement(row, container2, placeholder) {
+  container2.insertBefore(row, placeholder);
+  placeholder.remove();
+}
+function moveRepeaterItem(controller, tab, fromIndex, toIndex) {
+  if (fromIndex === toIndex || fromIndex < 0 || toIndex < 0)
+    return;
+  const tabData = controller.dataValue[tab] || {};
+  const items = [...tabData.repeated_items || []];
+  if (fromIndex >= items.length || toIndex >= items.length)
+    return;
+  const [moved] = items.splice(fromIndex, 1);
+  items.splice(toIndex, 0, moved);
+  controller.dataValue = {
+    ...controller.dataValue,
+    [tab]: {
+      ...tabData,
+      repeated_items: items
+    }
+  };
+  controller.getNewWidget();
+}
+function installManualDragReorder(frame) {
+  if (frame.dataset.recordListReorderBound === "true")
+    return;
+  frame.dataset.recordListReorderBound = "true";
+  let dragging = null;
+  const endDrag = (event) => {
+    if (!dragging)
+      return;
+    if (event.type === "pointerup" && event.pointerId !== dragging.pointerId)
+      return;
+    document.removeEventListener("pointermove", onPointerMove, true);
+    document.removeEventListener("pointerup", endDrag, true);
+    document.removeEventListener("pointercancel", endDrag, true);
+    const { row, ghost, container: container2, fromIndex, placeholder } = dragging;
+    removeDragGhost(ghost, frame);
+    finishDragPlacement(row, container2, placeholder);
+    dragging = null;
+    const controller = widgetController(frame);
+    if (!controller)
+      return;
+    const rows = [...container2.querySelectorAll(":scope > .kubik-wysiwyg-repeated-item")];
+    const toIndex = rows.indexOf(row);
+    moveRepeaterItem(controller, ITEMS_TAB, fromIndex, toIndex);
+  };
+  const onPointerMove = (event) => {
+    if (!dragging || event.pointerId !== dragging.pointerId)
+      return;
+    moveDragGhost(dragging.ghost, event, dragging);
+    const over = dropTargetRow(dragging.container, event);
+    if (!over)
+      return;
+    const rect = over.getBoundingClientRect();
+    const insertBefore = event.clientY < rect.top + rect.height / 2;
+    movePlaceholder(dragging, over, insertBefore);
+  };
+  frame.addEventListener(
+    "pointerdown",
+    (event) => {
+      const handle = event.target.closest(DRAG_HANDLE_SELECTOR);
+      if (!handle || !frame.contains(handle))
+        return;
+      const container2 = itemsRepeaterContainer(frame);
+      const row = handle.closest(".kubik-wysiwyg-repeated-item");
+      if (!container2 || !row || !container2.contains(row))
+        return;
+      const fromIndex = Number(row.dataset.kubikRepeaterIndexValue);
+      if (Number.isNaN(fromIndex))
+        return;
+      const rowRect = row.getBoundingClientRect();
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      const placeholder = createDropPlaceholder(row);
+      container2.insertBefore(placeholder, row);
+      container2.removeChild(row);
+      const ghost = createDragGhost(row);
+      const offsets = mountDragGhost(ghost, row, frame, event, rowRect);
+      dragging = {
+        row,
+        ghost,
+        container: container2,
+        fromIndex,
+        placeholder,
+        pointerId: event.pointerId,
+        ...offsets
+      };
+      document.addEventListener("pointermove", onPointerMove, true);
+      document.addEventListener("pointerup", endDrag, true);
+      document.addEventListener("pointercancel", endDrag, true);
+    },
+    true
+  );
+}
+function enhanceRecordListFrame(frame) {
+  enhanceDragHandles(frame);
+  installManualDragReorder(frame);
+  watchRecordListFrame(frame);
+}
+function scanRecordListWidgets(scope = document) {
+  recordListFrames(scope).forEach(enhanceRecordListFrame);
+}
+function patchGetNewWidgetRebind() {
+  var _a, _b;
+  if ((_a = window.Turbo) == null ? void 0 : _a.__recordListRenderPatched)
+    return;
+  if (!((_b = window.Turbo) == null ? void 0 : _b.renderStreamMessage))
+    return;
+  const originalRender = window.Turbo.renderStreamMessage.bind(window.Turbo);
+  window.Turbo.renderStreamMessage = (html) => {
+    const result2 = originalRender(html);
+    requestAnimationFrame(() => scanRecordListWidgets());
+    return result2;
+  };
+  window.Turbo.__recordListRenderPatched = true;
+}
+function patchRecordListWidgetConnect() {
+  if (KubikWidgetController.__recordListConnectPatched)
+    return;
+  const previousConnect = KubikWidgetController.prototype.connect;
+  KubikWidgetController.prototype.connect = function connectRecordListEnhancements() {
+    previousConnect.call(this);
+    if (this.element.classList.contains("kubik-wysiwyg-record-list")) {
+      requestAnimationFrame(() => enhanceRecordListFrame(this.element));
+    }
+  };
+  KubikWidgetController.__recordListConnectPatched = true;
+}
+function patchAutocompleteUnpublishedResults() {
+  if (KubikAutocompleteController.__recordListUnpublishedClassPatched)
+    return;
+  const previousResultsChanged = KubikAutocompleteController.prototype.resultsValueChanged;
+  KubikAutocompleteController.prototype.resultsValueChanged = function resultsValueChangedWithUnpublishedClass() {
+    previousResultsChanged.call(this);
+    this.resultTargets.forEach((result2) => {
+      var _a;
+      try {
+        const payload = JSON.parse(result2.dataset.returnObject || "{}");
+        const statusInfo = ((_a = payload.return_object) == null ? void 0 : _a.status_info) || {};
+        if (statusInfo.unpublished) {
+          result2.classList.add("kubik-wysiwyg-autocomplete-result--unpublished");
+        }
+      } catch {
+      }
+    });
+  };
+  KubikAutocompleteController.__recordListUnpublishedClassPatched = true;
+}
+function applyRecordListWidgetAdminEnhancements() {
+  patchRecordListWidgetConnect();
+  patchGetNewWidgetRebind();
+  patchAutocompleteUnpublishedResults();
+  scanRecordListWidgets();
+  document.addEventListener("turbo:frame-load", (event) => {
+    const target = event.target;
+    if (!(target instanceof Element))
+      return;
+    scanRecordListWidgets(target);
+  });
+  document.addEventListener("turbo:load", () => scanRecordListWidgets());
+}
+const LOADING_CLASS = "kubik-wysiwyg-component--loading";
+const LOADING_SELECTOR = ".kubik-wysiwyg-component__loading";
+const SETTLE_MS = 120;
+const WIDGET_FRAME_SELECTOR = "turbo-frame.kubik-wysiwyg-component";
+function widgetContentLoaded(frame) {
+  return Boolean(
+    frame.querySelector(
+      ".kubik-wysiwyg-tabs-container, .kubik-wysiwyg-widget-header, .kubik-wysiwyg--standard-fields"
+    )
+  );
+}
+function ensureLoadingSpinner(frame) {
+  if (!(frame instanceof Element))
+    return;
+  if (frame.querySelector(LOADING_SELECTOR))
+    return;
+  const overlay = document.createElement("div");
+  overlay.className = "kubik-wysiwyg-component__loading";
+  overlay.setAttribute("aria-busy", "true");
+  overlay.setAttribute("aria-label", "Loading widget");
+  overlay.innerHTML = '<span class="kubik-wysiwyg-component__loading-spinner"></span>';
+  frame.appendChild(overlay);
+}
+function showWidgetLoading(frame) {
+  if (!(frame instanceof Element))
+    return;
+  ensureLoadingSpinner(frame);
+  frame.classList.add(LOADING_CLASS);
+  frame.setAttribute("aria-busy", "true");
+}
+function hideWidgetLoading(frame) {
+  if (!(frame instanceof Element))
+    return;
+  if (!widgetContentLoaded(frame))
+    return;
+  frame.classList.remove(LOADING_CLASS);
+  frame.removeAttribute("aria-busy");
+}
+function waitForWidgetContent(frame) {
+  return new Promise((resolve2) => {
+    if (widgetContentLoaded(frame)) {
+      window.setTimeout(resolve2, SETTLE_MS);
+      return;
+    }
+    let settleTimer;
+    const finish = () => {
+      if (!widgetContentLoaded(frame))
+        return;
+      window.clearTimeout(settleTimer);
+      observer.disconnect();
+      window.setTimeout(resolve2, SETTLE_MS);
+    };
+    const observer = new MutationObserver(() => {
+      window.clearTimeout(settleTimer);
+      settleTimer = window.setTimeout(finish, SETTLE_MS);
+    });
+    observer.observe(frame, { childList: true, subtree: true, attributes: true });
+    settleTimer = window.setTimeout(() => {
+      observer.disconnect();
+      resolve2();
+    }, 15e3);
+  });
+}
+function scanWidgetFrames(root2 = document) {
+  root2.querySelectorAll(WIDGET_FRAME_SELECTOR).forEach((frame) => {
+    if (widgetContentLoaded(frame)) {
+      hideWidgetLoading(frame);
+    } else {
+      showWidgetLoading(frame);
+    }
+  });
+}
+function patchPluginFactoryInitialLoading() {
+  if (!PluginFactory || PluginFactory.__initialWidgetLoadingPatched)
+    return;
+  const originalRender = PluginFactory.prototype.render;
+  PluginFactory.prototype.render = function renderWithInitialLoading() {
+    const wrapper = originalRender.call(this);
+    showWidgetLoading(wrapper);
+    return wrapper;
+  };
+  PluginFactory.__initialWidgetLoadingPatched = true;
+}
+function patchKubikWidgetLoading() {
+  if (!KubikWidgetController || KubikWidgetController.__widgetLoadingUiPatched)
+    return;
+  const previousConnect = KubikWidgetController.prototype.connect;
+  KubikWidgetController.prototype.connect = function connectWithLoadingUi() {
+    showWidgetLoading(this.element);
+    return previousConnect.call(this);
+  };
+  const previousGetNewWidget = KubikWidgetController.prototype.getNewWidget;
+  KubikWidgetController.prototype.getNewWidget = function getNewWidgetWithLoadingUi() {
+    const frame = this.element;
+    showWidgetLoading(frame);
+    previousGetNewWidget.call(this);
+    waitForWidgetContent(frame).then(() => {
+      hideWidgetLoading(frame);
+    });
+  };
+  KubikWidgetController.__widgetLoadingUiPatched = true;
+}
+function observeEditorWidgets() {
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      mutation.addedNodes.forEach((node2) => {
+        if (!(node2 instanceof Element))
+          return;
+        if (node2.matches(WIDGET_FRAME_SELECTOR)) {
+          scanWidgetFrames(node2.parentElement || document);
+          return;
+        }
+        scanWidgetFrames(node2);
+      });
+    });
+  });
+  observer.observe(document.body, { childList: true, subtree: true });
+}
+function applyKubikWysiwygWidgetLoading() {
+  patchPluginFactoryInitialLoading();
+  patchKubikWidgetLoading();
+  scanWidgetFrames();
+  observeEditorWidgets();
+  document.addEventListener("turbo:load", () => scanWidgetFrames());
+  document.addEventListener("turbo:frame-load", (event) => {
+    if (event.target instanceof Element) {
+      scanWidgetFrames(event.target);
+    }
+  });
+}
+const DEFAULT_MEDIA_TYPE_FIELD = "media.media_type";
+function refreshWidgetAfterMediaTypeChange(select) {
+  var _a;
+  const widgetEl = select.closest('[data-controller~="kubik-widget"]');
+  if (!widgetEl)
+    return;
+  const app = window.KubikInterfaceStimulus;
+  const controller = app == null ? void 0 : app.getControllerForElementAndIdentifier(widgetEl, "kubik-widget");
+  (_a = controller == null ? void 0 : controller.getNewWidget) == null ? void 0 : _a.call(controller);
+}
+function onMediaTypeChange(event, fieldName) {
+  const select = event.target;
+  if (!select.matches(`select[name="${fieldName}"]`))
+    return;
+  window.requestAnimationFrame(() => refreshWidgetAfterMediaTypeChange(select));
+}
+function installMediaTypeChangeRefresh({ fieldName = DEFAULT_MEDIA_TYPE_FIELD } = {}) {
+  const key = `__kubikMediaTypeRefresh_${fieldName}`;
+  if (window[key])
+    return;
+  window[key] = true;
+  document.addEventListener("change", (event) => onMediaTypeChange(event, fieldName));
+}
 var index = {
+  KubikNavigableLinkTool,
   KubikWidgetController,
   KubikRepeaterController,
   KubikKeyValueRepeaterController,
   PluginFactory,
   KubikAutocompleteController,
   defineBlock,
+  defineRecordListBlock,
+  defineResourceReferenceBlock,
   presets,
   DEFAULT_INLINE_TOOLBAR,
   WIDGET_INLINE_TOOLBAR,
   ensureEditorJsInlineIcons,
-  buildBaseEditorTools
+  buildBaseEditorTools,
+  applyRecordListWidgetAdminEnhancements,
+  applyKubikWysiwygWidgetLoading,
+  installMediaTypeChangeRefresh,
+  fieldPresets
 };
-export { DEFAULT_INLINE_TOOLBAR, KubikAutocompleteController, KubikKeyValueRepeaterController, KubikRepeaterController, KubikWidgetController, PluginFactory, WIDGET_INLINE_TOOLBAR, buildBaseEditorTools, index as default, defineBlock, ensureEditorJsInlineIcons, presets };
+export { DEFAULT_INLINE_TOOLBAR, KubikAutocompleteController, KubikKeyValueRepeaterController, KubikNavigableLinkTool, KubikRepeaterController, KubikWidgetController, PluginFactory, WIDGET_INLINE_TOOLBAR, applyKubikWysiwygWidgetLoading, applyRecordListWidgetAdminEnhancements, buildBaseEditorTools, index as default, defineBlock, defineRecordListBlock, defineResourceReferenceBlock, ensureEditorJsInlineIcons, fieldPresets, installMediaTypeChangeRefresh, presets };

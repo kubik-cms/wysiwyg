@@ -2,38 +2,57 @@
 
 require "rails/generators"
 require "rails/generators/named_base"
+require_relative "../wysiwyg_generator_helpers"
 
 module Kubik
   module Generators
     class WysiwygBlockGenerator < Rails::Generators::NamedBase
-      source_root File.expand_path("wysiwyg_block/templates", __dir__)
+      include WysiwygGeneratorHelpers
 
-      class_option :editorjs_type, type: :string, desc: "Editor.js block type key (defaults to underscored name)"
+      source_root File.expand_path("templates", __dir__)
+
+      class_option :editorjs_type, type: :string, desc: "Editor.js tool key (defaults to underscored name)"
+      class_option :toolbox_title, type: :string, desc: "Block picker label (defaults to class name)"
+
+      def assign_template_variables
+        @block_type = options[:editorjs_type].presence || file_name
+        @toolbox_title = options[:toolbox_title].presence || class_name
+        @widget_folder = "#{file_name}_widget"
+        @snippet_dir = File.join("docs/wysiwyg_snippets", @block_type)
+      end
 
       def create_javascript_block
-        @block_type = options[:editorjs_type].presence || file_name
-        @widget_folder = "#{file_name}_widget"
         template "block_index.js.tt", File.join("app/javascript/admin/wysiwyg_widgets", @widget_folder, "index.js")
       end
 
       def append_bundle_export
-        bundle_path = "app/javascript/admin/wysiwyg_widgets_bundle.js"
-        return unless File.exist?(bundle_path)
-
-        export_line = "export { default as #{class_name}Widget } from \"admin/wysiwyg_widgets/#{@widget_folder}\""
-        append_file bundle_path, "\n#{export_line}" unless File.read(bundle_path).include?(export_line)
+        append_wysiwyg_bundle_export(
+          export_name: "#{class_name}Widget",
+          import_path: "admin/wysiwyg_widgets/#{@widget_folder}"
+        )
       end
 
       def create_renderer
         template "renderer.rb.tt", File.join("app/components/wysiwyg_renderer", "#{file_name}.rb")
       end
 
+      def create_agent_notes
+        template "AGENTS.md.tt", File.join("docs", "wysiwyg_block_#{file_name}.md")
+      end
+
+      def create_merge_snippets
+        template "wysiwyg_tools_snippet.js.tt", File.join(@snippet_dir, "wysiwyg_tools.js")
+        template "editor_renderer_snippet.rb.tt", File.join(@snippet_dir, "editor_renderer.rb")
+      end
+
       def show_next_steps
-        say "\nNext steps:", :green
-        say "  1. Register the tool in app/javascript/admin/controllers/wysiwyg_tools.js"
-        say "  2. Add \"#{@block_type}\" => WysiwygRenderer::#{class_name}.new to app/lib/kubik/editor_renderer.rb"
-        say "  3. Implement public rendering in app/components/wysiwyg_renderer/#{file_name}.rb"
-        say "  See docs/WYSIWYG.md in the kubik_wysiwyg gem.\n"
+        say "\nWYSIWYG block scaffold created (#{@block_type}).", :green
+        say "  1. Merge docs/wysiwyg_snippets/#{@block_type}/wysiwyg_tools.js into wysiwyg_tools.js"
+        say "  2. Merge docs/wysiwyg_snippets/#{@block_type}/editor_renderer.rb into config/initializers/kubik_editor_renderer.rb"
+        say "  3. Implement rendering in app/components/wysiwyg_renderer/#{file_name}.rb"
+        say "  4. Customise tabs/fields in app/javascript/admin/wysiwyg_widgets/#{@widget_folder}/index.js"
+        say "  5. Read docs/wysiwyg_block_#{file_name}.md"
+        say_wysiwyg_footer
       end
     end
   end

@@ -7,8 +7,15 @@
       <div class='kubik-wysiwyg--standard-fields' data-kubik-widget-content-target='<%= tab[:name] %>TabContainer'>
 
         <% if tab[:repeated] %>
-          <%= render Kubik::WysiwygEditor::Common::Repeater.new(tab: tab, data: @data, widget_id: @widget_id, config: @config) %>
-          <%= render Kubik::WysiwygEditor::Common::AddItem.new(tab, @widget_id) %>
+          <% if tab[:header_fields].present? %>
+            <% tab[:header_fields].each do |field| %>
+              <%= render Kubik::WysiwygEditor::Common::Field.new(field, @data, @widget_id, tab) %>
+            <% end %>
+          <% end %>
+          <% if repeater_visible?(tab) %>
+            <%= render Kubik::WysiwygEditor::Common::Repeater.new(tab: tab, data: @data, widget_id: @widget_id, config: @config) %>
+            <%= render Kubik::WysiwygEditor::Common::AddItem.new(tab, @widget_id) %>
+          <% end %>
         <% else %>
           <% if tab[:sections].present? %>
             <% grouped_fields = tab[:fields].group_by { |f| f[:section] } %>

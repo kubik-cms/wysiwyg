@@ -5,7 +5,7 @@ const Icon = '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 2
 
 export default defineBlock({
   toolbox: {
-    title: '<%= class_name %>',
+    title: '<%= @toolbox_title %>',
     icon: Icon,
   },
   sanitize: {
@@ -17,7 +17,7 @@ export default defineBlock({
     tabs: [
       presets.contentTab([
         { name: 'body', label: 'Body', type: 'textarea' },
-      ]),
+      ], { links: 'navigable_auto' }),
       presets.settingsTab({ layouts: [] }),
     ],
   },

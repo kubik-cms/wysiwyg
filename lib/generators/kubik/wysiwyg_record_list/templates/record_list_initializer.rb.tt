@@ -1,0 +1,28 @@
+# frozen_string_literal: true
+
+# Merge into config/initializers/kubik_wysiwyg_record_lists.rb (inside KubikWysiwyg.configure).
+
+Rails.application.config.to_prepare do
+  KubikWysiwyg.configure do |config|
+    config.register_record_list_model(
+      '<%= @model_class %>',
+      widget_name: '<%= @widget_name %>',
+      admin_search_path: lambda {
+        Rails.application.routes.url_helpers.admin_<%= @admin_search_path %>_path
+      },
+      default_source: :manual,
+      layouts: [
+<% @layouts.each do |layout| -%>
+        { value: '<%= layout[:value] %>', label: '<%= layout[:label] %>' },
+<% end -%>
+      ],
+      render_partial: '<%= @partial_namespace %>_large_partial',
+      layout_partials: {
+<% @layouts.each do |layout| -%>
+        '<%= layout[:value] %>' => '<%= @partial_namespace %>_<%= layout[:value] %>_partial',
+<% end -%>
+        'default' => '<%= @partial_namespace %>_<%= @default_layout %>_partial'
+      }
+    )
+  end
+end

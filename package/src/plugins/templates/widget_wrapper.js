@@ -24,12 +24,15 @@ export const widgetWrapper = function widgetWrapper (details = {}, data) {
     wrapperAttributes['data-kubik-widget-items-max-items-value'] = details.items_limit
   }
 
+  const extraClasses = details.setup.widget_classes ||
+    (details.setup.widget_class ? details.setup.widget_class.split(/\s+/).filter(Boolean) : [])
+
   const wrapper = makeElement(
     'turbo-frame',
     [
       'kubik_media_wrapper',
       'kubik-wysiwyg-component',
-      details.setup.widget_class
+      ...extraClasses,
     ],
     wrapperAttributes
   )

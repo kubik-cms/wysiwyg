@@ -6,8 +6,8 @@ module Kubik
         @widget_id = config[:widget_id]
         @tabs = @config[:config][:tabs]
         incoming = data.present? ? data.deep_symbolize_keys : {}
-        @data = deep_merge_defaults(widget_default_data, incoming)
-        @icon = @config.dig(:config, :icon)
+        @data = apply_record_list_defaults(deep_merge_defaults(widget_default_data, incoming))
+        @icon = @config.dig(:config, :icon).presence || @config[:icon]
       end
 
       private
@@ -49,6 +49,16 @@ module Kubik
         (field[:fields] || %w[key value]).each_with_object({}) do |name, row|
           row[name.to_sym] = ''
         end
+      end
+
+      def apply_record_list_defaults(data)
+        model = @config.dig(:config, :widget_model).presence
+        return data unless model
+
+        settings = (data[:settings] || {}).dup
+        settings[:model] = model
+        settings[:source] = settings[:source].presence || 'manual'
+        data.merge(settings: settings)
       end
     end
   end

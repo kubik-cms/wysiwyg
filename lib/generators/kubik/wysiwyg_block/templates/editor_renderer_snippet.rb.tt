@@ -1,0 +1,3 @@
+# Paste into config/initializers/kubik_editor_renderer.rb (inside blocks merge):
+
+          '<%= @block_type %>' => ::WysiwygRenderer::<%= class_name %>.new,

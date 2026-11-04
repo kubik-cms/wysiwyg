@@ -1,0 +1,31 @@
+<%# locals: items, repeated_items, title, content, link_text, link_url %>
+<%# TODO: customise card layout for <%= @model_class %> (SmallCard or site component). %>
+<% items_list = local_assigns[:items].presence || local_assigns[:repeated_items] || [] %>
+
+<% if items_list.present? %>
+  <div class="<%= file_name %>-listing-wysiwyg-block">
+    <%= render partial: 'layouts/partials/listing/articles_listing_header',
+               locals: { title: local_assigns[:title], content: local_assigns[:content] } %>
+
+    <div class="layout-item-columns">
+      <div class="layout-columns <%= file_name %>-listing-wysiwyg <%= file_name %>-listing-wysiwyg--small">
+        <% items_list.each_with_index do |item, index| %>
+          <% row = normalize_wysiwyg_<%= file_name %>_list_item(item) %>
+          <% next if row.nil? %>
+          <% next if row[:title].blank? && row[:path].blank? %>
+          <% column_class = index.even? ? 'card__col-1' : 'card__col-2' %>
+
+          <%= render SmallCard::SmallCardComponent.new(
+            title: row[:title],
+            summary: row[:summary],
+            path: row[:path],
+            image: row[:image],
+            color: :blue,
+            header: :h3,
+            additional_classes: column_class,
+          ) %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+<% end %>

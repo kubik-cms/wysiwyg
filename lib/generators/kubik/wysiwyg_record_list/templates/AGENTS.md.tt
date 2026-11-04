@@ -1,0 +1,38 @@
+# <%= @toolbox_title %> (<%= @widget_name %>)
+
+Site-owned record-list WYSIWYG block. Editor presets and admin UX are in **kubik_wysiwyg**; public cards/partials are customised here.
+
+## Generated files
+
+| File | Role |
+|------|------|
+| `app/javascript/admin/wysiwyg_widgets/<%= @widget_folder %>/index.js` | `defineRecordListBlock` |
+| `app/views/<%= @partial_namespace %>_{small,large}_partial.html.erb` | Public layouts |
+| `config/initializers/kubik_wysiwyg_record_lists_<%= file_name %>.rb` | Merge into `kubik_wysiwyg_record_lists.rb` |
+| `docs/wysiwyg_snippets/<%= @widget_name %>/wysiwyg_tools.js` | Tool registration |
+| `docs/wysiwyg_snippets/<%= @widget_name %>/model_wysiwyg.rb` | Model pickable/scopes stub |
+
+## Block tabs (gem)
+
+- **Items** — manual pick + reorder, or live query (`<%= @queries.map { |q| q[:value] }.join(', ') %>`) with limit/params
+- **Content** — title, intro, link, link_text
+- **Settings** — layout (<%= @layouts.map { |l| l[:value] }.join(' / ') %>), element id, data attributes
+
+## Customisation checklist
+
+1. Implement `wysiwyg_list_item` / `wysiwyg_scopes` on `<%= @model_class %>`.
+2. Add `normalize_wysiwyg_*_list_item` in host `Kubik::WysiwygHelper` if needed.
+3. Replace partial stubs with site Card/ViewComponents.
+4. Merge Ruby + JS snippets; confirm bundle export `<%= @listing_widget_export %>`.
+5. Ensure host admin calls `Wysiwyg.applyRecordListWidgetAdminEnhancements()` once.
+
+## Regenerate
+
+```bash
+bin/rails g kubik:wysiwyg_record_list <%= class_name %> \
+  --model=<%= @model_class %> \
+  --widget-name=<%= @widget_name %> \
+  --admin-search-path=<%= @admin_search_path %>
+```
+
+See gem **docs/GENERATORS.md**.

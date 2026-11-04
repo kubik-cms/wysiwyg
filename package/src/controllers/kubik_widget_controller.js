@@ -302,8 +302,9 @@ export default class extends Controller {
 
     const addedItem = diff['items'] && diff['items']['repeated_items'] && JSON.stringify(Object.values(diff['items']['repeated_items'])[0]) === JSON.stringify({});
     const resourceIdChange = changedKeys.some((key) => key.match(/(^|\.)id$/));
+    const sourceChange = changedKeys.some((key) => key === 'settings.source' || key.startsWith('settings.source.'));
 
-    if (addedItem || resourceIdChange) {
+    if (addedItem || resourceIdChange || sourceChange) {
       this.getNewWidget();
     }
   }

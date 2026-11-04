@@ -1,0 +1,29 @@
+# <%= class_name %> block (`<%= @block_type %>`)
+
+Site-owned WYSIWYG widget scaffold. Shared editor behaviour is in **kubik_wysiwyg**; this file tracks host-specific work.
+
+## Generated files
+
+| File | Role |
+|------|------|
+| `app/javascript/admin/wysiwyg_widgets/<%= @widget_folder %>/index.js` | Admin block definition (`defineBlock`) |
+| `app/components/wysiwyg_renderer/<%= file_name %>.rb` | Public HTML / ViewComponent |
+| `docs/wysiwyg_snippets/<%= @block_type %>/wysiwyg_tools.js` | Register in `wysiwyg_tools.js` |
+| `docs/wysiwyg_snippets/<%= @block_type %>/editor_renderer.rb` | Register in `config/initializers/kubik_editor_renderer.rb` |
+
+## Customisation checklist
+
+1. **Tabs & fields** — edit widget JS: `presets.contentTab`, `presets.settingsTab`, repeaters, media fields.
+2. **Toolbox** — title/icon in widget JS (`toolbox.title`, SVG `icon`).
+3. **Renderer** — replace stub in `wysiwyg_renderer/<%= file_name %>.rb` with ViewComponent or partial; always `Kubik::Wysiwyg::BlockData.strip_ui`.
+4. **Registration** — merge snippets into `wysiwyg_tools.js` and host `Kubik::EditorRenderer#blocks` prepend.
+5. **Styles** — public CSS in host app; admin widget chrome from gem `kubik_wysiwyg/*`.
+6. **Tests** — component or renderer test with fixture JSON block data.
+
+## Regenerate
+
+```bash
+bin/rails g kubik:wysiwyg_block <%= class_name %> --editorjs-type=<%= @block_type %>
+```
+
+Avoid overwriting customised JS/renderer without a diff review.

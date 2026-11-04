@@ -1,0 +1,24 @@
+<div class="input kubik-navigable-input" <%= tag.attributes(stimulus_data) %>>
+  <label class="label"><%= @field_label %></label>
+  <%= select_tag nil,
+                 options_for_select([['Navigation item', 'item'], ['Resource', 'resource']], @current[:kind]),
+                 data: { action: 'change->kubik-navigable-picker#kindChange', kubik_navigable_picker_target: 'kind' } %>
+  <%= select_tag nil, options_for_select([]), include_blank: true,
+                 data: { action: 'change->kubik-navigable-picker#syncHidden', kubik_navigable_picker_target: 'item' } %>
+  <%= select_tag nil,
+                 options_for_select(resource_types, @current[:resource_type]),
+                 include_blank: true,
+                 data: { action: 'change->kubik-navigable-picker#resourceTypeChange', kubik_navigable_picker_target: 'resourceType' } %>
+  <%= select_tag nil, options_for_select([]), include_blank: true,
+                 data: { action: 'change->kubik-navigable-picker#resourceChange', kubik_navigable_picker_target: 'resource' } %>
+  <%= select_tag nil, options_for_select([]), include_blank: 'Canonical',
+                 data: { kubik_navigable_picker_target: 'location' } %>
+  <input type="hidden"
+         name="<%= @field_name %>"
+         value="<%= @current.to_json %>"
+         data-kubik-navigable-picker-target="value"
+         data-action="input->kubik-widget#updateField" />
+  <% if @field[:hint].present? %>
+    <p class="inline-hints"><%= @field[:hint] %></p>
+  <% end %>
+</div>

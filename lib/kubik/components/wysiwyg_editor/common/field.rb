@@ -1,6 +1,8 @@
 module Kubik
   module WysiwygEditor
     class Common::Field < ViewComponent::Base
+      include FieldBinding
+
       def initialize(field, data, widget_id, tab, index=nil)
         @field = field
         @data = data.deep_symbolize_keys
@@ -22,6 +24,19 @@ module Kubik
           end
 
 
+      end
+
+      def render?
+        field_visible?
+      end
+
+      def field_visible?
+        rule = @field[:visible_when] || @field['visible_when']
+        return true if rule.blank?
+
+        rule = rule.with_indifferent_access
+        rule = rule.merge(tab: @tab[:name]) if rule[:tab].blank?
+        Visibility.match?(@data, rule)
       end
     end
   end

@@ -4,7 +4,16 @@ module Kubik
   class EditorRenderer
     class << self
       def blocks
-        @blocks ||= {
+        @blocks ||= build_blocks.freeze
+      end
+
+      def reset_blocks_cache!
+        @blocks = nil
+        @default_renderer = nil
+      end
+
+      def build_blocks
+        base = {
           "listing" => ::WysiwygRenderer::Listing.new,
           "accordion" => ::WysiwygRenderer::Accordion.new,
           "hero" => ::WysiwygRenderer::Hero.new,
@@ -15,7 +24,13 @@ module Kubik
           "header" => ::WysiwygRenderer::Header.new,
           "paragraph" => ::WysiwygRenderer::Text.new,
           "divider" => ::WysiwygRenderer::Divider.new
-        }.freeze
+        }
+
+        KubikWysiwyg.config.record_list_models.each_key do |widget_name|
+          base[widget_name] = ::WysiwygRenderer::RecordListing.new(widget_name: widget_name)
+        end
+
+        base
       end
 
       def default_renderer

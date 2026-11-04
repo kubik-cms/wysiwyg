@@ -4,6 +4,7 @@
      data-kubik-key-value-repeater-prefix-value='<%= @prefix %>'
      data-kubik-key-value-repeater-widget-id-value='<%= @widget_id %>'
      data-kubik-key-value-repeater-fields-value='<%= @fields.to_json %>'
+     data-kubik-key-value-repeater-field-config-value='<%= (@field[:field_config] || {}).to_json %>'
      data-kubik-key-value-repeater-field-name-value='<%= @field_name%>'>
   <label class='label' for='<%= @field[:name] %>-<% @widget_id %>'><%= @field_label %></label>
   <div class='kubik-wysiwyg-repeated-item--items-container' data-kubik-key-value-repeater-target='valuesContainer'>

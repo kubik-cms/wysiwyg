@@ -9,5 +9,5 @@ export function kubikWysiwygWidgetSrc() {
 
 export function kubikMediaUploadsModalSrc() {
   return document.querySelector("meta[name='kubik-media-uploads-src']")?.content
-    || `${activeAdminPath()}/kubik_media_uploads?modal=true`
+    || `${activeAdminPath()}/kubik_media_uploads?modal=true&media_type=image`
 }

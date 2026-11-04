@@ -37,7 +37,12 @@ export default class PluginFactory {
 
   render() {
     const widgetId = [this.config.widget_name, this.randomString].join('-')
-    const widgetClass = `widget_${this.api.ui.nodes.wrapper.parentElement.dataset.editorId}`
+    const editorRoot = this.api.ui.nodes.wrapper.parentElement
+    const editorId = editorRoot?.dataset?.editorId
+    const widgetClasses = [
+      editorId ? `widget_${editorId}` : null,
+      this.config.widget_model ? 'kubik-wysiwyg-record-list' : null,
+    ].filter(Boolean)
 
     const wrapper = widgetWrapper({
       setup: {
@@ -46,7 +51,7 @@ export default class PluginFactory {
         src: this.config.data_src,
         widget_id: widgetId,
         widget_type: this.config.widget_name,
-        widget_class: widgetClass,
+        widget_classes: widgetClasses,
         config: this.config
       },
     }, this.data)

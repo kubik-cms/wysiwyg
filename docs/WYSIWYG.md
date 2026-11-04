@@ -112,6 +112,15 @@ The npm package exports:
 
 Host importmap must pin `@editorjs/*` and `editorjs-hyperlink` (see cln-booking `config/kubik_importmap.rb`). Gem styles include hyperlink icon rules in `kubik_wysiwyg/_editor_inline_tools.scss`.
 
+**Record-list admin (drag reorder, picker layout):** call once in the host admin bundle:
+
+```javascript
+import Wysiwyg from "@kubik-cms/wysiwyg"
+Wysiwyg.applyRecordListWidgetAdminEnhancements()
+```
+
+Styles ship in `kubik_wysiwyg/_record_list_widget.scss` (turbo-frame class `kubik-wysiwyg-record-list`).
+
 ### Public rendering
 
 Always strip UI metadata:
@@ -131,25 +140,95 @@ end
 
 Map `settings[:data_attributes]` to HTML `data-*` in your ViewComponents (see `ComponentsHelper#transform_data_attributes`).
 
-## Generator
+## Generators
+
+Host apps scaffold site-owned widgets with Rails generators. **Canonical reference:** [GENERATORS.md](./GENERATORS.md).
 
 ```bash
 bin/rails generate kubik:wysiwyg_block PromoBanner --editorjs-type=promo_banner
+bin/rails generate kubik:wysiwyg_record_list Resource --model=ReadingSchools::Resource --widget-name=resources_listing
 ```
 
-Creates:
+Each generator appends the bundle export, writes merge snippets under `docs/wysiwyg_snippets/`, and adds `docs/wysiwyg_*.md` for agents.
 
-- `app/javascript/admin/wysiwyg_widgets/promo_banner_widget/index.js`
-- `app/components/wysiwyg_renderer/promo_banner.rb`
-- Appends export to `wysiwyg_widgets_bundle.js`
+### Custom block (`kubik:wysiwyg_block`)
 
-Then register the tool and `EditorRenderer::BLOCKS` entry (generator prints reminders).
+Creates widget JS, `WysiwygRenderer::*` stub, `wysiwyg_tools` + `EditorRenderer` snippets.
+
+### Record list (`kubik:wysiwyg_record_list`)
+
+Creates `defineRecordListBlock` JS, listing partial stubs, `register_record_list_model` initializer snippet, model stub, and tool registration snippet. Public rendering uses gem `WysiwygRenderer::RecordListing`.
+
+## Legacy generator note
+
+The block generator previously only printed manual next steps; it now matches the record-list generator output layout (snippets + agent doc).
 
 ## Manual vs resource-backed lists
 
 **Manual items** — `presets.manualItemsTab` with repeater fields; renderer reads `items.repeated_items`.
 
 **Resource-backed** — settings hold filter keys (e.g. `faq_type`); renderer loads records in Ruby (see FAQs pattern). Use `presets.resourceListSettingsTab` for consistent settings fields.
+
+## Record list widgets (per-model)
+
+Use **`defineRecordListBlock`** for CMS blocks that show database records (articles, resources, etc.). One thin JS file per model; shared behaviour lives in this gem.
+
+### Host app (Ruby)
+
+1. `include Kubik::WysiwygPickable` on the model (`return_object`, optional `wysiwyg_thumb_url`).
+2. Implement `self.wysiwyg_scopes` (callables for live queries) and `self.wysiwyg_list_item(record, view_context:)` for public cards.
+3. In Active Admin: `Kubik::WysiwygAutocomplete.register_collection_search!(self)` on the resource.
+4. Register the model:
+
+```ruby
+KubikWysiwyg.configure do |config|
+  config.register_record_list_model(
+    "MyModel",
+    widget_name: "my_models_listing",
+    admin_search_path: -> { admin_my_models_path },
+    render_partial: "my_models/listing",
+    layout_partials: { "carousel" => "my_models/carousel" }
+  )
+end
+```
+
+5. Register the Editor.js tool key (`widget_name`) in `wysiwyg_tools.js`.
+
+`Kubik::Wysiwyg::RecordListResolver` and `WysiwygRenderer::RecordListing` are registered automatically for each `widget_name`.
+
+**Item source** (`settings.source`): `manual` (default, hand-picked + reorder), `live_query` (resolve on each page view). Configure source and query fields on the **Items** tab in the editor; the model class comes from `widget_model` / `defineRecordListBlock({ model: ... })` and is not edited in the UI. Optional `snapshot` (`items.snapshot_ids`) is off by default (`allowSnapshot: false`).
+
+### Host app (JavaScript)
+
+```javascript
+import Wysiwyg from "@kubik-cms/wysiwyg"
+
+export default Wysiwyg.defineRecordListBlock({
+  toolbox: { title: "My models", icon: "<svg>...</svg>" },
+  widget_name: "my_models_listing",
+  model: "MyModel",
+  adminSearchPath: "/my_models",
+  queries: [{ value: "recent", label: "Recently added" }],
+  layouts: [{ value: "default", label: "Default" }],
+})
+```
+
+## Single record reference (`defineResourceReferenceBlock`)
+
+For one picked record (e.g. a reusable Banner):
+
+```javascript
+export default Wysiwyg.defineResourceReferenceBlock({
+  toolbox: { title: "Banner", icon: "<svg>...</svg>" },
+  widget_name: "banner",
+  model: "Banner",
+  adminSearchPath: "/banners",
+  referenceTabName: "banner",
+  referenceFieldName: "banner",
+})
+```
+
+Autocomplete hits `{adminSearchPath}/wysiwyg_search.json?kubik_search=1&q=...`.
 
 ## Development
 

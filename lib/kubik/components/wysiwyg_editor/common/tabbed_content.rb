@@ -16,6 +16,10 @@ module Kubik
         active = @data.dig(:_ui, :active_tab)
         active.present? ? active.to_s == tab[:name].to_s : index.zero?
       end
+
+      def repeater_visible?(tab)
+        Visibility.match?(@data, tab[:repeater_visible_when])
+      end
     end
   end
 end

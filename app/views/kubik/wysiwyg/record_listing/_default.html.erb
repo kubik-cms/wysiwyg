@@ -1,0 +1,21 @@
+<% if items.present? %>
+  <div class="section kubik-record-listing">
+    <% if title.present? %>
+      <h2 class="section__header"><%= title %></h2>
+    <% end %>
+    <% if local_assigns[:content].present? %>
+      <div class="section__content generic-content"><%= content %></div>
+    <% end %>
+    <ul class="kubik-record-listing__list">
+      <% items.each do |item| %>
+        <li class="kubik-record-listing__item">
+          <% if item[:link].present? %>
+            <%= link_to item[:title], item[:link], class: "kubik-record-listing__link" %>
+          <% else %>
+            <span class="kubik-record-listing__title"><%= item[:title] %></span>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>

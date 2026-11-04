@@ -5,9 +5,9 @@ module Kubik
     end
 
     def kubik_media_uploads_modal_src
-      url_helpers.admin_kubik_media_uploads_path(modal: true)
+      url_helpers.admin_kubik_media_uploads_path(modal: true, media_type: "image")
     rescue NoMethodError
-      "#{kubik_admin_path}/kubik_media_uploads?modal=true"
+      "#{kubik_admin_path}/kubik_media_uploads?modal=true&media_type=image"
     end
 
     def kubik_wysiwyg_widget_show_src
