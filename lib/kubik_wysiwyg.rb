@@ -17,6 +17,7 @@ module KubikWysiwyg
         kubik_wysiwyg.js
         kubik_wysiwyg/admin_editor_patches.js
         kubik_wysiwyg/wysiwyg_editor_controller.js
+        kubik_wysiwyg/kubik_navigable_picker_controller.js
       ]
       config.autoload_paths << root.join("app/inputs")
 
@@ -80,6 +81,12 @@ module KubikWysiwyg
         editor_js = root.join("app/assets/javascripts/kubik_wysiwyg/wysiwyg_editor_controller.js")
         if editor_js.exist?
           map.pin "kubik_wysiwyg/wysiwyg_editor_controller", to: "kubik_wysiwyg/wysiwyg_editor_controller.js"
+        end
+
+        navigable_js = root.join("app/assets/javascripts/kubik_wysiwyg/kubik_navigable_picker_controller.js")
+        if navigable_js.exist?
+          map.pin "kubik_wysiwyg/kubik_navigable_picker_controller",
+                   to: "kubik_wysiwyg/kubik_navigable_picker_controller.js"
         end
       end
 

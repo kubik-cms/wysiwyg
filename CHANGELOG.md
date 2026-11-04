@@ -12,6 +12,10 @@
 - `Wysiwyg.applyRecordListWidgetAdminEnhancements()`, record list admin JS, and `_record_list_widget` styles.
 - WYSIWYG autocomplete and pickable helpers; agent docs (`docs/AGENTS.md`, `FIELD_PRESETS.md`, `GENERATORS.md`).
 
+### Package
+
+- `@kubik-cms/wysiwyg` **0.1.28** (rebuild `package/` and run `bin/kubik-gems sync --link-js` in host apps).
+
 ### Changed
 
 - Widget loading, tabbed content layout, and media-type field refresh in the admin editor.
