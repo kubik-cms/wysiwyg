@@ -280,16 +280,22 @@ function scanRecordListWidgets(scope = document) {
 }
 
 function patchGetNewWidgetRebind() {
-  if (window.Turbo?.__recordListRenderPatched) return
-  if (!window.Turbo?.renderStreamMessage) return
+  if (document.__recordListStreamPatched) return
+  document.__recordListStreamPatched = true
 
-  const originalRender = window.Turbo.renderStreamMessage.bind(window.Turbo)
-  window.Turbo.renderStreamMessage = (html) => {
-    const result = originalRender(html)
-    requestAnimationFrame(() => scanRecordListWidgets())
-    return result
-  }
-  window.Turbo.__recordListRenderPatched = true
+  document.addEventListener(
+    'turbo:before-stream-render',
+    (event) => {
+      const { render } = event.detail
+      if (typeof render !== 'function') return
+
+      event.detail.render = (streamElement) => {
+        render(streamElement)
+        requestAnimationFrame(() => scanRecordListWidgets())
+      }
+    },
+    { capture: true }
+  )
 }
 
 function patchRecordListWidgetConnect() {

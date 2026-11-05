@@ -27,7 +27,8 @@ Host apps and generators should compose widget tabs from **`Wysiwyg.presets`** (
 | `urlLinkFields()` | Plain URL + link text |
 | `navigableLinkField()` | `type: 'navigable_link'` when `meta[name=kubik-navigable-wysiwyg]` is `true` |
 | `linkFieldsForHost({ preferNavigable: 'auto' })` | Navigable or URL fields |
-| `linksKeyValueRepeater({ styleOptions, … })` | Button/link rows with optional select columns via `field_config` |
+| `linksRepeater({ styleOptions, preferNavigable: 'auto' })` | Button/link rows with navigable destination (or URL fallback) |
+| `linksKeyValueRepeater({ … })` | Alias for `linksRepeater` (navigable when enabled) |
 
 Use `presets.contentTab(extraFields, { links: 'navigable_auto' })` for content tabs that should use navigable links when **kubik_navigation** is loaded.
 

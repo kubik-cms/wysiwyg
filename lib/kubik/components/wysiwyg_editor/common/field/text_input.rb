@@ -3,7 +3,7 @@ module Kubik
     class Common::Field::TextInput < ViewComponent::Base
       include FieldBinding
 
-      def initialize(field, data, widget_id, tab, index=nil, header_field=false)
+      def initialize(field, data, widget_id, tab, index=nil, header_field: false, hide_label: false)
         @field = field
         @data = data.deep_symbolize_keys
         @widget_id = widget_id
@@ -11,6 +11,7 @@ module Kubik
         @tab = tab
         @field_label = @field[:label] || @field[:name].humanize
         @header_field = header_field
+        @hide_label = hide_label || @field[:hide_label] == true
         @field_name = field_store_path(field, tab, index)
         @field_value = if field[:store_path].present?
                          value_at_path(@data, field[:store_path]) || ''
@@ -19,6 +20,18 @@ module Kubik
                        else
                          @data.fetch(@tab[:name].to_sym, {}).fetch(@field[:name].try(:to_sym), '')
                        end
+      end
+
+      def field_css_class
+        [@field[:css_class]].compact.join(' ').presence
+      end
+
+      def hide_label?
+        @hide_label
+      end
+
+      def input_dom_id
+        "#{@field[:name]}-#{@widget_id}"
       end
     end
   end

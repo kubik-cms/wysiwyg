@@ -7,6 +7,9 @@ require_relative "kubik_wysiwyg/record_list_model_config"
 require_relative "kubik/wysiwyg/wysiwyg_pickable"
 require_relative "kubik/wysiwyg/wysiwyg_autocomplete"
 require_relative "kubik/wysiwyg/record_list_resolver"
+require_relative "kubik/wysiwyg/link_resolver"
+require_relative "kubik/wysiwyg/nav_link_snapshot"
+require_relative "kubik/wysiwyg/snapshots_nav_links"
 require_relative "wysiwyg_renderer"
 
 module KubikWysiwyg

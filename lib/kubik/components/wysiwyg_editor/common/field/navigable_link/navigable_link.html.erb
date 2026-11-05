@@ -1,24 +1,17 @@
-<div class="input kubik-navigable-input" <%= tag.attributes(stimulus_data) %>>
+<div class="input kubik-navigable-input">
   <label class="label"><%= @field_label %></label>
-  <%= select_tag nil,
-                 options_for_select([['Navigation item', 'item'], ['Resource', 'resource']], @current[:kind]),
-                 data: { action: 'change->kubik-navigable-picker#kindChange', kubik_navigable_picker_target: 'kind' } %>
-  <%= select_tag nil, options_for_select([]), include_blank: true,
-                 data: { action: 'change->kubik-navigable-picker#syncHidden', kubik_navigable_picker_target: 'item' } %>
-  <%= select_tag nil,
-                 options_for_select(resource_types, @current[:resource_type]),
-                 include_blank: true,
-                 data: { action: 'change->kubik-navigable-picker#resourceTypeChange', kubik_navigable_picker_target: 'resourceType' } %>
-  <%= select_tag nil, options_for_select([]), include_blank: true,
-                 data: { action: 'change->kubik-navigable-picker#resourceChange', kubik_navigable_picker_target: 'resource' } %>
-  <%= select_tag nil, options_for_select([]), include_blank: 'Canonical',
-                 data: { kubik_navigable_picker_target: 'location' } %>
-  <input type="hidden"
-         name="<%= @field_name %>"
-         value="<%= @current.to_json %>"
-         data-kubik-navigable-picker-target="value"
-         data-action="input->kubik-widget#updateField" />
-  <% if @field[:hint].present? %>
-    <p class="inline-hints"><%= @field[:hint] %></p>
-  <% end %>
+  <%= render partial: "kubik/shared/navigable_link_editor", locals: {
+  field_name: @field_name,
+  current: @current,
+  summary_text: kubik_navigable_link_summary(@current),
+  ui_mode: kubik_navigable_ui_mode(@current),
+  include_text_target: @include_text_target,
+  target_options: target_options,
+  rel_options: rel_options,
+  filter_options_json: kubik_navigable_filter_options_json,
+  search_url: kubik_navigable_search_url,
+  link_status: @link_status,
+  field_hint: @field[:hint],
+  widget_sync: true,
+} %>
 </div>

@@ -36,6 +36,7 @@ module Kubik
 
         rule = rule.with_indifferent_access
         rule = rule.merge(tab: @tab[:name]) if rule[:tab].blank?
+        rule = rule.merge(repeater_index: @index) if @index.present?
         Visibility.match?(@data, rule)
       end
     end

@@ -24,30 +24,58 @@ export function headingLevelField({
   label = 'Heading level',
   options = DEFAULT_HEADING_LEVEL_OPTIONS,
   section,
+  hide_label = false,
+  include_blank = true,
+  default: defaultValue,
+  css_class,
+  field_group,
 } = {}) {
   const field = {
     name,
     label,
     type: 'select',
     options,
+    hide_label,
+    include_blank,
   }
+  if (defaultValue != null && defaultValue !== '') field.default = defaultValue
+  if (css_class) field.css_class = css_class
+  if (field_group) field.field_group = field_group
   if (section) field.section = section
   return field
 }
 
-/** Title text field plus an optional heading-level select (e.g. listing item titles). */
+/** Title text field plus heading-level select rendered inline (level left, title right). */
 export function titleWithHeadingLevel({
   titleName = 'title',
   titleLabel = 'Title',
   levelName = 'title_header_level',
   levelLabel = 'Title heading level',
   levels = DEFAULT_HEADING_LEVEL_OPTIONS,
+  defaultLevel = 'h2',
   section,
 } = {}) {
-  const title = { name: titleName, label: titleLabel, type: 'text' }
-  const level = headingLevelField({ name: levelName, label: levelLabel, options: levels, section })
+  const fieldGroup = 'title_with_heading_level'
+  const level = headingLevelField({
+    name: levelName,
+    label: levelLabel,
+    options: levels,
+    section,
+    hide_label: true,
+    include_blank: false,
+    default: defaultLevel,
+    css_class: 'kubik-wysiwyg-field--heading-level',
+    field_group: fieldGroup,
+  })
+  const title = {
+    name: titleName,
+    label: titleLabel,
+    type: 'text',
+    css_class: 'kubik-wysiwyg-field--title-with-heading',
+    field_group: fieldGroup,
+  }
   if (section) title.section = section
-  return [title, level]
+  return [level, title]
 }
 
 export function imageResourceField({
@@ -108,6 +136,17 @@ export function urlLinkFields({
  * CMS navigable JSON link (requires kubik_navigation + meta kubik-navigable-wysiwyg).
  * Falls back to urlLinkFields when navigable is unavailable.
  */
+export function simpleLinkFields({ section } = {}) {
+  const field = {
+    name: 'link_group',
+    label: 'Link',
+    type: 'simple_link',
+    hint: 'Link text, URL, target, and rel.',
+  }
+  if (section) field.section = section
+  return [field]
+}
+
 export function navigableLinkField({
   name = 'nav_link',
   label = 'Link',
@@ -116,14 +155,14 @@ export function navigableLinkField({
 } = {}) {
   if (!kubikNavigableWysiwygEnabled()) {
     if (!fallbackToUrl) return []
-    return urlLinkFields({ linkName: 'link', linkTextName: 'link_text', section })
+    return simpleLinkFields({ section })
   }
 
   const field = {
     name,
     label,
     type: 'navigable_link',
-    hint: 'Pick a navigation item or published resource. Stored as structured link data.',
+    hint: 'System typeahead (pages, navigation) or Manual URL. Stored as structured link data.',
   }
   if (section) field.section = section
   return [field]
@@ -135,7 +174,7 @@ export function linkFieldsForHost({ section, preferNavigable = 'auto' } = {}) {
   if (useNavigable) {
     return navigableLinkField({ section, fallbackToUrl: true })
   }
-  return urlLinkFields({ section })
+  return simpleLinkFields({ section })
 }
 
 export function dataAttributesRepeater({ section } = {}) {
@@ -150,22 +189,30 @@ export function dataAttributesRepeater({ section } = {}) {
   return field
 }
 
-export function linksKeyValueRepeater({
+export function linksRepeater({
   name = 'links',
   label = 'Links',
   prefix = 'link',
   fields = ['text', 'url', 'target', 'style'],
   styleOptions = [],
   hint,
+  preferNavigable = 'auto',
 } = {}) {
+  const useNavigable =
+    preferNavigable === true || (preferNavigable === 'auto' && kubikNavigableWysiwygEnabled())
+
+  if (!useNavigable) {
+    return linksKeyValueRepeater({ name, label, prefix, fields, styleOptions, hint })
+  }
+
   const repeater = {
     name,
     label,
-    type: 'key_value_repeater',
-    prefix,
-    fields,
+    type: 'links_repeater',
+    hint:
+      hint ||
+      'Pick a navigation item, published resource, or enter a URL. Legacy plain URL rows are still supported on the site.',
   }
-  if (hint) repeater.hint = hint
   if (styleOptions.length > 0) {
     repeater.field_config = {
       style: {
@@ -175,6 +222,25 @@ export function linksKeyValueRepeater({
     }
   }
   return repeater
+}
+
+export function linksKeyValueRepeater({
+  name = 'links',
+  label = 'Links',
+  prefix = 'link',
+  fields = ['text', 'url', 'target', 'style'],
+  styleOptions = [],
+  hint,
+} = {}) {
+  return linksRepeater({
+    name,
+    label,
+    prefix,
+    fields,
+    styleOptions,
+    hint,
+    preferNavigable: 'auto',
+  })
 }
 
 export function standardListingItemFields({
@@ -228,6 +294,8 @@ export const mediaTypeField = {
   label: 'Media type',
   type: 'select',
   section: 'fields',
+  include_blank: false,
+  default: 'image',
   options: [
     { label: 'Image', value: 'image' },
     { label: 'Video', value: 'video' },

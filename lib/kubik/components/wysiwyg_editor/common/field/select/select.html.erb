@@ -1,5 +1,7 @@
-<div class='input select'>
-  <label class='label' for='<%= @field[:name] %>-<% @widget_id %>'><%= @field_label %></label>
+<div class='input select <%= field_css_class %>'>
+  <% unless hide_label? %>
+    <label class='label' for='<%= @field[:name] %>-<% @widget_id %>'><%= @field_label %></label>
+  <% end %>
   <select
          id='<%= @field_name%>-<%= @widget_id %>'
          tabindex='1'

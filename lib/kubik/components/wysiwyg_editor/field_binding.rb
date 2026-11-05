@@ -29,7 +29,9 @@ module Kubik
       end
 
       def value_at_path(data, path)
-        keys = path.to_s.split('.').map(&:to_sym)
+        keys = path.to_s.split(".").map do |segment|
+          segment.match?(/\A\d+\z/) ? segment.to_i : segment.to_sym
+        end
         data.dig(*keys)
       end
 

@@ -1,4 +1,10 @@
-const DEFAULT_MEDIA_TYPE_FIELD = 'media.media_type'
+const REPEATER_MEDIA_TYPE = /^(\w+)\[repeated_items\]\[(\d+)\]\.media_type$/
+
+function isMediaTypeSelect(select) {
+  if (!(select instanceof HTMLSelectElement)) return false
+  if (select.name === 'media.media_type') return true
+  return REPEATER_MEDIA_TYPE.test(select.name)
+}
 
 function refreshWidgetAfterMediaTypeChange(select) {
   const widgetEl = select.closest('[data-controller~="kubik-widget"]')
@@ -9,19 +15,18 @@ function refreshWidgetAfterMediaTypeChange(select) {
   controller?.getNewWidget?.()
 }
 
-function onMediaTypeChange(event, fieldName) {
+function onMediaTypeChange(event) {
   const select = event.target
-  if (!select.matches(`select[name="${fieldName}"]`)) return
+  if (!isMediaTypeSelect(select)) return
   window.requestAnimationFrame(() => refreshWidgetAfterMediaTypeChange(select))
 }
 
 /** Re-render widget after media type changes so server-side visible_when applies. */
-export function installMediaTypeChangeRefresh({ fieldName = DEFAULT_MEDIA_TYPE_FIELD } = {}) {
-  const key = `__kubikMediaTypeRefresh_${fieldName}`
-  if (window[key]) return
-  window[key] = true
+export function installMediaTypeChangeRefresh() {
+  if (window.__kubikMediaTypeRefreshInstalled) return
+  window.__kubikMediaTypeRefreshInstalled = true
 
-  document.addEventListener('change', (event) => onMediaTypeChange(event, fieldName))
+  document.addEventListener('change', onMediaTypeChange)
 }
 
 export default installMediaTypeChangeRefresh

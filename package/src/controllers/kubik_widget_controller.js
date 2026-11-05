@@ -285,8 +285,17 @@ export default class extends Controller {
     if (typeof this.dataValue[tab] == 'undefined') {
       this.dataValue = Object.assign({}, this.dataValue, { [tab]: { 'repeated_items': [] } });
     }
-    this.dataValue = Object.assign({}, this.dataValue, { [tab]: { 'repeated_items': [...this.dataValue[tab]['repeated_items'], {}] } });
+    const newItem = this.defaultRepeaterItemForTab(tab);
+    this.dataValue = Object.assign({}, this.dataValue, { [tab]: { 'repeated_items': [...this.dataValue[tab]['repeated_items'], newItem] } });
     this.getNewWidget();
+  }
+
+  defaultRepeaterItemForTab(tabName) {
+    const tabs = this.setupValue?.config?.tabs || [];
+    const tab = tabs.find((entry) => entry.name === tabName);
+    const fields = tab?.fields || [];
+    if (!fields.some((field) => field.name === 'media_type')) return {};
+    return { media_type: 'image' };
   }
 
   dataValueChanged(value, previousValue) {
@@ -316,6 +325,26 @@ export default class extends Controller {
     this.dataValue = duplicateData;
   }
 
+  appendLinksRow(event) {
+    const tab = event.params.tab;
+    const field = event.params.field;
+    const path = `${tab}.${field}`;
+    const links = get(this.dataValue, path) || [];
+    this.dataValue = set({ ...this.dataValue }, path, [...links, {}]);
+    this.getNewWidget();
+  }
+
+  removeLinksRow(event) {
+    const tab = event.params.tab;
+    const field = event.params.field;
+    const index = Number(event.params.index);
+    const path = `${tab}.${field}`;
+    const links = [...(get(this.dataValue, path) || [])];
+    links.splice(index, 1);
+    this.dataValue = set({ ...this.dataValue }, path, links);
+    this.getNewWidget();
+  }
+
   updateField(event) {
     const name = event.currentTarget.name;
     let v = event.currentTarget.value;
@@ -331,6 +360,18 @@ export default class extends Controller {
       const fieldName = rest.reverse().join('.');
       const fieldValues = get(this.dataValue, fieldName);
       v = set(fieldValues[index], field, v);
+    }
+    const repeaterData = applyRepeaterFieldValue(this.dataValue, name, v);
+    if (repeaterData) {
+      this.dataValue = repeaterData;
+      return;
+    }
+    if (name.endsWith('.nav_link') && typeof v === 'string' && v.trim().startsWith('{')) {
+      try {
+        v = JSON.parse(v);
+      } catch {
+        /* keep string */
+      }
     }
     const duplicateData = set(this.dataValue, name, v);
     this.dataValue = duplicateData;

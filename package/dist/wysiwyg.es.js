@@ -11,7 +11,6 @@ import Underline from "@editorjs/underline";
 import Embed from "@editorjs/embed";
 import Paragraph from "@editorjs/paragraph";
 import Quote from "@editorjs/quote";
-import Hyperlink from "editorjs-hyperlink";
 var commonjsGlobal = typeof globalThis !== "undefined" ? globalThis : typeof window !== "undefined" ? window : typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : {};
 function getAugmentedNamespace(n) {
   if (n.__esModule)
@@ -10620,8 +10619,18 @@ class KubikWidgetController extends Controller {
     if (typeof this.dataValue[tab] == "undefined") {
       this.dataValue = Object.assign({}, this.dataValue, { [tab]: { "repeated_items": [] } });
     }
-    this.dataValue = Object.assign({}, this.dataValue, { [tab]: { "repeated_items": [...this.dataValue[tab]["repeated_items"], {}] } });
+    const newItem = this.defaultRepeaterItemForTab(tab);
+    this.dataValue = Object.assign({}, this.dataValue, { [tab]: { "repeated_items": [...this.dataValue[tab]["repeated_items"], newItem] } });
     this.getNewWidget();
+  }
+  defaultRepeaterItemForTab(tabName) {
+    var _a, _b;
+    const tabs = ((_b = (_a = this.setupValue) == null ? void 0 : _a.config) == null ? void 0 : _b.tabs) || [];
+    const tab = tabs.find((entry) => entry.name === tabName);
+    const fields = (tab == null ? void 0 : tab.fields) || [];
+    if (!fields.some((field) => field.name === "media_type"))
+      return {};
+    return { media_type: "image" };
   }
   dataValueChanged(value, previousValue) {
     if (!previousValue || !value)
@@ -10646,6 +10655,24 @@ class KubikWidgetController extends Controller {
     const duplicateData = set_1(this.dataValue, fieldName, value);
     this.dataValue = duplicateData;
   }
+  appendLinksRow(event) {
+    const tab = event.params.tab;
+    const field = event.params.field;
+    const path = `${tab}.${field}`;
+    const links = get_1(this.dataValue, path) || [];
+    this.dataValue = set_1({ ...this.dataValue }, path, [...links, {}]);
+    this.getNewWidget();
+  }
+  removeLinksRow(event) {
+    const tab = event.params.tab;
+    const field = event.params.field;
+    const index2 = Number(event.params.index);
+    const path = `${tab}.${field}`;
+    const links = [...get_1(this.dataValue, path) || []];
+    links.splice(index2, 1);
+    this.dataValue = set_1({ ...this.dataValue }, path, links);
+    this.getNewWidget();
+  }
   updateField(event) {
     const name = event.currentTarget.name;
     let v = event.currentTarget.value;
@@ -10661,6 +10688,17 @@ class KubikWidgetController extends Controller {
       const fieldName = rest.reverse().join(".");
       const fieldValues = get_1(this.dataValue, fieldName);
       v = set_1(fieldValues[index2], field, v);
+    }
+    const repeaterData = applyRepeaterFieldValue(this.dataValue, name, v);
+    if (repeaterData) {
+      this.dataValue = repeaterData;
+      return;
+    }
+    if (name.endsWith(".nav_link") && typeof v === "string" && v.trim().startsWith("{")) {
+      try {
+        v = JSON.parse(v);
+      } catch {
+      }
     }
     const duplicateData = set_1(this.dataValue, name, v);
     this.dataValue = duplicateData;
@@ -11217,7 +11255,7 @@ const DEFAULT_HEADING_LEVEL_OPTIONS = [
 ];
 const DEFAULT_IMAGE_HINT = "Should be at least 1200px wide and not bigger than 4MB";
 const DEFAULT_DOCUMENT_HINT = "PDF or other downloadable file from the media library";
-function kubikNavigableWysiwygEnabled() {
+function kubikNavigableWysiwygEnabled$1() {
   const meta = document.querySelector("meta[name='kubik-navigable-wysiwyg']");
   return (meta == null ? void 0 : meta.content) === "true";
 }
@@ -11225,14 +11263,27 @@ function headingLevelField({
   name = "header_level",
   label = "Heading level",
   options = DEFAULT_HEADING_LEVEL_OPTIONS,
-  section
+  section,
+  hide_label = false,
+  include_blank = true,
+  default: defaultValue,
+  css_class,
+  field_group
 } = {}) {
   const field = {
     name,
     label,
     type: "select",
-    options
+    options,
+    hide_label,
+    include_blank
   };
+  if (defaultValue != null && defaultValue !== "")
+    field.default = defaultValue;
+  if (css_class)
+    field.css_class = css_class;
+  if (field_group)
+    field.field_group = field_group;
   if (section)
     field.section = section;
   return field;
@@ -11243,13 +11294,31 @@ function titleWithHeadingLevel({
   levelName = "title_header_level",
   levelLabel = "Title heading level",
   levels = DEFAULT_HEADING_LEVEL_OPTIONS,
+  defaultLevel = "h2",
   section
 } = {}) {
-  const title = { name: titleName, label: titleLabel, type: "text" };
-  const level = headingLevelField({ name: levelName, label: levelLabel, options: levels, section });
+  const fieldGroup = "title_with_heading_level";
+  const level = headingLevelField({
+    name: levelName,
+    label: levelLabel,
+    options: levels,
+    section,
+    hide_label: true,
+    include_blank: false,
+    default: defaultLevel,
+    css_class: "kubik-wysiwyg-field--heading-level",
+    field_group: fieldGroup
+  });
+  const title = {
+    name: titleName,
+    label: titleLabel,
+    type: "text",
+    css_class: "kubik-wysiwyg-field--title-with-heading",
+    field_group: fieldGroup
+  };
   if (section)
     title.section = section;
-  return [title, level];
+  return [level, title];
 }
 function imageResourceField({
   name = "image",
@@ -11302,33 +11371,44 @@ function urlLinkFields({
   }
   return [link, linkText];
 }
+function simpleLinkFields({ section } = {}) {
+  const field = {
+    name: "link_group",
+    label: "Link",
+    type: "simple_link",
+    hint: "Link text, URL, target, and rel."
+  };
+  if (section)
+    field.section = section;
+  return [field];
+}
 function navigableLinkField({
   name = "nav_link",
   label = "Link",
   section,
   fallbackToUrl = true
 } = {}) {
-  if (!kubikNavigableWysiwygEnabled()) {
+  if (!kubikNavigableWysiwygEnabled$1()) {
     if (!fallbackToUrl)
       return [];
-    return urlLinkFields({ linkName: "link", linkTextName: "link_text", section });
+    return simpleLinkFields({ section });
   }
   const field = {
     name,
     label,
     type: "navigable_link",
-    hint: "Pick a navigation item or published resource. Stored as structured link data."
+    hint: "System typeahead (pages, navigation) or Manual URL. Stored as structured link data."
   };
   if (section)
     field.section = section;
   return [field];
 }
 function linkFieldsForHost({ section, preferNavigable = "auto" } = {}) {
-  const useNavigable = preferNavigable === true || preferNavigable === "auto" && kubikNavigableWysiwygEnabled();
+  const useNavigable = preferNavigable === true || preferNavigable === "auto" && kubikNavigableWysiwygEnabled$1();
   if (useNavigable) {
     return navigableLinkField({ section, fallbackToUrl: true });
   }
-  return urlLinkFields({ section });
+  return simpleLinkFields({ section });
 }
 function dataAttributesRepeater({ section } = {}) {
   const field = {
@@ -11342,23 +11422,25 @@ function dataAttributesRepeater({ section } = {}) {
     field.section = section;
   return field;
 }
-function linksKeyValueRepeater({
+function linksRepeater({
   name = "links",
   label = "Links",
   prefix = "link",
   fields = ["text", "url", "target", "style"],
   styleOptions = [],
-  hint
+  hint,
+  preferNavigable = "auto"
 } = {}) {
+  const useNavigable = preferNavigable === true || preferNavigable === "auto" && kubikNavigableWysiwygEnabled$1();
+  if (!useNavigable) {
+    return linksKeyValueRepeater({ name, label, prefix, fields, styleOptions, hint });
+  }
   const repeater = {
     name,
     label,
-    type: "key_value_repeater",
-    prefix,
-    fields
+    type: "links_repeater",
+    hint: hint || "Pick a navigation item, published resource, or enter a URL. Legacy plain URL rows are still supported on the site."
   };
-  if (hint)
-    repeater.hint = hint;
   if (styleOptions.length > 0) {
     repeater.field_config = {
       style: {
@@ -11368,6 +11450,24 @@ function linksKeyValueRepeater({
     };
   }
   return repeater;
+}
+function linksKeyValueRepeater({
+  name = "links",
+  label = "Links",
+  prefix = "link",
+  fields = ["text", "url", "target", "style"],
+  styleOptions = [],
+  hint
+} = {}) {
+  return linksRepeater({
+    name,
+    label,
+    prefix,
+    fields,
+    styleOptions,
+    hint,
+    preferNavigable: "auto"
+  });
 }
 function standardListingItemFields({
   includeDataAttributes = true,
@@ -11409,6 +11509,8 @@ const mediaTypeField = {
   label: "Media type",
   type: "select",
   section: "fields",
+  include_blank: false,
+  default: "image",
   options: [
     { label: "Image", value: "image" },
     { label: "Video", value: "video" }
@@ -11495,15 +11597,17 @@ function mediaTabFields({ mode = "full" } = {}) {
 var fieldPresets = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
   DEFAULT_HEADING_LEVEL_OPTIONS,
-  kubikNavigableWysiwygEnabled,
+  kubikNavigableWysiwygEnabled: kubikNavigableWysiwygEnabled$1,
   headingLevelField,
   titleWithHeadingLevel,
   imageResourceField,
   documentResourceField,
   urlLinkFields,
+  simpleLinkFields,
   navigableLinkField,
   linkFieldsForHost,
   dataAttributesRepeater,
+  linksRepeater,
   linksKeyValueRepeater,
   standardListingItemFields,
   standardListingItemTabConfig,
@@ -11879,8 +11983,8 @@ function defineResourceReferenceBlock({
     }
   });
 }
-const DEFAULT_INLINE_TOOLBAR = ["bold", "italic", "underline", "hyperlink", "kubikNavigableLink"];
-const WIDGET_INLINE_TOOLBAR = ["underline", "hyperlink", "kubikNavigableLink"];
+const DEFAULT_INLINE_TOOLBAR = ["bold", "italic", "underline", "kubikLink"];
+const WIDGET_INLINE_TOOLBAR = ["underline", "kubikLink"];
 const EDITORJS_INLINE_ICON_SPRITE_ID = "kubik-editorjs-inline-icons";
 const EDITORJS_LINK_ICON_SPRITE = `
 <symbol id="link" viewBox="0 0 14 10">
@@ -11903,58 +12007,223 @@ function ensureEditorJsInlineIcons() {
   svg.innerHTML = EDITORJS_LINK_ICON_SPRITE;
   document.body.appendChild(svg);
 }
-class KubikNavigableLinkTool {
+const TARGET_OPTIONS = [
+  ["Same tab", ""],
+  ["New tab", "_blank"],
+  ["Parent frame", "_parent"],
+  ["Top frame", "_top"]
+];
+const REL_OPTIONS = [
+  ["None", ""],
+  ["noopener noreferrer", "noopener noreferrer"],
+  ["noopener", "noopener"],
+  ["noreferrer", "noreferrer"],
+  ["nofollow", "nofollow"],
+  ["sponsored", "sponsored"],
+  ["ugc", "ugc"]
+];
+function kubikNavigableWysiwygEnabled() {
+  const meta = document.querySelector("meta[name='kubik-navigable-wysiwyg']");
+  return (meta == null ? void 0 : meta.content) === "true";
+}
+function navigableMeta() {
+  const search = document.querySelector("meta[name='kubik-navigable-search-url']");
+  const filters = document.querySelector("meta[name='kubik-navigable-filter-options']");
+  return {
+    searchUrl: search == null ? void 0 : search.content,
+    filterOptions: (filters == null ? void 0 : filters.content) ? JSON.parse(filters.content) : []
+  };
+}
+function buildSelectOptions(pairs, selected) {
+  return pairs.map(
+    ([label, value]) => `<option value="${value.replace(/"/g, "&quot;")}"${value === selected ? " selected" : ""}>${label}</option>`
+  ).join("");
+}
+function buildFilterOptions(filterOptions) {
+  return filterOptions.map(
+    (o) => `<option value="${String(o.key).replace(/"/g, "&quot;")}">${String(o.label).replace(/</g, "&lt;")}</option>`
+  ).join("");
+}
+function navigableLinkPanelInnerHtml({ selectedText = "", filterOptions = [] } = {}) {
+  const { searchUrl } = navigableMeta();
+  return `<div class="kubik-navigable-link"
+       data-controller="kubik-navigable-link"
+       data-kubik-navigable-link-search-url-value="${searchUrl || ""}"
+       data-kubik-navigable-link-filter-options-value='${JSON.stringify(filterOptions).replace(/'/g, "&#39;")}'
+       data-kubik-navigable-link-editing-value="true">
+    <div class="kubik-navigable-link__editor" data-kubik-navigable-link-target="editor">
+      <div class="kubik-navigable-link__metadata kubik-wysiwyg-link-metadata">
+        <div class="input">
+          <label class="label">Link text</label>
+          <input type="text" class="input" value="${(selectedText || "").replace(/"/g, "&quot;")}"
+                 data-kubik-navigable-link-target="text"
+                 data-action="input->kubik-navigable-link#syncHidden" />
+        </div>
+        <div class="input select">
+          <label class="label">Target</label>
+          <select data-kubik-navigable-link-target="linkTarget" data-action="change->kubik-navigable-link#syncHidden">
+            ${buildSelectOptions(TARGET_OPTIONS, "")}
+          </select>
+        </div>
+        <div class="input select">
+          <label class="label">Rel</label>
+          <select data-kubik-navigable-link-target="linkRel" data-action="change->kubik-navigable-link#syncHidden">
+            ${buildSelectOptions(REL_OPTIONS, "")}
+          </select>
+        </div>
+      </div>
+      <div class="kubik-navigable-link__primary-row">
+        <div class="input select kubik-navigable-link__mode">
+          <label class="label">Link to</label>
+          <select data-kubik-navigable-link-target="mode" data-action="change->kubik-navigable-link#modeChange">
+            <option value="system" selected>System</option>
+            <option value="manual">URL</option>
+          </select>
+        </div>
+        <div class="input kubik-navigable-link__query-wrap kubik-navigable-link__system-control">
+          <label class="label">Destination</label>
+          <input type="text" class="input" placeholder="Search pages and navigation\u2026" autocomplete="off"
+                 data-kubik-navigable-link-target="query"
+                 data-action="focus->kubik-navigable-link#queryFocus input->kubik-navigable-link#queryInput keydown->kubik-navigable-link#queryKeydown" />
+          <div class="kubik-navigable-link__results" hidden data-kubik-navigable-link-target="resultsPanel"
+               data-action="click->kubik-navigable-link#resultClick"></div>
+        </div>
+        <div class="input select kubik-navigable-link__filter kubik-navigable-link__system-control">
+          <label class="label">Filter</label>
+          <select data-kubik-navigable-link-target="filter" data-action="change->kubik-navigable-link#filterChange">
+            ${buildFilterOptions(filterOptions)}
+          </select>
+        </div>
+        <div class="input kubik-navigable-link__manual-url kubik-navigable-link__manual-url--hidden" data-kubik-navigable-link-target="manualUrl">
+          <label class="label">URL</label>
+          <input type="text" class="input" placeholder="https://example.com or /path" disabled
+                 data-kubik-navigable-link-target="hrefManual"
+                 data-action="input->kubik-navigable-link#hrefInput blur->kubik-navigable-link#manualHrefBlur" />
+        </div>
+      </div>
+      <div class="kubik-navigable-link__system-url-row" data-kubik-navigable-link-target="systemUrlRow">
+        <div class="input kubik-navigable-link__href-wrap">
+          <label class="label">URL</label>
+          <input type="text" class="input kubik-navigable-link__href kubik-navigable-link__href--locked" readonly tabindex="-1"
+                 placeholder="Resolved from destination"
+                 data-kubik-navigable-link-target="hrefSystem" data-action="input->kubik-navigable-link#hrefInput" />
+        </div>
+        <div class="kubik-navigable-link__url-actions">
+          <button type="button" class="kubik-navigable-link__icon-btn" title="Edit URL" aria-label="Edit URL"
+                  data-kubik-navigable-link-target="urlEdit" data-action="kubik-navigable-link#startUrlEdit">
+            <span class="material-symbols-outlined" aria-hidden="true">edit</span>
+          </button>
+          <button type="button" class="kubik-navigable-link__icon-btn kubik-navigable-link__icon-btn--cancel" title="Cancel" aria-label="Cancel URL edit" hidden
+                  data-kubik-navigable-link-target="urlCancel" data-action="kubik-navigable-link#cancelUrlEdit">
+            <span class="material-symbols-outlined" aria-hidden="true">close</span>
+          </button>
+          <button type="button" class="kubik-navigable-link__icon-btn kubik-navigable-link__icon-btn--approve" title="Approve" aria-label="Approve URL" hidden
+                  data-kubik-navigable-link-target="urlApprove" data-action="kubik-navigable-link#approveUrlEdit">
+            <span class="material-symbols-outlined" aria-hidden="true">check</span>
+          </button>
+        </div>
+      </div>
+      <input type="hidden" value="{}" data-kubik-navigable-link-target="value" />
+    </div>
+  </div>`;
+}
+class KubikLinkTool {
   static get isInline() {
     return true;
   }
   static get title() {
-    return "Kubik link";
+    return "Link";
   }
   constructor({ api }) {
     this.api = api;
     this.button = null;
-    this.state = false;
+    this.panel = null;
   }
   render() {
     this.button = document.createElement("button");
     this.button.type = "button";
-    this.button.textContent = "Nav";
+    this.button.innerHTML = "Link";
     this.button.classList.add(this.api.styles.inlineToolButton);
     return this.button;
   }
   surround(range) {
-    const selected = range.toString();
-    const kind = window.prompt("Link kind: item, resource, or url", "url");
-    if (!kind)
-      return;
-    const anchor = document.createElement("a");
-    if (kind === "url") {
-      const href = window.prompt("URL", "https://");
-      if (!href)
-        return;
-      anchor.setAttribute("href", href);
-      anchor.setAttribute("data-kubik-nav", JSON.stringify({ kind: "url", href }));
-    } else if (kind === "item") {
-      const id = window.prompt("Navigation item id");
-      if (!id)
-        return;
-      anchor.setAttribute("href", "#");
-      anchor.setAttribute("data-kubik-nav", JSON.stringify({ kind: "item", navigation_item_id: id }));
-    } else {
-      const resourceType = window.prompt("Resource type (e.g. Page)");
-      const resourceId = window.prompt("Resource id");
-      const locationId = window.prompt("Navigation item id (blank = canonical)", "");
-      if (!resourceType || !resourceId)
-        return;
-      const payload = { kind: "resource", resource_type: resourceType, resource_id: resourceId };
-      if (locationId)
-        payload.navigation_item_id = locationId;
-      anchor.setAttribute("href", "#");
-      anchor.setAttribute("data-kubik-nav", JSON.stringify(payload));
+    const selectedText = range.toString();
+    this.openPanel(range, selectedText);
+  }
+  openPanel(range, selectedText) {
+    var _a, _b, _c;
+    this.closePanel();
+    const navigable = kubikNavigableWysiwygEnabled();
+    const panel = document.createElement("div");
+    panel.className = "kubik-wysiwyg-inline-link-panel";
+    const { filterOptions } = navigableMeta();
+    const inner = navigable ? navigableLinkPanelInnerHtml({ selectedText, filterOptions }) : `<div class="kubik-wysiwyg-inline-link-panel__inner">
+          <label>URL <input type="text" data-kubik-link-href placeholder="https://example.com" /></label>
+        </div>`;
+    panel.innerHTML = `<div class="kubik-wysiwyg-inline-link-panel__inner">${inner}
+      <div class="kubik-wysiwyg-inline-link-panel__actions">
+        <button type="button" data-kubik-link-cancel>Cancel</button>
+        <button type="button" data-kubik-link-apply>Apply</button>
+      </div>
+    </div>`;
+    document.body.appendChild(panel);
+    this.panel = panel;
+    this.activeRange = range;
+    const linkRoot = panel.querySelector(".kubik-navigable-link");
+    if (linkRoot && ((_a = window.KubikInterfaceStimulus) == null ? void 0 : _a.load)) {
+      window.KubikInterfaceStimulus.load(linkRoot);
     }
-    anchor.textContent = selected;
-    range.deleteContents();
-    range.insertNode(anchor);
+    (_b = panel.querySelector("[data-kubik-link-cancel]")) == null ? void 0 : _b.addEventListener("click", () => this.closePanel());
+    (_c = panel.querySelector("[data-kubik-link-apply]")) == null ? void 0 : _c.addEventListener("click", () => {
+      this.applyLink(navigable);
+      this.closePanel();
+    });
+  }
+  applyLink(navigable) {
+    var _a, _b, _c, _d, _e, _f, _g, _h, _i;
+    const panel = this.panel;
+    if (!panel || !this.activeRange)
+      return;
+    const linkRoot = panel.querySelector("[data-controller*='kubik-navigable-link']");
+    let navPayload;
+    let href = "#";
+    if (navigable && linkRoot) {
+      const app = window.KubikInterfaceStimulus;
+      const controller = app == null ? void 0 : app.getControllerForElementAndIdentifier(linkRoot, "kubik-navigable-link");
+      controller == null ? void 0 : controller.syncHidden();
+      const raw = (_a = linkRoot.querySelector('[data-kubik-navigable-link-target="value"]')) == null ? void 0 : _a.value;
+      if (raw) {
+        navPayload = JSON.parse(raw);
+        const manual = linkRoot.querySelector('[data-kubik-navigable-link-target="hrefManual"]');
+        const system = linkRoot.querySelector('[data-kubik-navigable-link-target="hrefSystem"]');
+        href = (manual && !manual.closest(".kubik-navigable-link__manual-url--hidden") ? manual.value : system == null ? void 0 : system.value) || navPayload.href || navPayload.resolved_href || "#";
+      }
+    } else {
+      href = ((_c = (_b = panel.querySelector("[data-kubik-link-href]")) == null ? void 0 : _b.value) == null ? void 0 : _c.trim()) || "#";
+    }
+    const text = ((_e = (_d = linkRoot == null ? void 0 : linkRoot.querySelector('[data-kubik-navigable-link-target="text"]')) == null ? void 0 : _d.value) == null ? void 0 : _e.trim()) || this.activeRange.toString();
+    const target = (_g = (_f = linkRoot == null ? void 0 : linkRoot.querySelector('[data-kubik-navigable-link-target="linkTarget"]')) == null ? void 0 : _f.value) == null ? void 0 : _g.trim();
+    const rel = (_i = (_h = linkRoot == null ? void 0 : linkRoot.querySelector('[data-kubik-navigable-link-target="linkRel"]')) == null ? void 0 : _h.value) == null ? void 0 : _i.trim();
+    const anchor = document.createElement("a");
+    if (navigable && navPayload) {
+      anchor.setAttribute("href", href);
+      anchor.setAttribute("data-kubik-nav", JSON.stringify(navPayload));
+    } else {
+      anchor.setAttribute("href", href);
+    }
+    if (target)
+      anchor.setAttribute("target", target);
+    if (rel)
+      anchor.setAttribute("rel", rel);
+    anchor.textContent = text;
+    this.activeRange.deleteContents();
+    this.activeRange.insertNode(anchor);
+  }
+  closePanel() {
+    if (this.panel) {
+      this.panel.remove();
+      this.panel = null;
+    }
   }
   checkState() {
     return false;
@@ -11969,12 +12238,8 @@ function buildBaseEditorTools({
       class: Paragraph,
       inlineToolbar: widgetInlineToolbar
     },
-    hyperlink: {
-      class: Hyperlink,
-      config: {}
-    },
-    kubikNavigableLink: {
-      class: KubikNavigableLinkTool
+    kubikLink: {
+      class: KubikLinkTool
     },
     embed: {
       class: Embed,
@@ -12253,18 +12518,22 @@ function scanRecordListWidgets(scope = document) {
   recordListFrames(scope).forEach(enhanceRecordListFrame);
 }
 function patchGetNewWidgetRebind() {
-  var _a, _b;
-  if ((_a = window.Turbo) == null ? void 0 : _a.__recordListRenderPatched)
+  if (document.__recordListStreamPatched)
     return;
-  if (!((_b = window.Turbo) == null ? void 0 : _b.renderStreamMessage))
-    return;
-  const originalRender = window.Turbo.renderStreamMessage.bind(window.Turbo);
-  window.Turbo.renderStreamMessage = (html) => {
-    const result2 = originalRender(html);
-    requestAnimationFrame(() => scanRecordListWidgets());
-    return result2;
-  };
-  window.Turbo.__recordListRenderPatched = true;
+  document.__recordListStreamPatched = true;
+  document.addEventListener(
+    "turbo:before-stream-render",
+    (event) => {
+      const { render: render2 } = event.detail;
+      if (typeof render2 !== "function")
+        return;
+      event.detail.render = (streamElement) => {
+        render2(streamElement);
+        requestAnimationFrame(() => scanRecordListWidgets());
+      };
+    },
+    { capture: true }
+  );
 }
 function patchRecordListWidgetConnect() {
   if (KubikWidgetController.__recordListConnectPatched)
@@ -12441,7 +12710,14 @@ function applyKubikWysiwygWidgetLoading() {
     }
   });
 }
-const DEFAULT_MEDIA_TYPE_FIELD = "media.media_type";
+const REPEATER_MEDIA_TYPE = /^(\w+)\[repeated_items\]\[(\d+)\]\.media_type$/;
+function isMediaTypeSelect(select) {
+  if (!(select instanceof HTMLSelectElement))
+    return false;
+  if (select.name === "media.media_type")
+    return true;
+  return REPEATER_MEDIA_TYPE.test(select.name);
+}
 function refreshWidgetAfterMediaTypeChange(select) {
   var _a;
   const widgetEl = select.closest('[data-controller~="kubik-widget"]');
@@ -12451,21 +12727,20 @@ function refreshWidgetAfterMediaTypeChange(select) {
   const controller = app == null ? void 0 : app.getControllerForElementAndIdentifier(widgetEl, "kubik-widget");
   (_a = controller == null ? void 0 : controller.getNewWidget) == null ? void 0 : _a.call(controller);
 }
-function onMediaTypeChange(event, fieldName) {
+function onMediaTypeChange(event) {
   const select = event.target;
-  if (!select.matches(`select[name="${fieldName}"]`))
+  if (!isMediaTypeSelect(select))
     return;
   window.requestAnimationFrame(() => refreshWidgetAfterMediaTypeChange(select));
 }
-function installMediaTypeChangeRefresh({ fieldName = DEFAULT_MEDIA_TYPE_FIELD } = {}) {
-  const key = `__kubikMediaTypeRefresh_${fieldName}`;
-  if (window[key])
+function installMediaTypeChangeRefresh() {
+  if (window.__kubikMediaTypeRefreshInstalled)
     return;
-  window[key] = true;
-  document.addEventListener("change", (event) => onMediaTypeChange(event, fieldName));
+  window.__kubikMediaTypeRefreshInstalled = true;
+  document.addEventListener("change", onMediaTypeChange);
 }
 var index = {
-  KubikNavigableLinkTool,
+  KubikLinkTool,
   KubikWidgetController,
   KubikRepeaterController,
   KubikKeyValueRepeaterController,
@@ -12484,4 +12759,4 @@ var index = {
   installMediaTypeChangeRefresh,
   fieldPresets
 };
-export { DEFAULT_INLINE_TOOLBAR, KubikAutocompleteController, KubikKeyValueRepeaterController, KubikNavigableLinkTool, KubikRepeaterController, KubikWidgetController, PluginFactory, WIDGET_INLINE_TOOLBAR, applyKubikWysiwygWidgetLoading, applyRecordListWidgetAdminEnhancements, buildBaseEditorTools, index as default, defineBlock, defineRecordListBlock, defineResourceReferenceBlock, ensureEditorJsInlineIcons, fieldPresets, installMediaTypeChangeRefresh, presets };
+export { DEFAULT_INLINE_TOOLBAR, KubikAutocompleteController, KubikKeyValueRepeaterController, KubikLinkTool, KubikRepeaterController, KubikWidgetController, PluginFactory, WIDGET_INLINE_TOOLBAR, applyKubikWysiwygWidgetLoading, applyRecordListWidgetAdminEnhancements, buildBaseEditorTools, index as default, defineBlock, defineRecordListBlock, defineResourceReferenceBlock, ensureEditorJsInlineIcons, fieldPresets, installMediaTypeChangeRefresh, presets };

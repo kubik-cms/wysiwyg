@@ -1,5 +1,7 @@
-<div class='input'>
-  <label class='label' for='<%= @field[:name] %>-<% @widget_id %>'><%= @field_label %></label>
-  <input id='title-<%= @widget_id %>' tabindex='1' type='text' name='<%= @field_name %>' value='<%= @field_value %>' class='input' placeholder='<%= @field_label %>' <%= @index.present? ? "data-item-index='#{@index}'" : nil %> data-action='input->kubik-widget#updateField <%= @header_field ? 'input->kubik-repeater#updateHeader' : nil %>' />
+<div class='input <%= field_css_class %>'>
+  <% unless hide_label? %>
+    <label class='label' for='<%= input_dom_id %>'><%= @field_label %></label>
+  <% end %>
+  <input id='<%= input_dom_id %>' tabindex='1' type='text' name='<%= @field_name %>' value='<%= @field_value %>' class='input' placeholder='<%= @field_label %>' <%= @index.present? ? "data-item-index='#{@index}'" : nil %> data-action='input->kubik-widget#updateField <%= @header_field ? 'input->kubik-repeater#updateHeader' : nil %>' />
   <p class='inline-hints'><%= @field[:hint] %></p>
 </div>

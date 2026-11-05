@@ -1,0 +1,35 @@
+<div class="input kubik-wysiwyg-simple-link">
+  <div class="kubik-wysiwyg-link-metadata">
+    <div class="input">
+      <label class="label">Link text</label>
+      <input type="text"
+             name="<%= field_name('link_text') %>"
+             value="<%= @link_text %>"
+             class="input"
+             data-action="input->kubik-widget#updateField" />
+    </div>
+    <div class="input select">
+      <label class="label">Target</label>
+      <%= select_tag field_name('target'),
+                     options_for_select(target_options, @target),
+                     class: 'input',
+                     data: { action: 'change->kubik-widget#updateField' } %>
+    </div>
+    <div class="input select">
+      <label class="label">Rel</label>
+      <%= select_tag field_name('rel'),
+                     options_for_select(rel_options, @rel),
+                     class: 'input',
+                     data: { action: 'change->kubik-widget#updateField' } %>
+    </div>
+  </div>
+  <div class="input">
+    <label class="label">Link URL</label>
+    <input type="text"
+           name="<%= field_name('link') %>"
+           value="<%= @link %>"
+           class="input"
+           placeholder="https://example.com/page"
+           data-action="input->kubik-widget#updateField" />
+  </div>
+</div>

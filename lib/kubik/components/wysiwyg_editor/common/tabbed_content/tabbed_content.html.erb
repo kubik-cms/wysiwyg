@@ -21,15 +21,11 @@
             <% grouped_fields = tab[:fields].group_by { |f| f[:section] } %>
             <% grouped_fields.each do |group, fields| %>
               <div class='kubik_widget_section kubik_widget_section__<%= group %>'>
-                <% fields.each_with_index do |field, index| %>
-                  <%= render Kubik::WysiwygEditor::Common::Field.new(field, @data, @widget_id, tab) %>
-                <% end %>
+                <%= render_wysiwyg_field_list(fields, tab) %>
               </div>
             <% end %>
           <% else %>
-            <% tab[:fields].each do |field| %>
-              <%= render Kubik::WysiwygEditor::Common::Field.new(field, @data, @widget_id, tab) %>
-            <% end %>
+            <%= render_wysiwyg_field_list(tab[:fields], tab) %>
           <% end %>
         <% end %>
       </div>

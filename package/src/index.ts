@@ -10,14 +10,14 @@ import { defineResourceReferenceBlock } from "./resource_reference_block"
 import { DEFAULT_INLINE_TOOLBAR, WIDGET_INLINE_TOOLBAR } from "./editor/inline_toolbar"
 import { ensureEditorJsInlineIcons } from "./editor/editor_icons"
 import { buildBaseEditorTools } from "./editor/base_editor_tools"
-import KubikNavigableLinkTool from "./editor/navigable_link_tool"
+import KubikLinkTool from "./editor/kubik_link_tool"
 import { applyRecordListWidgetAdminEnhancements } from "./admin/record_list_widget_admin"
 import applyKubikWysiwygWidgetLoading from "./admin/widget_loading"
 import installMediaTypeChangeRefresh from "./admin/media_type_field_refresh"
 import * as fieldPresets from "./field_presets"
 
 export default {
-  KubikNavigableLinkTool,
+  KubikLinkTool,
   KubikWidgetController,
   KubikRepeaterController,
   KubikKeyValueRepeaterController,
@@ -38,7 +38,7 @@ export default {
 }
 
 export {
-  KubikNavigableLinkTool,
+  KubikLinkTool,
   KubikWidgetController,
   KubikRepeaterController,
   KubikKeyValueRepeaterController,

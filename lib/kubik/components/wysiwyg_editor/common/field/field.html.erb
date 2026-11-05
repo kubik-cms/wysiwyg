@@ -29,6 +29,10 @@
   <%= render Kubik::WysiwygEditor::Common::Field::Wysiwyg.new(@field, @data, @widget_id, @tab, @index) %>
 <% when 'key_value_repeater' %>
   <%= render Kubik::WysiwygEditor::Common::Field::KeyValueRepeaterInput.new(@field, @data, @widget_id, @tab, @index, header_field: @header_field) %>
+<% when 'links_repeater' %>
+  <%= render Kubik::WysiwygEditor::Common::Field::LinksRepeaterInput.new(@field, @data, @widget_id, @tab, @index, header_field: @header_field) %>
 <% when 'navigable_link' %>
   <%= render Kubik::WysiwygEditor::Common::Field::NavigableLink.new(@field, @data, @widget_id, @tab, @index) %>
+<% when 'simple_link' %>
+  <%= render Kubik::WysiwygEditor::Common::Field::SimpleLink.new(@field, @data, @widget_id, @tab, @index) %>
 <% end %>

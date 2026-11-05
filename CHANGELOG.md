@@ -1,5 +1,27 @@
 ## [Unreleased]
 
+### Added
+
+- `Kubik::Wysiwyg::LinkResolver` and nav-link snapshot helpers for resolving WYSIWYG link rows (URL, navigation ref, stale/broken flags).
+- Editor fields: `simple_link`, `links_repeater_input`, and `title_with_heading_level` ViewComponents.
+- Inline `KubikLinkTool` and navigable link panel HTML for the admin editor package.
+- Tests for link resolution (`test/kubik/wysiwyg/link_resolver_test.rb`).
+
+### Changed
+
+- Navigable link field markup and Stimulus wiring aligned with **kubik_navigation** navigable link editor.
+- Tabbed content, field binding, visibility, and shared field chrome (select/text input/navigable link).
+- Field presets and widget controller behaviour; `_field_styles.scss` updates.
+- Rebuilt `@kubik-cms/wysiwyg` dist (`package/dist/*`).
+
+### Package
+
+- Bump `@kubik-cms/wysiwyg` to **0.1.29**, `npm run build` in `package/`, then `bin/kubik-gems sync --link-js` in host apps.
+
+### Ruby gem
+
+- Bump `kubik_wysiwyg` gemspec patch (currently **0.2.9**); host apps: `bundle update kubik_wysiwyg`.
+
 ## [0.2.9] - 2026-11-04
 
 ### Added
