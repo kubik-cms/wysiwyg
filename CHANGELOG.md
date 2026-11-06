@@ -6,6 +6,10 @@
 - `KubikWysiwyg::LinkStyle` adapter for host brand style labels.
 - Record-list source select blank-option handling and default active tab support.
 
+### Package
+
+- Bump `@kubik-cms/wysiwyg` to **0.1.30**.
+
 ## [0.2.10] - 2026-11-06
 
 ### Added
