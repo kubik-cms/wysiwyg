@@ -329,9 +329,22 @@ export default class extends Controller {
     const tab = event.params.tab;
     const field = event.params.field;
     const path = `${tab}.${field}`;
-    const links = get(this.dataValue, path) || [];
-    this.dataValue = set({ ...this.dataValue }, path, [...links, {}]);
+    const links = [...(get(this.dataValue, path) || [])];
+    const limit = this.linksRepeaterMaxItems(tab, field);
+    if (limit && links.length >= limit) return;
+
+    links.push({});
+    this.dataValue = set({ ...this.dataValue }, path, links);
     this.getNewWidget();
+  }
+
+  linksRepeaterMaxItems(tab, fieldName) {
+    const tabs = this.setupValue?.config?.tabs || [];
+    const tabConfig = tabs.find((entry) => entry.name === tab);
+    const fieldConfig = tabConfig?.fields?.find((entry) => entry.name === fieldName);
+    const raw = fieldConfig?.max_items ?? fieldConfig?.maxItems ?? 0;
+    const limit = Number(raw);
+    return Number.isFinite(limit) && limit > 0 ? limit : null;
   }
 
   removeLinksRow(event) {

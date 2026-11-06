@@ -14,7 +14,12 @@ module Kubik
 
       def tab_checked?(tab, index)
         active = @data.dig(:_ui, :active_tab)
-        active.present? ? active.to_s == tab[:name].to_s : index.zero?
+        return active.to_s == tab[:name].to_s if active.present?
+
+        default_tab = @config.dig(:config, :default_active_tab)
+        return tab[:name].to_s == default_tab.to_s if default_tab.present?
+
+        index.zero?
       end
 
       def repeater_visible?(tab)

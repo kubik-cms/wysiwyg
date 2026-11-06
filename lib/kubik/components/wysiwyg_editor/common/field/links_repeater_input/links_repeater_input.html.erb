@@ -1,85 +1,107 @@
-<div class="input kubik-wysiwyg-links-repeater">
+<div class="input kubik-wysiwyg-links-repeater kubik-wysiwyg-links-repeater__compact kubik-wysiwyg-links-repeater--expandable">
   <label class="label"><%= @field_label %></label>
 
-  <% @rows.each_with_index do |row, row_index| %>
-    <% row = row.to_h.with_indifferent_access %>
-    <div class="kubik-wysiwyg-links-repeater__row">
-      <div class="kubik-wysiwyg-link-metadata">
-        <div class="input">
-          <label class="label">Link text</label>
-          <input type="text"
-                 name="<%= row_field_name(row_index, 'text') %>"
-                 value="<%= row[:text] %>"
-                 class="input"
-                 data-action="input->kubik-widget#updateField" />
+  <div class="kubik-wysiwyg-tabs-container">
+    <% @rows.each_with_index do |row, row_index| %>
+      <% row = row.to_h.with_indifferent_access %>
+      <div data-controller="kubik-repeater"
+           class="kubik-wysiwyg-repeated-item kubik-wysiwyg-repeated-item__compact <%= 'kubik-widget-expanded' if row_expanded?(row) %>"
+           data-kubik-repeater-expanded-class="kubik-widget-expanded"
+           data-kubik-repeater-tab-value="<%= tab_name %>"
+           data-kubik-links-repeater-field-value="<%= @field[:name] %>"
+           data-kubik-repeater-index-value="<%= row_index %>"
+           data-kubik-repeater-expanded-value="<%= row_expanded?(row) %>"
+           data-action="kubik-repeater:toggle->kubik-widget#linksRepeaterToggle">
+        <div class="kubik-wysiwyg-repeated-item-header">
+          <%= render Kubik::WysiwygEditor::Common::ExpandAction.new(row_index) %>
+          <div class="kubik-wysiwyg-repeated-item-header--summary"
+               data-kubik-repeater-target="header"
+               data-header-placeholder="<%= row_index + 1 %>"
+               data-action="click->kubik-repeater#toggleItem">
+            <%= render partial: "kubik/shared/link_row_summary", locals: { text: row_summary(row, row_index) } %>
+          </div>
+          <div class="kubik-wysiwyg-component--items-action">
+            <div class="kubik-wysiwyg-component--items-action kubik-wysiwyg-component--items-action--icon material-symbols-outlined kubik-repeater-delete-action"
+                 data-action="click->kubik-widget#removeLinksRow"
+                 data-kubik-widget-tab-param="<%= tab_name %>"
+                 data-kubik-widget-field-param="<%= @field[:name] %>"
+                 data-kubik-widget-index-param="<%= row_index %>">close</div>
+          </div>
+          <%= render Kubik::WysiwygEditor::Common::Actions.new(row_index, @rows.length, tab_name) %>
         </div>
 
-        <div class="input select">
-          <label class="label">Target</label>
-          <%= select_tag row_field_name(row_index, 'target'),
-                         options_for_select(target_select_options, row[:target]),
-                         class: 'input',
-                         data: { action: 'change->kubik-widget#updateField' } %>
-        </div>
+        <div class="fields">
+          <div class="fields-container kubik-wysiwyg-links-repeater__fields">
+            <div class="kubik-wysiwyg-link-metadata">
+              <div class="input">
+                <label class="label">Link text</label>
+                <input type="text"
+                       name="<%= row_field_name(row_index, 'text') %>"
+                       value="<%= row[:text] %>"
+                       class="input"
+                       data-action="input->kubik-widget#updateField" />
+              </div>
 
-        <div class="input select">
-          <label class="label">Rel</label>
-          <%= select_tag row_field_name(row_index, 'rel'),
-                         options_for_select(rel_select_options, row[:rel]),
-                         class: 'input',
-                         data: { action: 'change->kubik-widget#updateField' } %>
+              <% if show_metadata_style? %>
+                <div class="input select kubik-wysiwyg-link-metadata__style">
+                  <label class="label">Style</label>
+                  <%= select_tag row_field_name(row_index, 'style'),
+                                 options_for_select(metadata_style_option_pairs, row[:style]),
+                                 class: 'input',
+                                 data: { action: 'change->kubik-widget#updateField' } %>
+                </div>
+              <% end %>
+
+              <div class="input select kubik-wysiwyg-link-metadata__target">
+                <label class="label">Target</label>
+                <%= select_tag row_field_name(row_index, 'target'),
+                               options_for_select(target_select_options, row[:target]),
+                               class: 'input',
+                               data: { action: 'change->kubik-widget#updateField' } %>
+              </div>
+
+              <div class="input select kubik-wysiwyg-link-metadata__rel">
+                <label class="label">Rel</label>
+                <%= select_tag row_field_name(row_index, 'rel'),
+                               options_for_select(rel_select_options, row[:rel]),
+                               class: 'input',
+                               data: { action: 'change->kubik-widget#updateField' } %>
+              </div>
+            </div>
+
+            <% if @navigable_available %>
+              <%= render Kubik::WysiwygEditor::Common::Field::NavigableLink.new(
+                    navigable_row_field(row_index),
+                    @data,
+                    @widget_id,
+                    @tab,
+                    @index,
+                  ) %>
+            <% else %>
+              <div class="input">
+                <label class="label">URL</label>
+                <input type="text"
+                       name="<%= row_field_name(row_index, 'url') %>"
+                       value="<%= row[:url] %>"
+                       class="input"
+                       data-action="input->kubik-widget#updateField" />
+              </div>
+            <% end %>
+
+          </div>
         </div>
       </div>
+    <% end %>
+  </div>
 
-      <% if @navigable_available %>
-        <%= render Kubik::WysiwygEditor::Common::Field::NavigableLink.new(
-              navigable_row_field(row_index),
-              @data,
-              @widget_id,
-              @tab,
-              @index,
-            ) %>
-      <% else %>
-        <div class="input">
-          <label class="label">URL</label>
-          <input type="text"
-                 name="<%= row_field_name(row_index, 'url') %>"
-                 value="<%= row[:url] %>"
-                 class="input"
-                 data-action="input->kubik-widget#updateField" />
-        </div>
-      <% end %>
-
-      <% if style_select? %>
-        <div class="input select">
-          <label class="label">Style</label>
-          <select name="<%= row_field_name(row_index, 'style') %>"
-                  class="input"
-                  data-action="change->kubik-widget#updateField">
-            <% style_options.each do |option| %>
-              <option value="<%= option[:value] %>" <%= 'selected' if option[:value].to_s == row[:style].to_s %>>
-                <%= option[:label] %>
-              </option>
-            <% end %>
-          </select>
-        </div>
-      <% end %>
-
-      <button type="button"
-              class="kubik-wysiwyg-links-repeater__remove material-symbols-outlined"
-              data-action="click->kubik-widget#removeLinksRow"
-              data-kubik-widget-tab-param="<%= tab_name %>"
-              data-kubik-widget-field-param="<%= @field[:name] %>"
-              data-kubik-widget-index-param="<%= row_index %>">close</button>
+  <% if can_add_links? %>
+    <div class="kubik-wysiwyg-repeated-item--add-new"
+         data-action="click->kubik-widget#appendLinksRow"
+         data-kubik-widget-tab-param="<%= tab_name %>"
+         data-kubik-widget-field-param="<%= @field[:name] %>">
+      <%= @rows.present? ? add_another_link_label : add_link_label %>
     </div>
   <% end %>
-
-  <div class="kubik-wysiwyg-repeated-item--add-new"
-       data-action="click->kubik-widget#appendLinksRow"
-       data-kubik-widget-tab-param="<%= tab_name %>"
-       data-kubik-widget-field-param="<%= @field[:name] %>">
-    <%= @rows.present? ? "Add another" : "Add" %>
-  </div>
 
   <% if @field[:hint].present? %>
     <p class="inline-hints"><%= @field[:hint] %></p>

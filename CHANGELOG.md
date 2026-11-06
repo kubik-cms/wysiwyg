@@ -2,6 +2,14 @@
 
 ### Added
 
+- Expandable navigable-link and links-repeater field templates, admin drag/inline-link JS, and Dart Sass `admin_sass_entry`.
+- `KubikWysiwyg::LinkStyle` adapter for host brand style labels.
+- Record-list source select blank-option handling and default active tab support.
+
+## [0.2.10] - 2026-11-06
+
+### Added
+
 - `Kubik::Wysiwyg::LinkResolver` and nav-link snapshot helpers for resolving WYSIWYG link rows (URL, navigation ref, stale/broken flags).
 - Editor fields: `simple_link`, `links_repeater_input`, and `title_with_heading_level` ViewComponents.
 - Inline `KubikLinkTool` and navigable link panel HTML for the admin editor package.
@@ -9,6 +17,7 @@
 
 ### Changed
 
+- Repeater item styles (`_repeater.scss`) use `--kubik-repeater-*` custom properties; `.kubik-wysiwyg-repeated-item__compact` overrides density (header padding, summary type).
 - Navigable link field markup and Stimulus wiring aligned with **kubik_navigation** navigable link editor.
 - Tabbed content, field binding, visibility, and shared field chrome (select/text input/navigable link).
 - Field presets and widget controller behaviour; `_field_styles.scss` updates.

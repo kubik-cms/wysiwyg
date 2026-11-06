@@ -189,6 +189,14 @@ export function dataAttributesRepeater({ section } = {}) {
   return field
 }
 
+function applyLinksRepeaterMaxItems(field, maxItems, max_items) {
+  const raw = max_items ?? maxItems
+  if (raw == null || raw === '') return
+
+  const limit = Number(raw)
+  if (Number.isFinite(limit) && limit > 0) field.max_items = limit
+}
+
 export function linksRepeater({
   name = 'links',
   label = 'Links',
@@ -197,12 +205,23 @@ export function linksRepeater({
   styleOptions = [],
   hint,
   preferNavigable = 'auto',
+  maxItems,
+  max_items,
 } = {}) {
   const useNavigable =
     preferNavigable === true || (preferNavigable === 'auto' && kubikNavigableWysiwygEnabled())
 
   if (!useNavigable) {
-    return linksKeyValueRepeater({ name, label, prefix, fields, styleOptions, hint })
+    return linksKeyValueRepeater({
+      name,
+      label,
+      prefix,
+      fields,
+      styleOptions,
+      hint,
+      maxItems,
+      max_items,
+    })
   }
 
   const repeater = {
@@ -221,6 +240,7 @@ export function linksRepeater({
       },
     }
   }
+  applyLinksRepeaterMaxItems(repeater, maxItems, max_items)
   return repeater
 }
 
@@ -231,6 +251,8 @@ export function linksKeyValueRepeater({
   fields = ['text', 'url', 'target', 'style'],
   styleOptions = [],
   hint,
+  maxItems,
+  max_items,
 } = {}) {
   return linksRepeater({
     name,
@@ -240,6 +262,8 @@ export function linksKeyValueRepeater({
     styleOptions,
     hint,
     preferNavigable: 'auto',
+    maxItems,
+    max_items,
   })
 }
 

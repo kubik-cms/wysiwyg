@@ -34,6 +34,10 @@
   border: 1px solid var(--kubik-wysiwyg-border-color, var(--kubik-interface-color-grey-200));
   border-radius: var(--kubik-wysiwyg-radius, 0.2rem);
   overflow: hidden;
+
+  &.kubik-widget__expanded {
+    overflow: visible;
+  }
   &--header {
     display: flex;
     flex-direction: row;
@@ -237,6 +241,7 @@
     display: none;
     padding: 1.5rem;
     border: 1px solid var(--kubik-interface-color-grey-200);
+    overflow: visible;
   }
 }
 
@@ -448,6 +453,9 @@
         @include kubik-form-input-select;
         width: 100%;
         box-sizing: border-box;
+        border: 1px solid var(--kubik-repeater-border, var(--kubik-interface-color-grey-200, #e5e7eb));
+        border-right-width: 1px;
+        border-right-color: var(--kubik-repeater-border, var(--kubik-interface-color-grey-200, #e5e7eb));
       }
     }
 

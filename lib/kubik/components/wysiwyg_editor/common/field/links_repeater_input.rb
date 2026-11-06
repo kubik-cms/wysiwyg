@@ -66,17 +66,101 @@ module Kubik
         pairs
       end
 
+      def add_link_label
+        KubikWysiwyg::LinkStyle.add_link_label
+      end
+
+      def add_another_link_label
+        KubikWysiwyg::LinkStyle.add_another_link_label
+      end
+
+      def metadata_style_option_pairs
+        return style_options.map { |o| [o[:label], o[:value].to_s] } if style_select?
+
+        KubikWysiwyg::LinkStyle.default_pairs
+      end
+
+      def show_metadata_style?
+        metadata_style_option_pairs.any?
+      end
+
+      def max_items
+        raw = @field[:max_items] || @field[:maxItems]
+        return nil if raw.blank?
+
+        limit = raw.to_i
+        limit.positive? ? limit : nil
+      end
+
+      def can_add_links?
+        limit = max_items
+        return true unless limit
+
+        @rows.size < limit
+      end
+
+      def row_expanded?(row)
+        row.to_h.with_indifferent_access.dig(:_ui, :expanded) == true
+      end
+
+      def row_summary(row, row_index)
+        row = row.to_h.with_indifferent_access
+        text = row[:text].to_s.strip.presence || "Link #{row_index + 1}"
+        style_label = style_label_for(row[:style])
+
+        KubikWysiwyg::LinkStyle.link_row_summary_text(text, style_label)
+      end
+
+      def style_label_for(style_value)
+        value = style_value.to_s
+        pair = metadata_style_option_pairs.find { |_label, option_value| option_value.to_s == value }
+        return pair.first if pair
+
+        value.present? ? value : "Default"
+      end
+
       private
 
       def compact_link_rows(rows)
-        Array.wrap(rows).reject do |row|
+        rows = Array.wrap(rows).reject do |row|
           row = row.to_h.with_indifferent_access
+          next false if row.dig(:_ui, :expanded) == true
+
           nav = Kubik::Wysiwyg::LinkResolver.parse_nav_ref(row[:nav_link])
           row[:text].to_s.strip.blank? &&
             row[:url].to_s.strip.blank? &&
             row[:rel].to_s.strip.blank? &&
             nav.blank?
         end
+        rows = legacy_nav_link_rows_if_empty(rows)
+        limit = max_items
+        return rows unless limit && rows.size > limit
+
+        rows.first(limit)
+      end
+
+      def legacy_nav_link_rows_if_empty(rows)
+        return rows if rows.present?
+
+        tab_data = (@data.dig(@tab[:name].to_sym) || {}).with_indifferent_access
+        nav_raw = tab_data[:nav_link]
+        return rows if nav_raw.blank?
+
+        nav = Kubik::Wysiwyg::LinkResolver.parse_nav_ref(nav_raw) || {}
+        return rows if nav[:text].to_s.strip.blank? &&
+                       nav[:href].to_s.strip.blank? &&
+                       nav[:kind].to_s.strip.blank? &&
+                       nav[:url].to_s.strip.blank?
+
+        row = {
+          nav_link: nav_raw,
+          text: nav[:text],
+          style: nav[:style],
+          target: nav[:target],
+          rel: nav[:rel],
+        }.compact
+
+        [row.with_indifferent_access]
       end
 
       def navigable_routes_available?

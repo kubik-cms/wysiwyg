@@ -3,6 +3,7 @@ require "activeadmin"
 require "view_component"
 require_relative "kubik/wysiwyg/block_data"
 require_relative "kubik_wysiwyg/configuration"
+require_relative "kubik_wysiwyg/link_style"
 require_relative "kubik_wysiwyg/record_list_model_config"
 require_relative "kubik/wysiwyg/wysiwyg_pickable"
 require_relative "kubik/wysiwyg/wysiwyg_autocomplete"
@@ -19,8 +20,15 @@ module KubikWysiwyg
       config.assets.precompile += %w[
         kubik_wysiwyg.js
         kubik_wysiwyg/admin_editor_patches.js
+        kubik_wysiwyg/admin_ui_enhancements.js
         kubik_wysiwyg/wysiwyg_editor_controller.js
         kubik_wysiwyg/kubik_navigable_picker_controller.js
+        kubik_wysiwyg/wysiwyg_links_repeater_admin.js
+        kubik_wysiwyg/wysiwyg_media_widget_drag_reorder.js
+        kubik_wysiwyg/wysiwyg_inline_link_admin.js
+        kubik_wysiwyg/wysiwyg_navigable_link_admin.js
+        kubik_wysiwyg/media_management_fields.js
+        kubik_wysiwyg/record_listing_block.js
       ]
       config.autoload_paths << root.join("app/inputs")
 
@@ -79,17 +87,22 @@ module KubikWysiwyg
         js = root.join("app/assets/javascripts/kubik_wysiwyg/admin_editor_patches.js")
         next unless js.exist?
 
-        map.pin "kubik_wysiwyg/admin_editor_patches", to: "kubik_wysiwyg/admin_editor_patches.js", preload: true
+        {
+          "kubik_wysiwyg/admin_editor_patches" => true,
+          "kubik_wysiwyg/admin_ui_enhancements" => true,
+          "kubik_wysiwyg/wysiwyg_editor_controller" => false,
+          "kubik_wysiwyg/kubik_navigable_picker_controller" => false,
+          "kubik_wysiwyg/wysiwyg_links_repeater_admin" => false,
+          "kubik_wysiwyg/wysiwyg_media_widget_drag_reorder" => false,
+          "kubik_wysiwyg/wysiwyg_inline_link_admin" => false,
+          "kubik_wysiwyg/wysiwyg_navigable_link_admin" => false,
+          "kubik_wysiwyg/media_management_fields" => false,
+          "kubik_wysiwyg/record_listing_block" => false,
+        }.each do |name, preload|
+          path = "#{name}.js"
+          next unless root.join("app/assets/javascripts", path).exist?
 
-        editor_js = root.join("app/assets/javascripts/kubik_wysiwyg/wysiwyg_editor_controller.js")
-        if editor_js.exist?
-          map.pin "kubik_wysiwyg/wysiwyg_editor_controller", to: "kubik_wysiwyg/wysiwyg_editor_controller.js"
-        end
-
-        navigable_js = root.join("app/assets/javascripts/kubik_wysiwyg/kubik_navigable_picker_controller.js")
-        if navigable_js.exist?
-          map.pin "kubik_wysiwyg/kubik_navigable_picker_controller",
-                   to: "kubik_wysiwyg/kubik_navigable_picker_controller.js"
+          map.pin name, to: path, preload: preload
         end
       end
 

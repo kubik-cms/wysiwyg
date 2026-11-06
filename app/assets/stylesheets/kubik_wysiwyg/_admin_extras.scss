@@ -1,0 +1,327 @@
+
+turbo-frame.kubik-wysiwyg-component.kubik-wysiwyg-downloads .kubik-wysiwyg-repeated-item.kubik-widget-expanded > .fields,
+turbo-frame.kubik-wysiwyg-component.kubik-wysiwyg-record-list.kubik-wysiwyg-record-list--expandable-items .kubik-wysiwyg-repeated-item.kubik-widget-expanded > .fields,
+turbo-frame.kubik-wysiwyg-component.kubik-wysiwyg-record-list:has(
+    .kubik-wysiwyg-repeated-item .kubik_widget_section__fields .input[name]
+  ) .kubik-wysiwyg-repeated-item.kubik-widget-expanded > .fields {
+  padding: 0 !important;
+}
+
+turbo-frame.kubik-wysiwyg-component.kubik-wysiwyg-downloads .kubik-wysiwyg-repeated-item:has(.kubik_widget_section__fields .input[name]).kubik-widget-expanded .fields,
+turbo-frame.kubik-wysiwyg-component.kubik-wysiwyg-record-list.kubik-wysiwyg-record-list--expandable-items .kubik-wysiwyg-repeated-item:has(.kubik_widget_section__fields .input[name]).kubik-widget-expanded .fields,
+turbo-frame.kubik-wysiwyg-component.kubik-wysiwyg-record-list:has(
+    .kubik-wysiwyg-repeated-item .kubik_widget_section__fields .input[name]
+  ) .kubik-wysiwyg-repeated-item:has(.kubik_widget_section__fields .input[name]).kubik-widget-expanded .fields {
+  display: block !important;
+  visibility: visible !important;
+  max-height: 1000px !important;
+  overflow: visible !important;
+}
+
+// Downloads: row header already shows the picked document; expanded edit is link label only.
+turbo-frame.kubik-wysiwyg-component.kubik-wysiwyg-downloads .kubik-wysiwyg-repeated-item.kubik-widget-expanded .kubik_widget_section__thumb:has(.kubik--item-static-content),
+turbo-frame.kubik-wysiwyg-component.kubik-wysiwyg-downloads .kubik-wysiwyg-repeated-item.kubik-widget-expanded .fields .kubik--item-static-content {
+  display: none !important;
+}
+
+turbo-frame.kubik-wysiwyg-component.kubik-wysiwyg-downloads .kubik-wysiwyg-repeated-item.kubik-widget-expanded:has(.kubik-wysiwyg-repeated-item-header .kubik--item) .kubik_widget_section__thumb {
+  display: none !important;
+}
+
+turbo-frame.kubik-wysiwyg-component.kubik-wysiwyg-downloads .kubik-wysiwyg-repeated-item.kubik-widget-expanded .kubik_widget_section__fields {
+  flex: 1 1 100%;
+  width: 100%;
+  max-width: 100%;
+}
+
+.kubik-wysiwyg-component .kubik-wysiwyg--standard-fields .kubik--key_value_repeater {
+  input.input[type='text'] {
+    @include kubik-form-input-base;
+    flex: 1 1 6rem;
+    min-width: 0;
+  }
+
+  .input.select.kubik--key_value_repeater--field-select {
+    flex: 1 1 8rem;
+    min-width: 8rem;
+    padding: 0;
+
+    select.input {
+      @include kubik-form-input-select;
+      width: 100%;
+      border: 1px solid var(--kubik-repeater-border, var(--kubik-interface-color-grey-200, #e5e7eb));
+      border-right-width: 1px;
+    }
+  }
+}
+
+
+.kubik-wysiwyg-tabs-container .kubik-wysiwyg-tab-content {
+  border: none;
+  border-top: 1px solid var(--kubik-interface-color-grey-200);
+  overflow: visible;
+}
+
+// Loading overlay while a widget re-renders (getNewWidget / Turbo morph).
+turbo-frame.kubik-wysiwyg-component {
+  position: relative;
+
+  .kubik-wysiwyg-component__loading {
+    display: none;
+    position: absolute;
+    inset: 0;
+    z-index: 15;
+    align-items: center;
+    justify-content: center;
+    background: rgb(255 255 255 / 78%);
+    pointer-events: none;
+  }
+
+  &.kubik-wysiwyg-component--loading .kubik-wysiwyg-component__loading {
+    display: flex;
+  }
+
+  &.kubik-wysiwyg-component--loading:not(:has(.kubik-wysiwyg-widget-header)) {
+    display: block;
+    min-height: 3.25rem;
+    max-height: 3.25rem;
+    overflow: hidden;
+  }
+
+  .kubik-wysiwyg-component__loading-spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--kubik-interface-color-grey-200, #e5e7eb);
+    border-top-color: var(--kubik-interface-color-primary, #1d4ed8);
+    border-radius: 50%;
+    animation: kubik-wysiwyg-component-spin 0.75s linear infinite;
+  }
+
+  &.kubik-wysiwyg-component--drag-active {
+    overflow: visible !important;
+    z-index: 40;
+  }
+}
+
+@keyframes kubik-wysiwyg-component-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Media widget: drag handle reorder (same as articles / record-list widgets; tab name is "media").
+turbo-frame.kubik-wysiwyg-component:not(.kubik-wysiwyg-record-list) {
+  [class*='-tabs-media']:has(.kubik-wysiwyg-repeated-item) {
+    position: relative;
+
+    .kubik-wysiwyg-repeated-item-drop-placeholder {
+      box-sizing: border-box;
+      width: 100%;
+      margin: 0;
+      border: 2px dashed var(--kubik-interface-color-grey-400, #9ca3af);
+      border-radius: 4px;
+      background: var(--kubik-interface-color-grey-100, #f3f4f6);
+      pointer-events: none;
+      transition: min-height 0.12s ease-out;
+    }
+
+    .kubik-wysiwyg-repeated-item-header .kubik-wysiwyg-component--items-action--more {
+      cursor: grab;
+      touch-action: none;
+      user-select: none;
+
+      &:active {
+        cursor: grabbing;
+      }
+
+      .kubik-wysiwyg-component--items-more-actions {
+        display: none !important;
+      }
+
+      > .material-symbols-outlined {
+        font-size: 0;
+        line-height: 1;
+        width: 20px;
+        height: 20px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        &::after {
+          content: 'drag_indicator';
+          font-family: 'Material Symbols Outlined';
+          font-size: 20px;
+          font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+        }
+      }
+    }
+  }
+}
+
+// Content with media — Media tab: same thumb + fields row as Media widget repeater items.
+// Direct-child sections only (Media widget nests sections inside repeater rows).
+.kubik-wysiwyg-component .kubik-wysiwyg--standard-fields:has(> .kubik_widget_section__thumb):has(> .kubik_widget_section__fields) {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 2rem;
+  width: 100%;
+}
+
+// Accordion (and other) widget item fields: full-width stack without thumb sections.
+.kubik-wysiwyg-repeated-item .fields:not(.fields__with-sections) {
+  flex: 1 1 100%;
+  width: 100%;
+
+  .fields-container {
+    width: 100%;
+  }
+
+  .input {
+    width: 100%;
+  }
+
+  .kubik-navigable-link__primary-row > .input,
+  .kubik-navigable-link__system-url-row > .input,
+  .kubik-wysiwyg-link-metadata > .input,
+  .kubik-navigable-input__metadata > .input {
+    float: none;
+    width: auto;
+    max-width: none;
+  }
+}
+
+.kubik-wysiwyg-rich-text-field {
+  width: 100%;
+
+  &__toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    margin-bottom: 0.35rem;
+  }
+
+  &__tool {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+    border: 1px solid var(--kubik-interface-color-grey-200, #e5e7eb);
+    border-radius: var(--kubik-interface-radius-100, 0.2rem);
+    background: var(--kubik-interface-color-white, #fff);
+    color: var(--kubik-interface-color-grey-700, #374151);
+    cursor: pointer;
+
+    .material-symbols-outlined {
+      font-size: 1.125rem;
+      line-height: 1;
+    }
+
+    &:hover {
+      background: var(--kubik-interface-color-grey-100, #f3f4f6);
+    }
+  }
+
+  &__input .input.input-wysiwyg {
+    width: 100%;
+    min-height: 10rem;
+  }
+}
+
+.ce-popover__item-icon svg {
+  width: 100%;
+  height: 100%;
+  max-width: 12px;
+  max-height: 12px;
+}
+
+.ce-inline-tool .material-symbols-outlined {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.kubik-wysiwyg-inline-link-panel {
+  position: fixed;
+  z-index: 10000;
+  top: 0;
+  left: 0;
+  width: min(42rem, calc(100vw - 2rem));
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+
+  .kubik-wysiwyg-inline-link-panel__inner {
+    background-color: var(--kubik-repeater-bg, var(--kubik-interface-color-grey-100, #f3f4f6));
+    border: 1px solid var(--kubik-repeater-border, var(--kubik-interface-color-grey-200, #e5e7eb));
+    border-radius: var(--kubik-repeater-radius, 3px);
+    box-sizing: border-box;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    box-shadow: 0 8px 24px rgb(0 0 0 / 12%);
+  }
+
+  .input {
+    float: none;
+    padding: 0 0 0.25rem;
+  }
+
+  .input > .label,
+  label.label {
+    @include kubik-form-label;
+    display: block;
+    float: none;
+    width: auto;
+    padding: 0;
+    margin: 0 0 0.25rem;
+  }
+
+  .input input,
+  .input textarea,
+  .input input.input {
+    @include kubik-form-input-base;
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid var(--kubik-repeater-border, var(--kubik-interface-color-grey-200, #e5e7eb));
+    background-color: #fff;
+  }
+
+  .input.select select,
+  .input.select select.input,
+  .input.select .input,
+  select.input {
+    @include kubik-form-input-select;
+    width: 100%;
+    box-sizing: border-box;
+    appearance: none;
+    border: 1px solid var(--kubik-repeater-border, var(--kubik-interface-color-grey-200, #e5e7eb));
+    border-right-width: 1rem;
+    border-right-color: transparent;
+    background-color: #fff;
+  }
+
+  .kubik-wysiwyg-inline-link-panel__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    padding-top: 0.25rem;
+    border-top: 1px solid var(--kubik-interface-color-grey-200, #e5e7eb);
+    margin-top: 0.25rem;
+  }
+
+  .kubik-wysiwyg-inline-link-panel__actions [data-kubik-link-unlink] {
+    margin-right: auto;
+  }
+
+  .kubik-wysiwyg-inline-link-panel__actions button {
+    @include kubik-button--secondary;
+    width: auto;
+    min-width: 5.5rem;
+    cursor: pointer;
+  }
+}

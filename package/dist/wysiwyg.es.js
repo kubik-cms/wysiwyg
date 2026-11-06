@@ -10659,9 +10659,55 @@ class KubikWidgetController extends Controller {
     const tab = event.params.tab;
     const field = event.params.field;
     const path = `${tab}.${field}`;
-    const links = get_1(this.dataValue, path) || [];
-    this.dataValue = set_1({ ...this.dataValue }, path, [...links, {}]);
+    const links = [...get_1(this.dataValue, path) || []];
+    const limit = this.linksRepeaterMaxItems(tab, field);
+    if (limit && links.length >= limit)
+      return;
+    links.push({});
+    this.dataValue = set_1({ ...this.dataValue }, path, links);
     this.getNewWidget();
+  }
+  setNavigableLinkUiExpanded(tab, field, expanded) {
+    const tabData = Object.assign({}, this.dataValue[tab] || {});
+    const ui = Object.assign({}, tabData._ui || {});
+    ui[field] = Object.assign({}, ui[field] || {}, { expanded });
+    tabData._ui = ui;
+    this.dataValue = Object.assign({}, this.dataValue, { [tab]: tabData });
+  }
+  navigableLinkToggle(event) {
+    const { tab, expanded } = event.detail;
+    const field = event.currentTarget.dataset.kubikNavigableLinkFieldValue;
+    if (!tab || !field)
+      return;
+    this.setNavigableLinkUiExpanded(tab, field, expanded);
+  }
+  appendNavigableLink(event) {
+    const tab = event.params.tab;
+    const field = event.params.field;
+    if (!tab || !field)
+      return;
+    this.setNavigableLinkUiExpanded(tab, field, true);
+    this.getNewWidget();
+  }
+  clearNavigableLink(event) {
+    const tab = event.params.tab;
+    const field = event.params.field;
+    if (!tab || !field)
+      return;
+    const tabData = Object.assign({}, this.dataValue[tab] || {});
+    tabData[field] = {};
+    this.dataValue = Object.assign({}, this.dataValue, { [tab]: tabData });
+    this.setNavigableLinkUiExpanded(tab, field, false);
+    this.getNewWidget();
+  }
+  linksRepeaterMaxItems(tab, fieldName) {
+    var _a, _b, _c, _d, _e;
+    const tabs = ((_b = (_a = this.setupValue) == null ? void 0 : _a.config) == null ? void 0 : _b.tabs) || [];
+    const tabConfig = tabs.find((entry) => entry.name === tab);
+    const fieldConfig = (_c = tabConfig == null ? void 0 : tabConfig.fields) == null ? void 0 : _c.find((entry) => entry.name === fieldName);
+    const raw = (_e = (_d = fieldConfig == null ? void 0 : fieldConfig.max_items) != null ? _d : fieldConfig == null ? void 0 : fieldConfig.maxItems) != null ? _e : 0;
+    const limit = Number(raw);
+    return Number.isFinite(limit) && limit > 0 ? limit : null;
   }
   removeLinksRow(event) {
     const tab = event.params.tab;
@@ -11422,6 +11468,14 @@ function dataAttributesRepeater({ section } = {}) {
     field.section = section;
   return field;
 }
+function applyLinksRepeaterMaxItems(field, maxItems, max_items) {
+  const raw = max_items != null ? max_items : maxItems;
+  if (raw == null || raw === "")
+    return;
+  const limit = Number(raw);
+  if (Number.isFinite(limit) && limit > 0)
+    field.max_items = limit;
+}
 function linksRepeater({
   name = "links",
   label = "Links",
@@ -11429,11 +11483,22 @@ function linksRepeater({
   fields = ["text", "url", "target", "style"],
   styleOptions = [],
   hint,
-  preferNavigable = "auto"
+  preferNavigable = "auto",
+  maxItems,
+  max_items
 } = {}) {
   const useNavigable = preferNavigable === true || preferNavigable === "auto" && kubikNavigableWysiwygEnabled$1();
   if (!useNavigable) {
-    return linksKeyValueRepeater({ name, label, prefix, fields, styleOptions, hint });
+    return linksKeyValueRepeater({
+      name,
+      label,
+      prefix,
+      fields,
+      styleOptions,
+      hint,
+      maxItems,
+      max_items
+    });
   }
   const repeater = {
     name,
@@ -11449,6 +11514,7 @@ function linksRepeater({
       }
     };
   }
+  applyLinksRepeaterMaxItems(repeater, maxItems, max_items);
   return repeater;
 }
 function linksKeyValueRepeater({
@@ -11457,7 +11523,9 @@ function linksKeyValueRepeater({
   prefix = "link",
   fields = ["text", "url", "target", "style"],
   styleOptions = [],
-  hint
+  hint,
+  maxItems,
+  max_items
 } = {}) {
   return linksRepeater({
     name,
@@ -11466,7 +11534,9 @@ function linksKeyValueRepeater({
     fields,
     styleOptions,
     hint,
-    preferNavigable: "auto"
+    preferNavigable: "auto",
+    maxItems,
+    max_items
   });
 }
 function standardListingItemFields({
@@ -12113,7 +12183,7 @@ function navigableLinkPanelInnerHtml({ selectedText = "", filterOptions = [] } =
                   data-kubik-navigable-link-target="urlEdit" data-action="kubik-navigable-link#startUrlEdit">
             <span class="material-symbols-outlined" aria-hidden="true">edit</span>
           </button>
-          <button type="button" class="kubik-navigable-link__icon-btn kubik-navigable-link__icon-btn--cancel" title="Cancel" aria-label="Cancel URL edit" hidden
+          <button type="button" class="kubik-navigable-link__icon-btn" title="Cancel" aria-label="Cancel URL edit" hidden
                   data-kubik-navigable-link-target="urlCancel" data-action="kubik-navigable-link#cancelUrlEdit">
             <span class="material-symbols-outlined" aria-hidden="true">close</span>
           </button>

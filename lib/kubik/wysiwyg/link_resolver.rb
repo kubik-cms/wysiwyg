@@ -25,6 +25,7 @@ module Kubik
           target ||= nav[:target].presence
           rel ||= nav[:rel].presence
           text ||= nav[:text].presence
+          style = style.presence || nav[:style].presence
         end
 
         return nil if text.blank? && url.blank?
@@ -47,7 +48,15 @@ module Kubik
 
       def normalize_content_link(content, href_resolver: default_href_resolver)
         content = content.with_indifferent_access
+        link_rows = Array.wrap(content[:links]).reject(&:blank?)
+        if link_rows.any?
+          row = normalize_row(link_rows.first, href_resolver: href_resolver)
+          return row if row
+        end
+
         nav = parse_nav_ref(content[:nav_link])
+        style = content[:style].presence || content[:link_style].presence
+        style ||= nav&.dig(:style).presence
         if nav.present?
           row = normalize_row(
             {
@@ -55,6 +64,7 @@ module Kubik
               text: content[:link_text].presence || nav[:text],
               target: content[:target].presence || nav[:target],
               rel: content[:rel].presence || nav[:rel],
+              style: style,
             },
             href_resolver: href_resolver,
           )
@@ -67,7 +77,7 @@ module Kubik
         rel = content[:rel].presence
         return nil if text.blank? && url.blank?
 
-        { text: text, url: url, target: target, rel: rel }.compact
+        { text: text, url: url, target: target, rel: rel, style: style }.compact
       end
 
       def parse_nav_ref(raw)

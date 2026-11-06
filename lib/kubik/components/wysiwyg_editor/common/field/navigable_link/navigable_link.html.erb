@@ -1,17 +1,55 @@
-<div class="input kubik-navigable-input">
-  <label class="label"><%= @field_label %></label>
-  <%= render partial: "kubik/shared/navigable_link_editor", locals: {
-  field_name: @field_name,
-  current: @current,
-  summary_text: kubik_navigable_link_summary(@current),
-  ui_mode: kubik_navigable_ui_mode(@current),
-  include_text_target: @include_text_target,
-  target_options: target_options,
-  rel_options: rel_options,
-  filter_options_json: kubik_navigable_filter_options_json,
-  search_url: kubik_navigable_search_url,
-  link_status: @link_status,
-  field_hint: @field[:hint],
-  widget_sync: true,
-} %>
-</div>
+<% if nested_in_links_repeater? %>
+  <div class="input">
+    <%= render partial: "kubik/shared/navigable_link_editor", locals: navigable_link_editor_locals(hide_summary: true) %>
+  </div>
+<% else %>
+  <div class="input kubik-navigable-input--expandable">
+    <label class="label kubik-navigable-input__field-label"><%= @field_label %></label>
+    <% if @current.blank? && !navigable_link_expanded? %>
+      <div class="kubik-wysiwyg-repeated-item--add-new"
+           data-action="click->kubik-widget#appendNavigableLink"
+           data-kubik-widget-tab-param="<%= tab_name %>"
+           data-kubik-widget-field-param="<%= @field[:name] %>">
+        <%= add_link_label %>
+      </div>
+    <% else %>
+    <div class="kubik-navigable-input__tabs-container">
+      <div data-controller="kubik-repeater"
+           class="kubik-wysiwyg-repeated-item kubik-wysiwyg-repeated-item__compact kubik-navigable-input__item <%= "kubik-widget-expanded" if navigable_link_expanded? %>"
+           data-kubik-repeater-expanded-class="kubik-widget-expanded"
+           data-kubik-repeater-tab-value="<%= tab_name %>"
+           data-kubik-navigable-link-field-value="<%= @field[:name] %>"
+           data-kubik-repeater-index-value="0"
+           data-kubik-repeater-expanded-value="<%= navigable_link_expanded? %>"
+           data-action="kubik-repeater:toggle->kubik-widget#navigableLinkToggle">
+        <div class="kubik-wysiwyg-repeated-item-header">
+          <%= render Kubik::WysiwygEditor::Common::ExpandAction.new(0) %>
+          <div class="kubik-wysiwyg-repeated-item-header--summary"
+               data-kubik-repeater-target="header"
+               data-header-placeholder="1"
+               data-action="click->kubik-repeater#toggleItem">
+            <%= render partial: "kubik/shared/link_row_summary", locals: { text: navigable_link_header_summary } %>
+          </div>
+          <div class="kubik-wysiwyg-component--items-action">
+            <div class="kubik-wysiwyg-component--items-action kubik-wysiwyg-component--items-action--icon material-symbols-outlined kubik-repeater-delete-action"
+                 data-action="click->kubik-widget#clearNavigableLink"
+                 data-kubik-widget-tab-param="<%= tab_name %>"
+                 data-kubik-widget-field-param="<%= @field[:name] %>">close</div>
+          </div>
+          <%= render Kubik::WysiwygEditor::Common::Actions.new(0, 1, tab_name) %>
+        </div>
+
+        <div class="fields">
+          <div class="fields-container kubik-navigable-input__fields">
+            <%= render partial: "kubik/shared/navigable_link_editor", locals: navigable_link_editor_locals(hide_summary: true) %>
+          </div>
+        </div>
+      </div>
+    </div>
+    <% end %>
+
+    <% if @field[:hint].present? %>
+      <p class="inline-hints"><%= @field[:hint] %></p>
+    <% end %>
+  </div>
+<% end %>
